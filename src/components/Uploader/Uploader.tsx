@@ -7,7 +7,6 @@ interface UploaderProps {
 
 export function Uploader({ onUpload }: UploaderProps) {
   const [isDragging, setIsDragging] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
@@ -37,7 +36,6 @@ export function Uploader({ onUpload }: UploaderProps) {
     )
 
     if (files.length > 0) {
-      setUploadedFiles(prev => [...prev, ...files])
       onUpload?.(files)
     }
   }
@@ -46,7 +44,6 @@ export function Uploader({ onUpload }: UploaderProps) {
     const files = e.target.files ? Array.from(e.target.files) : []
 
     if (files.length > 0) {
-      setUploadedFiles(prev => [...prev, ...files])
       onUpload?.(files)
     }
   }
@@ -71,10 +68,6 @@ export function Uploader({ onUpload }: UploaderProps) {
 
     if (isDragging) {
       return `${baseClasses} border-violet-500 bg-gradient-to-br from-violet-50 to-violet-100 scale-[1.02] shadow-[0_25px_60px_rgba(139,92,246,0.25)] before:opacity-100`
-    }
-
-    if (uploadedFiles.length > 0) {
-      return `${baseClasses} border-emerald-500 bg-gradient-to-br from-green-50 to-green-100`
     }
 
     return `${baseClasses} border-gray-300 bg-gradient-to-br from-gray-50 to-gray-100`
@@ -135,9 +128,7 @@ export function Uploader({ onUpload }: UploaderProps) {
             bg-clip-text text-transparent
             md:text-2xl
           ">
-            {uploadedFiles.length > 0
-              ? `${uploadedFiles.length}장의 사진이 추가되었어요`
-              : '소중한 순간을 담아주세요'}
+            소중한 순간을 담아주세요
           </h2>
 
           <p className="text-lg text-gray-500 m-0 mb-8 leading-relaxed md:text-base">
@@ -146,57 +137,25 @@ export function Uploader({ onUpload }: UploaderProps) {
               : '사진을 드래그하거나 클릭해서 추가하세요'}
           </p>
 
-          {uploadedFiles.length === 0 && (
-            <button
-              className="
-                inline-flex items-center gap-3
-                py-4 px-10 text-lg font-semibold text-white
-                bg-gradient-to-br from-violet-500 to-indigo-500
-                border-none rounded-2xl cursor-pointer
-                transition-all duration-300
-                shadow-[0_10px_30px_rgba(139,92,246,0.3)]
-                hover:-translate-y-0.5 hover:shadow-[0_15px_40px_rgba(139,92,246,0.4)]
-                active:translate-y-0
-                md:py-3.5 md:px-8 md:text-base
-              "
-              type="button"
-            >
-              <span className="text-2xl animate-pulse">📸</span>
-              사진 추가하기
-            </button>
-          )}
+          <button
+            className="
+              inline-flex items-center gap-3
+              py-4 px-10 text-lg font-semibold text-white
+              bg-gradient-to-br from-violet-500 to-indigo-500
+              border-none rounded-2xl cursor-pointer
+              transition-all duration-300
+              shadow-[0_10px_30px_rgba(139,92,246,0.3)]
+              hover:-translate-y-0.5 hover:shadow-[0_15px_40px_rgba(139,92,246,0.4)]
+              active:translate-y-0
+              md:py-3.5 md:px-8 md:text-base
+            "
+            type="button"
+          >
+            <span className="text-2xl animate-pulse">📸</span>
+            사진 추가하기
+          </button>
         </div>
       </div>
-
-      {uploadedFiles.length > 0 && (
-        <div className="mt-12">
-          <h3 className="text-2xl font-semibold text-gray-800 m-0 mb-6">
-            업로드된 사진
-          </h3>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 md:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] md:gap-4">
-            {uploadedFiles.map((file, index) => (
-              <div
-                key={`${file.name}-${index}`}
-                className="
-                  bg-white rounded-2xl overflow-hidden
-                  shadow-[0_4px_20px_rgba(0,0,0,0.08)]
-                  transition-all duration-300
-                  hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]
-                "
-              >
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={file.name}
-                  className="w-full h-[200px] object-cover md:h-[150px]"
-                />
-                <p className="p-4 text-sm text-gray-500 m-0 whitespace-nowrap overflow-hidden text-ellipsis">
-                  {file.name}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

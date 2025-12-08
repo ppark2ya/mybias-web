@@ -1,14 +1,24 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import Uploader from "../components/Uploader";
+import Editor from "../components/Editor";
 
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
 export function Home() {
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+
   const handleUpload = (files: File[]) => {
-    console.log("Uploaded files:", files);
+    setUploadedFiles((prev) => [...prev, ...files]);
   };
+
+  const handleCloseEditor = () => {
+    setUploadedFiles([]);
+  };
+
+  const isEditing = uploadedFiles.length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 py-8 px-4 md:py-4 md:px-2">
@@ -22,7 +32,11 @@ export function Home() {
       </header>
 
       <main className="max-w-[1200px] mx-auto">
-        <Uploader onUpload={handleUpload} />
+        {isEditing ? (
+          <Editor files={uploadedFiles} onClose={handleCloseEditor} />
+        ) : (
+          <Uploader onUpload={handleUpload} />
+        )}
       </main>
     </div>
   );
