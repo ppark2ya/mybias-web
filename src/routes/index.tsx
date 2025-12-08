@@ -1,5 +1,10 @@
+import { createFileRoute } from "@tanstack/react-router";
 import Uploader from "../components/Uploader";
 import "./index.css";
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});
 
 export function Home() {
   const handleUpload = (files: File[]) => {
