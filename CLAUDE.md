@@ -17,6 +17,7 @@
 - **React DOM 19.2.0** - DOM rendering for React
 - **TypeScript 5.9.3** - Strict type checking enabled
 - **Vite 7.2.4** - Ultra-fast build tool with HMR (Hot Module Replacement)
+- **Tailwind CSS** - Utility-first CSS framework (all styling uses Tailwind classes)
 
 ### Development Tools
 - **ESLint** - Code linting with comprehensive React rules
@@ -243,10 +244,17 @@ Uses **Flat Config** format (modern ESLint 9.x style).
 
 ### Styling
 
-**Global Styles:** `src/index.css`
-**Component Styles:** `src/App.css`
-- CSS Modules not configured (can import regular CSS)
-- Consider CSS-in-JS libraries if needed
+**CSS Framework:** Tailwind CSS
+- All styles should be written using Tailwind CSS utility classes
+- Do NOT create separate CSS files for components
+- Global styles and Tailwind directives: `src/index.css`
+- Custom theme configuration: `tailwind.config.js`
+
+**Styling Guidelines:**
+- Use Tailwind utility classes directly in JSX
+- For complex/repeated styles, use template literals or helper functions
+- Responsive design: Use Tailwind breakpoints (e.g., `md:`, `lg:`)
+- Custom values: Use arbitrary values when needed (e.g., `w-[120px]`, `shadow-[0_10px_40px_rgba(0,0,0,0.3)]`)
 
 ## AI Assistant Guidelines
 
