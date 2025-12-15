@@ -432,13 +432,6 @@ export function Editor({ files, onClose }: EditorProps) {
               </div>
             )}
           </div>
-
-          {/* Image dimensions info */}
-          {currentImageState && (
-            <div className="mt-2 text-sm text-center text-gray-500">
-              {currentImageState.width} x {currentImageState.height} px
-            </div>
-          )}
         </div>
 
         {/* Thumbnails */}
