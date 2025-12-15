@@ -571,7 +571,7 @@ export function Editor({ files, onClose }: EditorProps) {
                       border-2 transition-all duration-200 cursor-pointer
                       ${
                         selectedIndex === index
-                          ? "border-violet-500 shadow-[0_0_0_2px_rgba(139,92,246,0.3)]"
+                          ? "border-fuchsia-500 shadow-[0_0_0_2px_rgba(217,70,239,0.3)]"
                           : "border-transparent hover:border-gray-300"
                       }
                     `}
@@ -605,7 +605,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
                   activeTool === "CROP"
-                    ? "bg-violet-500 text-white shadow-md"
+                    ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }
               `}
@@ -639,7 +639,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
                   activeTool === "BLUR"
-                    ? "bg-violet-500 text-white shadow-md"
+                    ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }
               `}
@@ -674,7 +674,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
                   activeTool === "RESIZE"
-                    ? "bg-violet-500 text-white shadow-md"
+                    ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }
               `}
@@ -733,7 +733,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
-                bg-emerald-500 text-white hover:bg-emerald-600
+                bg-gradient-to-r from-cyan-400 to-teal-400 text-white hover:from-cyan-500 hover:to-teal-500
               `}
               type="button"
               aria-label="Download"
@@ -773,7 +773,7 @@ export function Editor({ files, onClose }: EditorProps) {
                   <button
                     onClick={handleApplyCrop}
                     disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg  bg-violet-500 hover:bg-violet-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
                     type="button"
                   >
                     Apply Crop
@@ -802,7 +802,7 @@ export function Editor({ files, onClose }: EditorProps) {
                   <button
                     onClick={handleApplyBlur}
                     disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg  bg-violet-500 hover:bg-violet-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
                     type="button"
                   >
                     Apply Blur
@@ -856,7 +856,7 @@ export function Editor({ files, onClose }: EditorProps) {
                   <button
                     onClick={handleApplyResize}
                     disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg  bg-violet-500 hover:bg-violet-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
                     type="button"
                   >
                     Apply Resize
