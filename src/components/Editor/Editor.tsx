@@ -394,8 +394,8 @@ export function Editor({ files, onClose }: EditorProps) {
   };
 
   return (
-    <div className="w-full max-w-[1000px] mx-auto p-8 md:p-4">
-      <div className="relative bg-white rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
+    <div className="w-full max-w-[1000px] mx-auto p-2 sm:p-4 lg:p-8">
+      <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
         {/* Header with Close button */}
         <div className="absolute z-10 top-4 right-4">
           <button
@@ -436,7 +436,7 @@ export function Editor({ files, onClose }: EditorProps) {
         </div>
 
         {/* Main Preview Area - 9:20 aspect ratio for mobile wallpaper */}
-        <div className="p-8 pb-4 md:p-4 md:pb-2 flex justify-center">
+        <div className="p-2 pb-2 sm:p-4 sm:pb-2 lg:p-6 lg:pb-4 flex justify-center">
           <div
             ref={imageContainerRef}
             className="relative flex items-center justify-center overflow-hidden bg-gray-100 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto touch-none"
@@ -575,14 +575,15 @@ export function Editor({ files, onClose }: EditorProps) {
         {/* Toolbar */}
         <div className="border-t border-gray-200">
           {/* Tool Buttons */}
-          <div className="flex items-center justify-center gap-2 p-4 bg-white">
+          <div className="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 lg:p-4 bg-white">
             <button
               onClick={() =>
                 setActiveTool(activeTool === "CROP" ? null : "CROP")
               }
               disabled={isProcessing}
               className={`
-                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
@@ -595,8 +596,7 @@ export function Editor({ files, onClose }: EditorProps) {
               aria-label="Crop tool"
             >
               <svg
-                width="20"
-                height="20"
+                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -607,7 +607,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
                 <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
               </svg>
-              <span className="text-xs font-semibold">CROP</span>
+              <span className="text-[10px] sm:text-xs font-semibold">CROP</span>
             </button>
 
             <button
@@ -616,7 +616,8 @@ export function Editor({ files, onClose }: EditorProps) {
               }
               disabled={isProcessing}
               className={`
-                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
@@ -629,8 +630,7 @@ export function Editor({ files, onClose }: EditorProps) {
               aria-label="Blur tool"
             >
               <svg
-                width="20"
-                height="20"
+                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -642,7 +642,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 <circle cx="12" cy="12" r="7" opacity="0.5" />
                 <circle cx="12" cy="12" r="11" opacity="0.3" />
               </svg>
-              <span className="text-xs font-semibold">BLUR</span>
+              <span className="text-[10px] sm:text-xs font-semibold">BLUR</span>
             </button>
 
             <button
@@ -651,7 +651,8 @@ export function Editor({ files, onClose }: EditorProps) {
               }
               disabled={isProcessing}
               className={`
-                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
                 ${
@@ -664,8 +665,7 @@ export function Editor({ files, onClose }: EditorProps) {
               aria-label="Resize tool"
             >
               <svg
-                width="20"
-                height="20"
+                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -677,14 +677,15 @@ export function Editor({ files, onClose }: EditorProps) {
                 <polyline points="16 3 21 3 21 8" />
                 <line x1="14" y1="10" x2="21" y2="3" />
               </svg>
-              <span className="text-xs font-semibold">RESIZE</span>
+              <span className="text-[10px] sm:text-xs font-semibold">RESIZE</span>
             </button>
 
             <button
               onClick={handleUndo}
               disabled={isProcessing || !canUndo}
               className={`
-                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
                 bg-gray-100 text-gray-700 hover:bg-gray-200
@@ -693,8 +694,7 @@ export function Editor({ files, onClose }: EditorProps) {
               aria-label="Undo"
             >
               <svg
-                width="20"
-                height="20"
+                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -705,13 +705,13 @@ export function Editor({ files, onClose }: EditorProps) {
                 <polyline points="1 4 1 10 7 10" />
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
-              <span className="text-xs font-semibold">UNDO</span>
+              <span className="text-[10px] sm:text-xs font-semibold">UNDO</span>
             </button>
           </div>
 
           {/* Tool Settings Panel */}
           {activeTool && (
-            <div className="p-6 border-t border-gray-200 bg-gray-50 md:p-4">
+            <div className="p-3 sm:p-4 lg:p-6 border-t border-gray-200 bg-gray-50">
               {activeTool === "CROP" && (
                 <div className="flex flex-col items-center gap-4">
                   <p className="m-0 text-sm text-gray-600">
