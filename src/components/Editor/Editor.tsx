@@ -460,15 +460,15 @@ export function Editor({ files, onClose }: EditorProps) {
                 {/* Crop overlay */}
                 {activeTool === "CROP" && (
                   <div
-                    className="absolute border-2 cursor-move border-violet-500 bg-violet-500/20 touch-none"
+                    className="absolute border-2 cursor-move border-white bg-black/20 touch-none shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"
                     style={getCropOverlayStyle()}
                     onMouseDown={(e) => handleCropMouseDown(e, false)}
                     onTouchStart={(e) => handleCropTouchStart(e, false)}
                   >
-                    {/* Corner resize handles for better touch targets */}
+                    {/* Corner resize handles - L-shaped brackets */}
                     {/* Top-left */}
                     <div
-                      className="absolute top-0 left-0 w-6 h-6 -translate-x-1/2 -translate-y-1/2 bg-violet-500 rounded-full cursor-nw-resize md:w-8 md:h-8"
+                      className="absolute top-0 left-0 w-6 h-6 cursor-nw-resize md:w-8 md:h-8"
                       onMouseDown={(e) => {
                         e.stopPropagation();
                         handleCropMouseDown(e, true);
@@ -477,10 +477,13 @@ export function Editor({ files, onClose }: EditorProps) {
                         e.stopPropagation();
                         handleCropTouchStart(e, true);
                       }}
-                    />
+                    >
+                      <div className="absolute top-0 left-0 w-5 h-[3px] bg-white -translate-x-[2px] -translate-y-[2px]" />
+                      <div className="absolute top-0 left-0 w-[3px] h-5 bg-white -translate-x-[2px] -translate-y-[2px]" />
+                    </div>
                     {/* Top-right */}
                     <div
-                      className="absolute top-0 right-0 w-6 h-6 translate-x-1/2 -translate-y-1/2 bg-violet-500 rounded-full cursor-ne-resize md:w-8 md:h-8"
+                      className="absolute top-0 right-0 w-6 h-6 cursor-ne-resize md:w-8 md:h-8"
                       onMouseDown={(e) => {
                         e.stopPropagation();
                         handleCropMouseDown(e, true);
@@ -489,10 +492,13 @@ export function Editor({ files, onClose }: EditorProps) {
                         e.stopPropagation();
                         handleCropTouchStart(e, true);
                       }}
-                    />
+                    >
+                      <div className="absolute top-0 right-0 w-5 h-[3px] bg-white translate-x-[2px] -translate-y-[2px]" />
+                      <div className="absolute top-0 right-0 w-[3px] h-5 bg-white translate-x-[2px] -translate-y-[2px]" />
+                    </div>
                     {/* Bottom-left */}
                     <div
-                      className="absolute bottom-0 left-0 w-6 h-6 -translate-x-1/2 translate-y-1/2 bg-violet-500 rounded-full cursor-sw-resize md:w-8 md:h-8"
+                      className="absolute bottom-0 left-0 w-6 h-6 cursor-sw-resize md:w-8 md:h-8"
                       onMouseDown={(e) => {
                         e.stopPropagation();
                         handleCropMouseDown(e, true);
@@ -501,10 +507,13 @@ export function Editor({ files, onClose }: EditorProps) {
                         e.stopPropagation();
                         handleCropTouchStart(e, true);
                       }}
-                    />
+                    >
+                      <div className="absolute bottom-0 left-0 w-5 h-[3px] bg-white -translate-x-[2px] translate-y-[2px]" />
+                      <div className="absolute bottom-0 left-0 w-[3px] h-5 bg-white -translate-x-[2px] translate-y-[2px]" />
+                    </div>
                     {/* Bottom-right */}
                     <div
-                      className="absolute bottom-0 right-0 w-6 h-6 translate-x-1/2 translate-y-1/2 bg-violet-500 rounded-full cursor-se-resize md:w-8 md:h-8"
+                      className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize md:w-8 md:h-8"
                       onMouseDown={(e) => {
                         e.stopPropagation();
                         handleCropMouseDown(e, true);
@@ -513,7 +522,10 @@ export function Editor({ files, onClose }: EditorProps) {
                         e.stopPropagation();
                         handleCropTouchStart(e, true);
                       }}
-                    />
+                    >
+                      <div className="absolute bottom-0 right-0 w-5 h-[3px] bg-white translate-x-[2px] translate-y-[2px]" />
+                      <div className="absolute bottom-0 right-0 w-[3px] h-5 bg-white translate-x-[2px] translate-y-[2px]" />
+                    </div>
                   </div>
                 )}
               </>
