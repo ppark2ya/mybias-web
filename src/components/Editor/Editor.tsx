@@ -34,6 +34,7 @@ export function Editor({ files, onClose }: EditorProps) {
   const [isResizing, setIsResizing] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const imageContainerRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
 
   // Blur state
   const [blurRadius, setBlurRadius] = useState(5)
@@ -153,27 +154,25 @@ export function Editor({ files, onClose }: EditorProps) {
     if (!isDragging && !isResizing) return
     if (!imageContainerRef.current || !currentImageState) return
 
-    const containerRect = imageContainerRef.current.getBoundingClientRect()
+    const bounds = getDisplayedImageBounds()
     const deltaX = e.clientX - dragStart.x
     const deltaY = e.clientY - dragStart.y
 
-    // Calculate scale factor between displayed image and actual image
-    const displayedWidth = containerRect.width
-    const displayedHeight = containerRect.height
-    const scaleX = currentImageState.width / displayedWidth
-    const scaleY = currentImageState.height / displayedHeight
+    // Convert pixel deltas to image coordinates using the actual displayed scale
+    const deltaImageX = deltaX / bounds.scale
+    const deltaImageY = deltaY / bounds.scale
 
     if (isDragging) {
       setCropArea((prev) => ({
         ...prev,
-        x: Math.max(0, Math.min(currentImageState.width - prev.width, prev.x + deltaX * scaleX)),
-        y: Math.max(0, Math.min(currentImageState.height - prev.height, prev.y + deltaY * scaleY)),
+        x: Math.max(0, Math.min(currentImageState.width - prev.width, prev.x + deltaImageX)),
+        y: Math.max(0, Math.min(currentImageState.height - prev.height, prev.y + deltaImageY)),
       }))
     } else if (isResizing) {
       setCropArea((prev) => ({
         ...prev,
-        width: Math.max(50, Math.min(currentImageState.width - prev.x, prev.width + deltaX * scaleX)),
-        height: Math.max(50, Math.min(currentImageState.height - prev.y, prev.height + deltaY * scaleY)),
+        width: Math.max(50, Math.min(currentImageState.width - prev.x, prev.width + deltaImageX)),
+        height: Math.max(50, Math.min(currentImageState.height - prev.y, prev.height + deltaImageY)),
       }))
     }
 
@@ -190,7 +189,31 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true)
     try {
-      const croppedDataURL = await cropImage(currentImageState.dataURL, cropArea)
+      // Round crop area values to integers for precise pixel cropping
+      const normalizedCropArea = {
+        x: Math.round(cropArea.x),
+        y: Math.round(cropArea.y),
+        width: Math.round(cropArea.width),
+        height: Math.round(cropArea.height),
+      }
+
+      const bounds = getDisplayedImageBounds()
+
+      console.log('=== Applying Crop ===')
+      console.log('Image Natural Size (original):', currentImageState.width, 'x', currentImageState.height)
+      console.log('Image Displayed Size (on screen):', bounds.width, 'x', bounds.height)
+      console.log('Scale Factor:', bounds.scale)
+      console.log('Crop Area (image coords):', normalizedCropArea)
+      console.log('Display Bounds:', bounds)
+      console.log('Crop Area (screen coords):', {
+        left: normalizedCropArea.x * bounds.scale + bounds.offsetX,
+        top: normalizedCropArea.y * bounds.scale + bounds.offsetY,
+        width: normalizedCropArea.width * bounds.scale,
+        height: normalizedCropArea.height * bounds.scale,
+      })
+      console.log('Expected cropped image size:', normalizedCropArea.width, 'x', normalizedCropArea.height)
+
+      const croppedDataURL = await cropImage(currentImageState.dataURL, normalizedCropArea)
       await updateImageState(croppedDataURL)
     } catch (error) {
       console.error('Failed to crop image:', error)
@@ -247,19 +270,52 @@ export function Editor({ files, onClose }: EditorProps) {
     }
   }
 
+  // Calculate the actual displayed image size and position within the container (object-contain)
+  const getDisplayedImageBounds = () => {
+    if (!currentImageState || !imageContainerRef.current || !imageRef.current) {
+      return { width: 0, height: 0, offsetX: 0, offsetY: 0, scale: 1 }
+    }
+
+    // Get the actual rendered size of the image element
+    const imgElement = imageRef.current
+    const displayedWidth = imgElement.clientWidth
+    const displayedHeight = imgElement.clientHeight
+
+    // Get image natural (original) dimensions
+    const imageWidth = currentImageState.width
+    const imageHeight = currentImageState.height
+
+    // Get container dimensions to calculate offset
+    const containerRect = imageContainerRef.current.getBoundingClientRect()
+    const imgRect = imgElement.getBoundingClientRect()
+
+    // Calculate offset from container's top-left to image's top-left
+    const offsetX = imgRect.left - containerRect.left
+    const offsetY = imgRect.top - containerRect.top
+
+    // Calculate scale: displayed size / original size
+    const scale = displayedWidth / imageWidth
+
+    return {
+      width: displayedWidth,
+      height: displayedHeight,
+      offsetX,
+      offsetY,
+      scale,
+    }
+  }
+
   // Calculate crop overlay position for display
   const getCropOverlayStyle = () => {
     if (!currentImageState || !imageContainerRef.current) return {}
 
-    const containerRect = imageContainerRef.current.getBoundingClientRect()
-    const scaleX = containerRect.width / currentImageState.width
-    const scaleY = containerRect.height / currentImageState.height
+    const bounds = getDisplayedImageBounds()
 
     return {
-      left: cropArea.x * scaleX,
-      top: cropArea.y * scaleY,
-      width: cropArea.width * scaleX,
-      height: cropArea.height * scaleY,
+      left: cropArea.x * bounds.scale + bounds.offsetX,
+      top: cropArea.y * bounds.scale + bounds.offsetY,
+      width: cropArea.width * bounds.scale,
+      height: cropArea.height * bounds.scale,
     }
   }
 
@@ -313,6 +369,7 @@ export function Editor({ files, onClose }: EditorProps) {
             {currentImageState && (
               <>
                 <img
+                  ref={imageRef}
                   src={currentImageState.dataURL}
                   alt="Editing"
                   className="max-w-full max-h-full object-contain"
