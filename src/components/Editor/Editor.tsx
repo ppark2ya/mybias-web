@@ -8,7 +8,7 @@ import {
   type CropArea,
 } from '../../utils/imageEditor'
 
-type EditorTab = 'CROP' | 'BLUR' | 'RESIZE'
+type EditorTool = 'CROP' | 'BLUR' | 'RESIZE' | null
 
 interface EditorProps {
   files: File[]
@@ -22,7 +22,7 @@ interface ImageState {
 }
 
 export function Editor({ files, onClose }: EditorProps) {
-  const [activeTab, setActiveTab] = useState<EditorTab>('CROP')
+  const [activeTool, setActiveTool] = useState<EditorTool>(null)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [imageStates, setImageStates] = useState<Map<number, ImageState>>(new Map())
   const [history, setHistory] = useState<Map<number, string[]>>(new Map())
@@ -43,12 +43,6 @@ export function Editor({ files, onClose }: EditorProps) {
   const [resizeHeight, setResizeHeight] = useState(600)
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true)
   const [originalAspectRatio, setOriginalAspectRatio] = useState(1)
-
-  const tabs: { id: EditorTab; label: string }[] = [
-    { id: 'CROP', label: 'CROP' },
-    { id: 'BLUR', label: 'BLUR' },
-    { id: 'RESIZE', label: 'RESIZE' },
-  ]
 
   // Initialize image states from files
   useEffect(() => {
@@ -272,37 +266,8 @@ export function Editor({ files, onClose }: EditorProps) {
   return (
     <div className="w-full max-w-[1000px] mx-auto p-8 md:p-4">
       <div className="relative bg-white rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
-        {/* Header with Close and Undo buttons */}
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
-          {canUndo && (
-            <button
-              onClick={handleUndo}
-              disabled={isProcessing}
-              className="
-                w-10 h-10 flex items-center justify-center
-                bg-violet-500 hover:bg-violet-600 disabled:bg-gray-300
-                rounded-full cursor-pointer
-                transition-all duration-200
-                disabled:cursor-not-allowed
-              "
-              type="button"
-              aria-label="Undo"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-              </svg>
-            </button>
-          )}
+        {/* Header with Close button */}
+        <div className="absolute top-4 right-4 z-10">
           <button
             onClick={onClose}
             className="
@@ -355,7 +320,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 />
 
                 {/* Crop overlay */}
-                {activeTab === 'CROP' && (
+                {activeTool === 'CROP' && (
                   <div
                     className="absolute border-2 border-violet-500 bg-violet-500/20 cursor-move"
                     style={getCropOverlayStyle()}
@@ -423,139 +388,246 @@ export function Editor({ files, onClose }: EditorProps) {
 
         {/* Toolbar */}
         <div className="border-t border-gray-200">
-          <div className="flex">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  flex-1 py-4 px-6 text-sm font-semibold
-                  transition-all duration-200 cursor-pointer
-                  border-b-2
-                  ${activeTab === tab.id
-                    ? 'text-violet-600 border-violet-500 bg-violet-50'
-                    : 'text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50'
-                  }
-                `}
-                type="button"
+          {/* Tool Buttons */}
+          <div className="flex items-center justify-center gap-2 p-4 bg-white">
+            <button
+              onClick={() => setActiveTool(activeTool === 'CROP' ? null : 'CROP')}
+              disabled={isProcessing}
+              className={`
+                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                ${activeTool === 'CROP'
+                  ? 'bg-violet-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }
+              `}
+              type="button"
+              aria-label="Crop tool"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {tab.label}
-              </button>
-            ))}
+                <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
+                <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
+              </svg>
+              <span className="text-xs font-semibold">CROP</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTool(activeTool === 'BLUR' ? null : 'BLUR')}
+              disabled={isProcessing}
+              className={`
+                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                ${activeTool === 'BLUR'
+                  ? 'bg-violet-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }
+              `}
+              type="button"
+              aria-label="Blur tool"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <circle cx="12" cy="12" r="7" opacity="0.5" />
+                <circle cx="12" cy="12" r="11" opacity="0.3" />
+              </svg>
+              <span className="text-xs font-semibold">BLUR</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTool(activeTool === 'RESIZE' ? null : 'RESIZE')}
+              disabled={isProcessing}
+              className={`
+                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                ${activeTool === 'RESIZE'
+                  ? 'bg-violet-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }
+              `}
+              type="button"
+              aria-label="Resize tool"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 3 21 3 21 8" />
+                <line x1="14" y1="10" x2="21" y2="3" />
+              </svg>
+              <span className="text-xs font-semibold">RESIZE</span>
+            </button>
+
+            <button
+              onClick={handleUndo}
+              disabled={isProcessing || !canUndo}
+              className={`
+                flex flex-col items-center justify-center gap-1 px-6 py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                bg-gray-100 text-gray-700 hover:bg-gray-200
+              `}
+              type="button"
+              aria-label="Undo"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
+              <span className="text-xs font-semibold">UNDO</span>
+            </button>
           </div>
 
-          {/* Tool Panel */}
-          <div className="p-6 min-h-[120px] bg-gray-50 md:p-4">
-            {activeTab === 'CROP' && (
-              <div className="flex flex-col items-center gap-4">
-                <p className="text-sm text-gray-600 m-0">
-                  Drag the selection box to position, drag the corner to resize
-                </p>
-                <div className="flex gap-4 text-sm text-gray-500">
-                  <span>X: {Math.round(cropArea.x)}</span>
-                  <span>Y: {Math.round(cropArea.y)}</span>
-                  <span>W: {Math.round(cropArea.width)}</span>
-                  <span>H: {Math.round(cropArea.height)}</span>
-                </div>
-                <button
-                  onClick={handleApplyCrop}
-                  disabled={isProcessing}
-                  className="
-                    px-6 py-2 bg-violet-500 hover:bg-violet-600
-                    disabled:bg-gray-300 disabled:cursor-not-allowed
-                    text-white font-semibold rounded-lg
-                    transition-all duration-200
-                  "
-                  type="button"
-                >
-                  Apply Crop
-                </button>
-              </div>
-            )}
-
-            {activeTab === 'BLUR' && (
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-4 w-full max-w-md">
-                  <label className="text-sm text-gray-600 whitespace-nowrap">
-                    Blur Radius:
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    value={blurRadius}
-                    onChange={(e) => setBlurRadius(Number(e.target.value))}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-gray-500 w-8">{blurRadius}px</span>
-                </div>
-                <button
-                  onClick={handleApplyBlur}
-                  disabled={isProcessing}
-                  className="
-                    px-6 py-2 bg-violet-500 hover:bg-violet-600
-                    disabled:bg-gray-300 disabled:cursor-not-allowed
-                    text-white font-semibold rounded-lg
-                    transition-all duration-200
-                  "
-                  type="button"
-                >
-                  Apply Blur
-                </button>
-              </div>
-            )}
-
-            {activeTab === 'RESIZE' && (
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex flex-wrap items-center justify-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">Width:</label>
-                    <input
-                      type="number"
-                      value={resizeWidth}
-                      onChange={(e) => handleWidthChange(Number(e.target.value))}
-                      className="w-24 px-2 py-1 border border-gray-300 rounded text-center"
-                      min="1"
-                    />
-                    <span className="text-sm text-gray-500">px</span>
+          {/* Tool Settings Panel */}
+          {activeTool && (
+            <div className="p-6 border-t border-gray-200 bg-gray-50 md:p-4">
+              {activeTool === 'CROP' && (
+                <div className="flex flex-col items-center gap-4">
+                  <p className="text-sm text-gray-600 m-0">
+                    Drag the selection box to position, drag the corner to resize
+                  </p>
+                  <div className="flex gap-4 text-sm text-gray-500">
+                    <span>X: {Math.round(cropArea.x)}</span>
+                    <span>Y: {Math.round(cropArea.y)}</span>
+                    <span>W: {Math.round(cropArea.width)}</span>
+                    <span>H: {Math.round(cropArea.height)}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">Height:</label>
-                    <input
-                      type="number"
-                      value={resizeHeight}
-                      onChange={(e) => handleHeightChange(Number(e.target.value))}
-                      className="w-24 px-2 py-1 border border-gray-300 rounded text-center"
-                      min="1"
-                    />
-                    <span className="text-sm text-gray-500">px</span>
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={maintainAspectRatio}
-                      onChange={(e) => setMaintainAspectRatio(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm text-gray-600">Lock aspect ratio</span>
-                  </label>
+                  <button
+                    onClick={handleApplyCrop}
+                    disabled={isProcessing}
+                    className="
+                      px-6 py-2 bg-violet-500 hover:bg-violet-600
+                      disabled:bg-gray-300 disabled:cursor-not-allowed
+                      text-white font-semibold rounded-lg
+                      transition-all duration-200
+                    "
+                    type="button"
+                  >
+                    Apply Crop
+                  </button>
                 </div>
-                <button
-                  onClick={handleApplyResize}
-                  disabled={isProcessing}
-                  className="
-                    px-6 py-2 bg-violet-500 hover:bg-violet-600
-                    disabled:bg-gray-300 disabled:cursor-not-allowed
-                    text-white font-semibold rounded-lg
-                    transition-all duration-200
-                  "
-                  type="button"
-                >
-                  Apply Resize
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+
+              {activeTool === 'BLUR' && (
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-4 w-full max-w-md">
+                    <label className="text-sm text-gray-600 whitespace-nowrap">
+                      Blur Radius:
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="20"
+                      value={blurRadius}
+                      onChange={(e) => setBlurRadius(Number(e.target.value))}
+                      className="flex-1"
+                    />
+                    <span className="text-sm text-gray-500 w-8">{blurRadius}px</span>
+                  </div>
+                  <button
+                    onClick={handleApplyBlur}
+                    disabled={isProcessing}
+                    className="
+                      px-6 py-2 bg-violet-500 hover:bg-violet-600
+                      disabled:bg-gray-300 disabled:cursor-not-allowed
+                      text-white font-semibold rounded-lg
+                      transition-all duration-200
+                    "
+                    type="button"
+                  >
+                    Apply Blur
+                  </button>
+                </div>
+              )}
+
+              {activeTool === 'RESIZE' && (
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600">Width:</label>
+                      <input
+                        type="number"
+                        value={resizeWidth}
+                        onChange={(e) => handleWidthChange(Number(e.target.value))}
+                        className="w-24 px-2 py-1 border border-gray-300 rounded text-center"
+                        min="1"
+                      />
+                      <span className="text-sm text-gray-500">px</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600">Height:</label>
+                      <input
+                        type="number"
+                        value={resizeHeight}
+                        onChange={(e) => handleHeightChange(Number(e.target.value))}
+                        className="w-24 px-2 py-1 border border-gray-300 rounded text-center"
+                        min="1"
+                      />
+                      <span className="text-sm text-gray-500">px</span>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={maintainAspectRatio}
+                        onChange={(e) => setMaintainAspectRatio(e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-gray-600">Lock aspect ratio</span>
+                    </label>
+                  </div>
+                  <button
+                    onClick={handleApplyResize}
+                    disabled={isProcessing}
+                    className="
+                      px-6 py-2 bg-violet-500 hover:bg-violet-600
+                      disabled:bg-gray-300 disabled:cursor-not-allowed
+                      text-white font-semibold rounded-lg
+                      transition-all duration-200
+                    "
+                    type="button"
+                  >
+                    Apply Resize
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
