@@ -85,11 +85,12 @@ export function Editor({ files, onClose }: EditorProps) {
       setResizeWidth(currentState.width);
       setResizeHeight(currentState.height);
       setOriginalAspectRatio(currentState.width / currentState.height);
+      // Set crop area to cover entire image by default
       setCropArea({
         x: 0,
         y: 0,
-        width: Math.min(200, currentState.width),
-        height: Math.min(200, currentState.height),
+        width: currentState.width,
+        height: currentState.height,
       });
     }
   }, [selectedIndex, imageStates]);
@@ -148,7 +149,18 @@ export function Editor({ files, onClose }: EditorProps) {
     });
   };
 
-  // Crop handlers
+  // Helper to get client coordinates from mouse or touch event
+  const getEventCoordinates = (
+    e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent
+  ) => {
+    if ("touches" in e) {
+      const touch = e.touches[0] || e.changedTouches[0];
+      return { x: touch.clientX, y: touch.clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  };
+
+  // Crop handlers - Mouse events
   const handleCropMouseDown = (e: React.MouseEvent, isResize = false) => {
     e.preventDefault();
     if (isResize) {
@@ -156,16 +168,29 @@ export function Editor({ files, onClose }: EditorProps) {
     } else {
       setIsDragging(true);
     }
-    setDragStart({ x: e.clientX, y: e.clientY });
+    const coords = getEventCoordinates(e);
+    setDragStart(coords);
   };
 
-  const handleCropMouseMove = (e: React.MouseEvent) => {
+  // Crop handlers - Touch events
+  const handleCropTouchStart = (e: React.TouchEvent, isResize = false) => {
+    e.preventDefault();
+    if (isResize) {
+      setIsResizing(true);
+    } else {
+      setIsDragging(true);
+    }
+    const coords = getEventCoordinates(e);
+    setDragStart(coords);
+  };
+
+  const handleCropMove = (clientX: number, clientY: number) => {
     if (!isDragging && !isResizing) return;
     if (!imageContainerRef.current || !currentImageState) return;
 
     const bounds = getDisplayedImageBounds();
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
+    const deltaX = clientX - dragStart.x;
+    const deltaY = clientY - dragStart.y;
 
     // Convert pixel deltas to image coordinates using the actual displayed scale
     const deltaImageX = deltaX / bounds.scale;
@@ -197,10 +222,19 @@ export function Editor({ files, onClose }: EditorProps) {
       }));
     }
 
-    setDragStart({ x: e.clientX, y: e.clientY });
+    setDragStart({ x: clientX, y: clientY });
   };
 
-  const handleCropMouseUp = () => {
+  const handleCropMouseMove = (e: React.MouseEvent) => {
+    handleCropMove(e.clientX, e.clientY);
+  };
+
+  const handleCropTouchMove = (e: React.TouchEvent) => {
+    const coords = getEventCoordinates(e);
+    handleCropMove(coords.x, coords.y);
+  };
+
+  const handleCropEnd = () => {
     setIsDragging(false);
     setIsResizing(false);
   };
@@ -405,10 +439,13 @@ export function Editor({ files, onClose }: EditorProps) {
         <div className="p-8 pb-4 md:p-4 md:pb-2 flex justify-center">
           <div
             ref={imageContainerRef}
-            className="relative flex items-center justify-center overflow-hidden bg-gray-100 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto"
+            className="relative flex items-center justify-center overflow-hidden bg-gray-100 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto touch-none"
             onMouseMove={handleCropMouseMove}
-            onMouseUp={handleCropMouseUp}
-            onMouseLeave={handleCropMouseUp}
+            onMouseUp={handleCropEnd}
+            onMouseLeave={handleCropEnd}
+            onTouchMove={handleCropTouchMove}
+            onTouchEnd={handleCropEnd}
+            onTouchCancel={handleCropEnd}
           >
             {currentImageState && (
               <>
@@ -423,16 +460,58 @@ export function Editor({ files, onClose }: EditorProps) {
                 {/* Crop overlay */}
                 {activeTool === "CROP" && (
                   <div
-                    className="absolute border-2 cursor-move border-violet-500 bg-violet-500/20"
+                    className="absolute border-2 cursor-move border-violet-500 bg-violet-500/20 touch-none"
                     style={getCropOverlayStyle()}
                     onMouseDown={(e) => handleCropMouseDown(e, false)}
+                    onTouchStart={(e) => handleCropTouchStart(e, false)}
                   >
-                    {/* Resize handle */}
+                    {/* Corner resize handles for better touch targets */}
+                    {/* Top-left */}
                     <div
-                      className="absolute bottom-0 right-0 w-4 h-4 translate-x-1/2 translate-y-1/2 bg-violet-500 cursor-se-resize"
+                      className="absolute top-0 left-0 w-6 h-6 -translate-x-1/2 -translate-y-1/2 bg-violet-500 rounded-full cursor-nw-resize md:w-8 md:h-8"
                       onMouseDown={(e) => {
                         e.stopPropagation();
                         handleCropMouseDown(e, true);
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        handleCropTouchStart(e, true);
+                      }}
+                    />
+                    {/* Top-right */}
+                    <div
+                      className="absolute top-0 right-0 w-6 h-6 translate-x-1/2 -translate-y-1/2 bg-violet-500 rounded-full cursor-ne-resize md:w-8 md:h-8"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        handleCropMouseDown(e, true);
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        handleCropTouchStart(e, true);
+                      }}
+                    />
+                    {/* Bottom-left */}
+                    <div
+                      className="absolute bottom-0 left-0 w-6 h-6 -translate-x-1/2 translate-y-1/2 bg-violet-500 rounded-full cursor-sw-resize md:w-8 md:h-8"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        handleCropMouseDown(e, true);
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        handleCropTouchStart(e, true);
+                      }}
+                    />
+                    {/* Bottom-right */}
+                    <div
+                      className="absolute bottom-0 right-0 w-6 h-6 translate-x-1/2 translate-y-1/2 bg-violet-500 rounded-full cursor-se-resize md:w-8 md:h-8"
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        handleCropMouseDown(e, true);
+                      }}
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        handleCropTouchStart(e, true);
                       }}
                     />
                   </div>
