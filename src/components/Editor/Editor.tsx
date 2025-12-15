@@ -5,6 +5,7 @@ import {
   blurImage,
   resizeImage,
   getImageDimensions,
+  downloadImage,
   type CropArea,
 } from "../../utils/imageEditor";
 
@@ -340,6 +341,22 @@ export function Editor({ files, onClose }: EditorProps) {
       await updateImageState(resizedDataURL);
     } catch (error) {
       console.error("Failed to resize image:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Download handler
+  const handleDownload = async () => {
+    if (!currentImageState || isProcessing) return;
+
+    setIsProcessing(true);
+    try {
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `mybias-${timestamp}.png`;
+      await downloadImage(currentImageState.dataURL, filename);
+    } catch (error) {
+      console.error("Failed to download image:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -706,6 +723,35 @@ export function Editor({ files, onClose }: EditorProps) {
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
               <span className="text-[10px] sm:text-xs font-semibold">UNDO</span>
+            </button>
+
+            <button
+              onClick={handleDownload}
+              disabled={isProcessing || !currentImageState}
+              className={`
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                bg-emerald-500 text-white hover:bg-emerald-600
+              `}
+              type="button"
+              aria-label="Download"
+            >
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span className="text-[10px] sm:text-xs font-semibold">SAVE</span>
             </button>
           </div>
 
