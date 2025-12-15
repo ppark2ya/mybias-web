@@ -188,7 +188,28 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true)
     try {
-      const croppedDataURL = await cropImage(currentImageState.dataURL, cropArea)
+      // Round crop area values to integers for precise pixel cropping
+      const normalizedCropArea = {
+        x: Math.round(cropArea.x),
+        y: Math.round(cropArea.y),
+        width: Math.round(cropArea.width),
+        height: Math.round(cropArea.height),
+      }
+
+      const bounds = getDisplayedImageBounds()
+
+      console.log('=== Applying Crop ===')
+      console.log('Image Size:', currentImageState.width, 'x', currentImageState.height)
+      console.log('Crop Area (image coords):', normalizedCropArea)
+      console.log('Display Bounds:', bounds)
+      console.log('Crop Area (screen coords):', {
+        left: normalizedCropArea.x * bounds.scale + bounds.offsetX,
+        top: normalizedCropArea.y * bounds.scale + bounds.offsetY,
+        width: normalizedCropArea.width * bounds.scale,
+        height: normalizedCropArea.height * bounds.scale,
+      })
+
+      const croppedDataURL = await cropImage(currentImageState.dataURL, normalizedCropArea)
       await updateImageState(croppedDataURL)
     } catch (error) {
       console.error('Failed to crop image:', error)
