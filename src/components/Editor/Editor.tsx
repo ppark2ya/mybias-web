@@ -366,24 +366,38 @@ export function Editor({ files, onClose }: EditorProps) {
         <div className="absolute z-10 top-4 right-4">
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 transition-all duration-200 rounded-full cursor-pointer  bg-black/10 hover:bg-black/20 hover:rotate-90"
+            className="
+              group flex items-center gap-2 px-4 py-2
+              bg-white/90 backdrop-blur-sm
+              border border-gray-200
+              rounded-full cursor-pointer
+              shadow-lg shadow-black/5
+              transition-all duration-300 ease-out
+              hover:bg-gray-900 hover:border-gray-900
+              hover:shadow-xl hover:shadow-black/10
+              hover:scale-105
+              active:scale-95
+            "
             type="button"
             aria-label="Close editor"
           >
             <svg
-              width="20"
-              height="20"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-gray-700"
+              className="text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90"
             >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
+            <span className="text-sm font-medium text-gray-600 transition-colors duration-300 group-hover:text-white">
+              닫기
+            </span>
           </button>
         </div>
 
