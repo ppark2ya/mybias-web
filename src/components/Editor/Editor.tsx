@@ -153,27 +153,25 @@ export function Editor({ files, onClose }: EditorProps) {
     if (!isDragging && !isResizing) return
     if (!imageContainerRef.current || !currentImageState) return
 
-    const containerRect = imageContainerRef.current.getBoundingClientRect()
+    const bounds = getDisplayedImageBounds()
     const deltaX = e.clientX - dragStart.x
     const deltaY = e.clientY - dragStart.y
 
-    // Calculate scale factor between displayed image and actual image
-    const displayedWidth = containerRect.width
-    const displayedHeight = containerRect.height
-    const scaleX = currentImageState.width / displayedWidth
-    const scaleY = currentImageState.height / displayedHeight
+    // Convert pixel deltas to image coordinates using the actual displayed scale
+    const deltaImageX = deltaX / bounds.scale
+    const deltaImageY = deltaY / bounds.scale
 
     if (isDragging) {
       setCropArea((prev) => ({
         ...prev,
-        x: Math.max(0, Math.min(currentImageState.width - prev.width, prev.x + deltaX * scaleX)),
-        y: Math.max(0, Math.min(currentImageState.height - prev.height, prev.y + deltaY * scaleY)),
+        x: Math.max(0, Math.min(currentImageState.width - prev.width, prev.x + deltaImageX)),
+        y: Math.max(0, Math.min(currentImageState.height - prev.height, prev.y + deltaImageY)),
       }))
     } else if (isResizing) {
       setCropArea((prev) => ({
         ...prev,
-        width: Math.max(50, Math.min(currentImageState.width - prev.x, prev.width + deltaX * scaleX)),
-        height: Math.max(50, Math.min(currentImageState.height - prev.y, prev.height + deltaY * scaleY)),
+        width: Math.max(50, Math.min(currentImageState.width - prev.x, prev.width + deltaImageX)),
+        height: Math.max(50, Math.min(currentImageState.height - prev.y, prev.height + deltaImageY)),
       }))
     }
 
@@ -247,19 +245,62 @@ export function Editor({ files, onClose }: EditorProps) {
     }
   }
 
+  // Calculate the actual displayed image size and position within the container (object-contain)
+  const getDisplayedImageBounds = () => {
+    if (!currentImageState || !imageContainerRef.current) {
+      return { width: 0, height: 0, offsetX: 0, offsetY: 0, scale: 1 }
+    }
+
+    const containerRect = imageContainerRef.current.getBoundingClientRect()
+    const containerWidth = containerRect.width
+    const containerHeight = containerRect.height
+    const imageWidth = currentImageState.width
+    const imageHeight = currentImageState.height
+
+    // Calculate aspect ratios
+    const containerAspect = containerWidth / containerHeight
+    const imageAspect = imageWidth / imageHeight
+
+    let displayedWidth: number
+    let displayedHeight: number
+    let offsetX = 0
+    let offsetY = 0
+
+    // object-contain logic: fit image inside container while maintaining aspect ratio
+    if (imageAspect > containerAspect) {
+      // Image is wider than container - fit to width
+      displayedWidth = containerWidth
+      displayedHeight = containerWidth / imageAspect
+      offsetY = (containerHeight - displayedHeight) / 2
+    } else {
+      // Image is taller than container - fit to height
+      displayedHeight = containerHeight
+      displayedWidth = containerHeight * imageAspect
+      offsetX = (containerWidth - displayedWidth) / 2
+    }
+
+    const scale = displayedWidth / imageWidth
+
+    return {
+      width: displayedWidth,
+      height: displayedHeight,
+      offsetX,
+      offsetY,
+      scale,
+    }
+  }
+
   // Calculate crop overlay position for display
   const getCropOverlayStyle = () => {
     if (!currentImageState || !imageContainerRef.current) return {}
 
-    const containerRect = imageContainerRef.current.getBoundingClientRect()
-    const scaleX = containerRect.width / currentImageState.width
-    const scaleY = containerRect.height / currentImageState.height
+    const bounds = getDisplayedImageBounds()
 
     return {
-      left: cropArea.x * scaleX,
-      top: cropArea.y * scaleY,
-      width: cropArea.width * scaleX,
-      height: cropArea.height * scaleY,
+      left: cropArea.x * bounds.scale + bounds.offsetX,
+      top: cropArea.y * bounds.scale + bounds.offsetY,
+      width: cropArea.width * bounds.scale,
+      height: cropArea.height * bounds.scale,
     }
   }
 
