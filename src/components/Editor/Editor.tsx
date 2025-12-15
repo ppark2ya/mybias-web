@@ -34,6 +34,7 @@ export function Editor({ files, onClose }: EditorProps) {
   const [isResizing, setIsResizing] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const imageContainerRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
 
   // Blur state
   const [blurRadius, setBlurRadius] = useState(5)
@@ -199,7 +200,9 @@ export function Editor({ files, onClose }: EditorProps) {
       const bounds = getDisplayedImageBounds()
 
       console.log('=== Applying Crop ===')
-      console.log('Image Size:', currentImageState.width, 'x', currentImageState.height)
+      console.log('Image Natural Size (original):', currentImageState.width, 'x', currentImageState.height)
+      console.log('Image Displayed Size (on screen):', bounds.width, 'x', bounds.height)
+      console.log('Scale Factor:', bounds.scale)
       console.log('Crop Area (image coords):', normalizedCropArea)
       console.log('Display Bounds:', bounds)
       console.log('Crop Area (screen coords):', {
@@ -208,6 +211,7 @@ export function Editor({ files, onClose }: EditorProps) {
         width: normalizedCropArea.width * bounds.scale,
         height: normalizedCropArea.height * bounds.scale,
       })
+      console.log('Expected cropped image size:', normalizedCropArea.width, 'x', normalizedCropArea.height)
 
       const croppedDataURL = await cropImage(currentImageState.dataURL, normalizedCropArea)
       await updateImageState(croppedDataURL)
@@ -268,38 +272,28 @@ export function Editor({ files, onClose }: EditorProps) {
 
   // Calculate the actual displayed image size and position within the container (object-contain)
   const getDisplayedImageBounds = () => {
-    if (!currentImageState || !imageContainerRef.current) {
+    if (!currentImageState || !imageContainerRef.current || !imageRef.current) {
       return { width: 0, height: 0, offsetX: 0, offsetY: 0, scale: 1 }
     }
 
-    const containerRect = imageContainerRef.current.getBoundingClientRect()
-    const containerWidth = containerRect.width
-    const containerHeight = containerRect.height
+    // Get the actual rendered size of the image element
+    const imgElement = imageRef.current
+    const displayedWidth = imgElement.clientWidth
+    const displayedHeight = imgElement.clientHeight
+
+    // Get image natural (original) dimensions
     const imageWidth = currentImageState.width
     const imageHeight = currentImageState.height
 
-    // Calculate aspect ratios
-    const containerAspect = containerWidth / containerHeight
-    const imageAspect = imageWidth / imageHeight
+    // Get container dimensions to calculate offset
+    const containerRect = imageContainerRef.current.getBoundingClientRect()
+    const imgRect = imgElement.getBoundingClientRect()
 
-    let displayedWidth: number
-    let displayedHeight: number
-    let offsetX = 0
-    let offsetY = 0
+    // Calculate offset from container's top-left to image's top-left
+    const offsetX = imgRect.left - containerRect.left
+    const offsetY = imgRect.top - containerRect.top
 
-    // object-contain logic: fit image inside container while maintaining aspect ratio
-    if (imageAspect > containerAspect) {
-      // Image is wider than container - fit to width
-      displayedWidth = containerWidth
-      displayedHeight = containerWidth / imageAspect
-      offsetY = (containerHeight - displayedHeight) / 2
-    } else {
-      // Image is taller than container - fit to height
-      displayedHeight = containerHeight
-      displayedWidth = containerHeight * imageAspect
-      offsetX = (containerWidth - displayedWidth) / 2
-    }
-
+    // Calculate scale: displayed size / original size
     const scale = displayedWidth / imageWidth
 
     return {
@@ -375,6 +369,7 @@ export function Editor({ files, onClose }: EditorProps) {
             {currentImageState && (
               <>
                 <img
+                  ref={imageRef}
                   src={currentImageState.dataURL}
                   alt="Editing"
                   className="max-w-full max-h-full object-contain"
