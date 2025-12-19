@@ -514,10 +514,10 @@ export function Editor({ files, onClose }: EditorProps) {
         </div>
 
         {/* Main Preview Area - 9:20 aspect ratio for mobile wallpaper */}
-        <div className="p-2 pb-2 sm:p-4 sm:pb-2 lg:p-6 lg:pb-4 flex justify-center">
+        <div className="pt-12 sm:pt-14 lg:pt-16 px-2 pb-2 sm:px-4 lg:px-6 lg:pb-4 flex justify-center">
           <div
             ref={imageContainerRef}
-            className="relative flex items-center justify-center overflow-hidden bg-gray-100 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto touch-none"
+            className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto touch-none"
             onMouseMove={handleCropMouseMove}
             onMouseUp={handleCropEnd}
             onMouseLeave={handleCropEnd}
@@ -667,7 +667,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 ${
                   activeTool === "CROP"
                     ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100"
                 }
               `}
               type="button"
@@ -701,7 +701,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 ${
                   activeTool === "BLUR"
                     ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100"
                 }
               `}
               type="button"
@@ -736,7 +736,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 ${
                   activeTool === "RESIZE"
                     ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100"
                 }
               `}
               type="button"
@@ -766,7 +766,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
-                bg-gray-100 text-gray-700 hover:bg-gray-200
+                bg-slate-100 text-slate-600 hover:bg-slate-200
               `}
               type="button"
               aria-label="Undo"
