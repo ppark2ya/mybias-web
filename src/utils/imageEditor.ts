@@ -88,7 +88,7 @@ export async function cropImage(
 }
 
 /**
- * Apply blur effect to an image using StackBlur algorithm
+ * Apply blur effect to an image using CSS filter (GPU accelerated)
  */
 export async function blurImage(
   imageSrc: string,
@@ -102,61 +102,33 @@ export async function blurImage(
     throw new Error('Failed to get canvas context')
   }
 
-  canvas.width = img.width
-  canvas.height = img.height
+  // Add padding to prevent edge artifacts from blur
+  const padding = options.radius * 2
+  canvas.width = img.width + padding * 2
+  canvas.height = img.height + padding * 2
 
-  ctx.drawImage(img, 0, 0)
-
-  // Apply CSS filter for blur
+  // Apply blur filter (GPU accelerated)
   ctx.filter = `blur(${options.radius}px)`
-  ctx.drawImage(canvas, 0, 0)
-  ctx.filter = 'none'
+  ctx.drawImage(img, padding, padding)
 
-  // Alternative: Manual box blur for better compatibility
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-  const blurredData = applyBoxBlur(imageData, options.radius)
-  ctx.putImageData(blurredData, 0, 0)
+  // Create output canvas with original dimensions (crop out padding)
+  const outputCanvas = document.createElement('canvas')
+  const outputCtx = outputCanvas.getContext('2d')
 
-  return canvas.toDataURL('image/png')
-}
-
-/**
- * Simple box blur implementation
- */
-function applyBoxBlur(imageData: ImageData, radius: number): ImageData {
-  const { data, width, height } = imageData
-  const output = new Uint8ClampedArray(data)
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      let r = 0, g = 0, b = 0, a = 0
-      let count = 0
-
-      for (let dy = -radius; dy <= radius; dy++) {
-        for (let dx = -radius; dx <= radius; dx++) {
-          const nx = x + dx
-          const ny = y + dy
-
-          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-            const idx = (ny * width + nx) * 4
-            r += data[idx]
-            g += data[idx + 1]
-            b += data[idx + 2]
-            a += data[idx + 3]
-            count++
-          }
-        }
-      }
-
-      const idx = (y * width + x) * 4
-      output[idx] = r / count
-      output[idx + 1] = g / count
-      output[idx + 2] = b / count
-      output[idx + 3] = a / count
-    }
+  if (!outputCtx) {
+    throw new Error('Failed to get output canvas context')
   }
 
-  return new ImageData(output, width, height)
+  outputCanvas.width = img.width
+  outputCanvas.height = img.height
+
+  outputCtx.drawImage(
+    canvas,
+    padding, padding, img.width, img.height,
+    0, 0, img.width, img.height
+  )
+
+  return outputCanvas.toDataURL('image/png')
 }
 
 /**

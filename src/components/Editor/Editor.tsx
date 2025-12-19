@@ -48,10 +48,13 @@ export function Editor({ files, onClose }: EditorProps) {
 
   // Blur state
   const [blurRadius, setBlurRadius] = useState(5);
+  const [initialBlurRadius] = useState(5);
 
   // Resize state
   const [resizeWidth, setResizeWidth] = useState(800);
   const [resizeHeight, setResizeHeight] = useState(600);
+  const [initialResizeWidth, setInitialResizeWidth] = useState(800);
+  const [initialResizeHeight, setInitialResizeHeight] = useState(600);
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true);
   const [originalAspectRatio, setOriginalAspectRatio] = useState(1);
 
@@ -85,6 +88,8 @@ export function Editor({ files, onClose }: EditorProps) {
     if (currentState) {
       setResizeWidth(currentState.width);
       setResizeHeight(currentState.height);
+      setInitialResizeWidth(currentState.width);
+      setInitialResizeHeight(currentState.height);
       setOriginalAspectRatio(currentState.width / currentState.height);
       // Set crop area to cover entire image by default
       setCropArea({
@@ -99,6 +104,16 @@ export function Editor({ files, onClose }: EditorProps) {
   const currentImageState = imageStates.get(selectedIndex);
   const currentHistory = history.get(selectedIndex) || [];
   const canUndo = currentHistory.length > 1;
+
+  // Check if tool values have changed from initial state
+  const isBlurChanged = blurRadius !== initialBlurRadius;
+  const isResizeChanged = resizeWidth !== initialResizeWidth || resizeHeight !== initialResizeHeight;
+  const isCropChanged = currentImageState ? (
+    cropArea.x !== 0 ||
+    cropArea.y !== 0 ||
+    cropArea.width !== currentImageState.width ||
+    cropArea.height !== currentImageState.height
+  ) : false;
 
   const updateImageState = async (newDataURL: string) => {
     const dimensions = await getImageDimensions(newDataURL);
@@ -413,12 +428,60 @@ export function Editor({ files, onClose }: EditorProps) {
   return (
     <div className="w-full max-w-[1000px] mx-auto p-2 sm:p-4 lg:p-8">
       <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
-        {/* Header with Close button */}
-        <div className="absolute z-10 top-4 right-4">
+        {/* Header with Close button and Apply button */}
+        <div className="absolute z-10 top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 flex items-center gap-1.5 sm:gap-2">
+          {activeTool && (
+            <button
+              onClick={
+                activeTool === "CROP" ? handleApplyCrop :
+                activeTool === "BLUR" ? handleApplyBlur :
+                activeTool === "RESIZE" ? handleApplyResize :
+                undefined
+              }
+              disabled={
+                isProcessing ||
+                (activeTool === "CROP" && !isCropChanged) ||
+                (activeTool === "BLUR" && !isBlurChanged) ||
+                (activeTool === "RESIZE" && !isResizeChanged)
+              }
+              className="
+                group flex items-center gap-1 sm:gap-1.5 lg:gap-2
+                px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
+                bg-gradient-to-r from-fuchsia-500 to-purple-500
+                border border-transparent
+                rounded-full cursor-pointer
+                shadow-lg shadow-fuchsia-500/20
+                transition-all duration-300 ease-out
+                hover:from-fuchsia-600 hover:to-purple-600
+                hover:shadow-xl hover:shadow-fuchsia-500/30
+                hover:scale-105
+                active:scale-95
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+              type="button"
+              aria-label="Apply changes"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-white"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span className="text-xs sm:text-sm font-medium text-white">
+                완료
+              </span>
+            </button>
+          )}
           <button
             onClick={onClose}
             className="
-              group flex items-center gap-2 px-4 py-2
+              group flex items-center gap-1 sm:gap-1.5 lg:gap-2
+              px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
               bg-white/90 backdrop-blur-sm
               border border-gray-200
               rounded-full cursor-pointer
@@ -433,20 +496,18 @@ export function Editor({ files, onClose }: EditorProps) {
             aria-label="Close editor"
           >
             <svg
-              width="16"
-              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90"
             >
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-            <span className="text-sm font-medium text-gray-600 transition-colors duration-300 group-hover:text-white">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 transition-colors duration-300 group-hover:text-white">
               닫기
             </span>
           </button>
@@ -756,110 +817,80 @@ export function Editor({ files, onClose }: EditorProps) {
           </div>
 
           {/* Tool Settings Panel */}
-          {activeTool && (
+          {activeTool && activeTool !== "CROP" && (
             <div className="p-3 sm:p-4 lg:p-6 border-t border-gray-200 bg-gray-50">
-              {activeTool === "CROP" && (
-                <div className="flex flex-col items-center gap-4">
-                  <p className="m-0 text-sm text-gray-600">
-                    Drag the selection box to position, drag the corner to
-                    resize
-                  </p>
-                  <div className="flex gap-4 text-sm text-gray-500">
-                    <span>X: {Math.round(cropArea.x)}</span>
-                    <span>Y: {Math.round(cropArea.y)}</span>
-                    <span>W: {Math.round(cropArea.width)}</span>
-                    <span>H: {Math.round(cropArea.height)}</span>
-                  </div>
-                  <button
-                    onClick={handleApplyCrop}
-                    disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
-                    type="button"
-                  >
-                    Apply Crop
-                  </button>
-                </div>
-              )}
-
               {activeTool === "BLUR" && (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex items-center w-full max-w-md gap-4">
-                    <label className="text-sm text-gray-600 whitespace-nowrap">
-                      Blur Radius:
-                    </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="20"
-                      value={blurRadius}
-                      onChange={(e) => setBlurRadius(Number(e.target.value))}
-                      className="flex-1"
-                    />
-                    <span className="w-8 text-sm text-gray-500">
-                      {blurRadius}px
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleApplyBlur}
-                    disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
-                    type="button"
-                  >
-                    Apply Blur
-                  </button>
+                <div className="flex items-center justify-center w-full max-w-md mx-auto gap-4">
+                  <label className="text-sm text-gray-600 whitespace-nowrap">
+                    Blur Radius:
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={blurRadius}
+                    onChange={(e) => setBlurRadius(Number(e.target.value))}
+                    className="flex-1"
+                  />
+                  <span className="w-8 text-sm text-gray-500">
+                    {blurRadius}px
+                  </span>
                 </div>
               )}
 
               {activeTool === "RESIZE" && (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex flex-wrap items-center justify-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Width:</label>
-                      <input
-                        type="number"
-                        value={resizeWidth}
-                        onChange={(e) =>
-                          handleWidthChange(Number(e.target.value))
-                        }
-                        className="w-24 px-2 py-1 text-center border border-gray-300 rounded"
-                        min="1"
-                      />
-                      <span className="text-sm text-gray-500">px</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Height:</label>
-                      <input
-                        type="number"
-                        value={resizeHeight}
-                        onChange={(e) =>
-                          handleHeightChange(Number(e.target.value))
-                        }
-                        className="w-24 px-2 py-1 text-center border border-gray-300 rounded"
-                        min="1"
-                      />
-                      <span className="text-sm text-gray-500">px</span>
-                    </div>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={maintainAspectRatio}
-                        onChange={(e) =>
-                          setMaintainAspectRatio(e.target.checked)
-                        }
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm text-gray-600">
-                        Lock aspect ratio
-                      </span>
-                    </label>
-                  </div>
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <input
+                    type="number"
+                    value={resizeWidth}
+                    onChange={(e) =>
+                      handleWidthChange(Number(e.target.value))
+                    }
+                    className="w-16 sm:w-20 px-2 py-1 text-center text-sm border border-gray-300 rounded"
+                    min="1"
+                  />
+                  <span className="text-gray-400 font-medium">×</span>
+                  <input
+                    type="number"
+                    value={resizeHeight}
+                    onChange={(e) =>
+                      handleHeightChange(Number(e.target.value))
+                    }
+                    className="w-16 sm:w-20 px-2 py-1 text-center text-sm border border-gray-300 rounded"
+                    min="1"
+                  />
                   <button
-                    onClick={handleApplyResize}
-                    disabled={isProcessing}
-                    className="px-6 py-2 font-semibold text-white transition-all duration-200 rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-500 hover:from-fuchsia-600 hover:to-purple-600 disabled:bg-gray-300 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed"
                     type="button"
+                    onClick={() => setMaintainAspectRatio(!maintainAspectRatio)}
+                    className={`p-1.5 rounded transition-colors ${
+                      maintainAspectRatio
+                        ? "text-fuchsia-500 bg-fuchsia-50"
+                        : "text-gray-400 bg-gray-100"
+                    }`}
+                    aria-label="Lock aspect ratio"
+                    title={maintainAspectRatio ? "비율 고정 해제" : "비율 고정"}
                   >
-                    Apply Resize
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      {maintainAspectRatio ? (
+                        <>
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </>
+                      ) : (
+                        <>
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                        </>
+                      )}
+                    </svg>
                   </button>
                 </div>
               )}
