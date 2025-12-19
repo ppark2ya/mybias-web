@@ -377,6 +377,91 @@ export function Editor({ files, onClose }: EditorProps) {
     }
   };
 
+  // AI Enhance handler with polling
+  const handleAIEnhance = async () => {
+    if (!currentImageState || isProcessing) return;
+
+    setIsProcessing(true);
+    try {
+      // 1. Start the prediction
+      const startResponse = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: currentImageState.dataURL,
+          scale: 2,
+          faceEnhance: true,
+        }),
+      });
+
+      if (!startResponse.ok) {
+        const errorData = await startResponse.json();
+        throw new Error(errorData.error || "Failed to start enhancement");
+      }
+
+      const startData = await startResponse.json();
+      const predictionId = startData.id;
+
+      if (!predictionId) {
+        throw new Error("No prediction ID received");
+      }
+
+      // 2. Poll for status
+      const pollForResult = (): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const maxAttempts = 120; // 2 minutes max
+          let attempts = 0;
+
+          const interval = setInterval(async () => {
+            attempts++;
+
+            try {
+              const statusResponse = await fetch(`/api/status/${predictionId}`);
+              const statusData = await statusResponse.json();
+
+              if (statusData.status === "succeeded") {
+                clearInterval(interval);
+                resolve(statusData.output);
+              } else if (statusData.status === "failed") {
+                clearInterval(interval);
+                reject(new Error(statusData.error || "Enhancement failed"));
+              } else if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                reject(new Error("Enhancement timed out"));
+              }
+              // If "starting" or "processing", continue polling
+            } catch (error) {
+              clearInterval(interval);
+              reject(error);
+            }
+          }, 1000);
+        });
+      };
+
+      const outputUrl = await pollForResult();
+
+      // 3. Fetch the enhanced image and convert to data URL
+      const imageResponse = await fetch(outputUrl);
+      const blob = await imageResponse.blob();
+      const reader = new FileReader();
+
+      const enhancedDataURL = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      await updateImageState(enhancedDataURL);
+    } catch (error) {
+      console.error("Failed to enhance image:", error);
+      alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // Calculate the actual displayed image size and position within the container (object-contain)
   const getDisplayedImageBounds = () => {
     if (!currentImageState || !imageContainerRef.current || !imageRef.current) {
@@ -428,8 +513,46 @@ export function Editor({ files, onClose }: EditorProps) {
   return (
     <div className="w-full max-w-[1000px] mx-auto p-2 sm:p-4 lg:p-8">
       <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
-        {/* Header with Close button and Apply button */}
+        {/* Header with Close button, Undo button, and Apply button */}
         <div className="absolute z-10 top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 flex items-center gap-1.5 sm:gap-2">
+          {/* Undo button */}
+          {canUndo && (
+            <button
+              onClick={handleUndo}
+              disabled={isProcessing}
+              className="
+                group flex items-center gap-1 sm:gap-1.5 lg:gap-2
+                px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
+                bg-white/90 backdrop-blur-sm
+                border border-gray-200
+                rounded-full cursor-pointer
+                shadow-lg shadow-black/5
+                transition-all duration-300 ease-out
+                hover:bg-slate-100
+                hover:scale-105
+                active:scale-95
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+              type="button"
+              aria-label="Undo"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-slate-600"
+              >
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
+              <span className="text-xs sm:text-sm font-medium text-slate-600">
+                되돌리기
+              </span>
+            </button>
+          )}
           {activeTool && (
             <button
               onClick={
@@ -759,17 +882,17 @@ export function Editor({ files, onClose }: EditorProps) {
             </button>
 
             <button
-              onClick={handleUndo}
-              disabled={isProcessing || !canUndo}
+              onClick={handleAIEnhance}
+              disabled={isProcessing || !currentImageState}
               className={`
                 flex flex-col items-center justify-center gap-0.5 sm:gap-1
                 px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
                 transition-all duration-200 cursor-pointer
                 disabled:cursor-not-allowed disabled:opacity-50
-                bg-slate-100 text-slate-600 hover:bg-slate-200
+                bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600
               `}
               type="button"
-              aria-label="Undo"
+              aria-label="AI Enhance"
             >
               <svg
                 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
@@ -780,10 +903,9 @@ export function Editor({ files, onClose }: EditorProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
               </svg>
-              <span className="text-[10px] sm:text-xs font-semibold">UNDO</span>
+              <span className="text-[10px] sm:text-xs font-semibold">AI</span>
             </button>
 
             <button
