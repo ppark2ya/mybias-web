@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "pages:dev": "wrangler pages dev .",
+    "pages:dev": "wrangler pages dev --proxy 5173 -- bun run dev",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -24,9 +24,11 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.5.0",
+    "replicate": "^1.4.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251219.0",
     "@eslint/js": "^9.39.1",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@tanstack/router-devtools": "^1.140.0",
