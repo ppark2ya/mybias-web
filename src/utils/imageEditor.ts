@@ -183,31 +183,13 @@ export async function getImageDimensions(
  * Download an image from a data URL
  * Works on desktop and mobile browsers (Chrome, Safari, Edge, etc.)
  */
-export async function downloadImage(
+export function downloadImage(
   dataURL: string,
   filename: string = 'edited-image.png'
-): Promise<void> {
+): void {
   const blob = dataURLToBlob(dataURL)
 
-  // Check if Web Share API is available and can share files (mainly for mobile)
-  if (navigator.share && navigator.canShare) {
-    const file = new File([blob], filename, { type: blob.type })
-    const shareData = { files: [file] }
-
-    if (navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData)
-        return
-      } catch (error) {
-        // User cancelled or share failed, fall back to download
-        if ((error as Error).name === 'AbortError') {
-          return // User cancelled, don't try fallback
-        }
-      }
-    }
-  }
-
-  // Fallback: Create download link
+  // Create download link (works on both desktop and mobile)
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url

@@ -49,26 +49,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Create prediction - don't wait, just return the id
-    const response = await fetch(
-      "https://api.replicate.com/v1/predictions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${apiToken}`,
-          "Content-Type": "application/json",
+    const response = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        version: REPLICATE_MODEL_VERSION,
+        input: {
+          image,
+          upscale,
+          codeformer_fidelity: fidelity,
+          background_enhance: backgroundEnhance,
+          face_upsample: faceUpsample,
         },
-        body: JSON.stringify({
-          version: REPLICATE_MODEL_VERSION,
-          input: {
-            image,
-            upscale,
-            codeformer_fidelity: fidelity,
-            background_enhance: backgroundEnhance,
-            face_upsample: faceUpsample,
-          },
-        }),
-      }
-    );
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();

@@ -107,13 +107,14 @@ export function Editor({ files, onClose }: EditorProps) {
 
   // Check if tool values have changed from initial state
   const isBlurChanged = blurRadius !== initialBlurRadius;
-  const isResizeChanged = resizeWidth !== initialResizeWidth || resizeHeight !== initialResizeHeight;
-  const isCropChanged = currentImageState ? (
-    cropArea.x !== 0 ||
-    cropArea.y !== 0 ||
-    cropArea.width !== currentImageState.width ||
-    cropArea.height !== currentImageState.height
-  ) : false;
+  const isResizeChanged =
+    resizeWidth !== initialResizeWidth || resizeHeight !== initialResizeHeight;
+  const isCropChanged = currentImageState
+    ? cropArea.x !== 0 ||
+      cropArea.y !== 0 ||
+      cropArea.width !== currentImageState.width ||
+      cropArea.height !== currentImageState.height
+    : false;
 
   const updateImageState = async (newDataURL: string) => {
     const dimensions = await getImageDimensions(newDataURL);
@@ -362,19 +363,12 @@ export function Editor({ files, onClose }: EditorProps) {
   };
 
   // Download handler
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!currentImageState || isProcessing) return;
 
-    setIsProcessing(true);
-    try {
-      const timestamp = new Date().toISOString().slice(0, 10);
-      const filename = `mybias-${timestamp}.png`;
-      await downloadImage(currentImageState.dataURL, filename);
-    } catch (error) {
-      console.error("Failed to download image:", error);
-    } finally {
-      setIsProcessing(false);
-    }
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const filename = `mybias-${timestamp}.png`;
+    downloadImage(currentImageState.dataURL, filename);
   };
 
   // AI Enhance handler with polling
@@ -550,7 +544,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 <polyline points="1 4 1 10 7 10" />
                 <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
               </svg>
-              <span className="text-xs sm:text-sm font-medium text-slate-600">
+              <span className="text-xs font-medium sm:text-sm text-slate-600">
                 되돌리기
               </span>
             </button>
@@ -558,10 +552,13 @@ export function Editor({ files, onClose }: EditorProps) {
           {activeTool && (
             <button
               onClick={
-                activeTool === "CROP" ? handleApplyCrop :
-                activeTool === "BLUR" ? handleApplyBlur :
-                activeTool === "RESIZE" ? handleApplyResize :
-                undefined
+                activeTool === "CROP"
+                  ? handleApplyCrop
+                  : activeTool === "BLUR"
+                    ? handleApplyBlur
+                    : activeTool === "RESIZE"
+                      ? handleApplyResize
+                      : undefined
               }
               disabled={
                 isProcessing ||
@@ -597,7 +594,7 @@ export function Editor({ files, onClose }: EditorProps) {
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              <span className="text-xs sm:text-sm font-medium text-white">
+              <span className="text-xs font-medium text-white sm:text-sm">
                 완료
               </span>
             </button>
@@ -632,14 +629,14 @@ export function Editor({ files, onClose }: EditorProps) {
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-            <span className="text-xs sm:text-sm font-medium text-gray-600 transition-colors duration-300 group-hover:text-white">
+            <span className="text-xs font-medium text-gray-600 transition-colors duration-300 sm:text-sm group-hover:text-white">
               닫기
             </span>
           </button>
         </div>
 
         {/* Main Preview Area - 9:20 aspect ratio for mobile wallpaper */}
-        <div className="pt-12 sm:pt-14 lg:pt-16 px-2 pb-2 sm:px-4 lg:px-6 lg:pb-4 flex justify-center">
+        <div className="flex justify-center px-2 pt-12 pb-2 sm:pt-14 lg:pt-16 sm:px-4 lg:px-6 lg:pb-4">
           <div
             ref={imageContainerRef}
             className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-slate-900 to-slate-800 rounded-2xl aspect-[9/20] max-h-[70vh] w-auto touch-none"
@@ -778,7 +775,7 @@ export function Editor({ files, onClose }: EditorProps) {
         {/* Toolbar */}
         <div className="border-t border-gray-200">
           {/* Tool Buttons */}
-          <div className="flex items-center justify-center gap-1 sm:gap-2 p-2 sm:p-3 lg:p-4 bg-white">
+          <div className="flex items-center justify-center gap-1 p-2 bg-white sm:gap-2 sm:p-3 lg:p-4">
             <button
               onClick={() =>
                 setActiveTool(activeTool === "CROP" ? null : "CROP")
@@ -880,7 +877,9 @@ export function Editor({ files, onClose }: EditorProps) {
                 <polyline points="16 3 21 3 21 8" />
                 <line x1="14" y1="10" x2="21" y2="3" />
               </svg>
-              <span className="text-[10px] sm:text-xs font-semibold">RESIZE</span>
+              <span className="text-[10px] sm:text-xs font-semibold">
+                RESIZE
+              </span>
             </button>
 
             <button
@@ -942,9 +941,9 @@ export function Editor({ files, onClose }: EditorProps) {
 
           {/* Tool Settings Panel */}
           {activeTool && activeTool !== "CROP" && (
-            <div className="p-3 sm:p-4 lg:p-6 border-t border-gray-200 bg-gray-50">
+            <div className="p-3 border-t border-gray-200 sm:p-4 lg:p-6 bg-gray-50">
               {activeTool === "BLUR" && (
-                <div className="flex items-center justify-center w-full max-w-md mx-auto gap-4">
+                <div className="flex items-center justify-center w-full max-w-md gap-4 mx-auto">
                   <label className="text-sm text-gray-600 whitespace-nowrap">
                     Blur Radius:
                   </label>
@@ -967,20 +966,16 @@ export function Editor({ files, onClose }: EditorProps) {
                   <input
                     type="number"
                     value={resizeWidth}
-                    onChange={(e) =>
-                      handleWidthChange(Number(e.target.value))
-                    }
-                    className="w-16 sm:w-20 px-2 py-1 text-center text-sm border border-gray-300 rounded"
+                    onChange={(e) => handleWidthChange(Number(e.target.value))}
+                    className="w-16 px-2 py-1 text-sm text-center border border-gray-300 rounded sm:w-20"
                     min="1"
                   />
-                  <span className="text-gray-400 font-medium">×</span>
+                  <span className="font-medium text-gray-400">×</span>
                   <input
                     type="number"
                     value={resizeHeight}
-                    onChange={(e) =>
-                      handleHeightChange(Number(e.target.value))
-                    }
-                    className="w-16 sm:w-20 px-2 py-1 text-center text-sm border border-gray-300 rounded"
+                    onChange={(e) => handleHeightChange(Number(e.target.value))}
+                    className="w-16 px-2 py-1 text-sm text-center border border-gray-300 rounded sm:w-20"
                     min="1"
                   />
                   <button
@@ -1005,12 +1000,26 @@ export function Editor({ files, onClose }: EditorProps) {
                     >
                       {maintainAspectRatio ? (
                         <>
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                          />
                           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                         </>
                       ) : (
                         <>
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                          />
                           <path d="M7 11V7a5 5 0 0 1 9.9-1" />
                         </>
                       )}
