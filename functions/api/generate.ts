@@ -4,12 +4,15 @@ interface Env {
 
 interface GenerateRequest {
   image: string;
-  scale?: number;
-  faceEnhance?: boolean;
+  upscale?: number;
+  fidelity?: number;
+  backgroundEnhance?: boolean;
+  faceUpsample?: boolean;
 }
 
+// CodeFormer - Face Restoration model (sczhou/codeformer)
 const REPLICATE_MODEL_VERSION =
-  "42fed1c4974146d4d2414e2be2c5277c7fcf05fcc3a73abf41610695738c1d7b";
+  "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,8 +22,13 @@ const corsHeaders = {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
-    const { image, scale = 2, faceEnhance = true }: GenerateRequest =
-      await context.request.json();
+    const {
+      image,
+      upscale = 2,
+      fidelity = 0.6,
+      backgroundEnhance = true,
+      faceUpsample = true,
+    }: GenerateRequest = await context.request.json();
 
     if (!image) {
       return new Response(JSON.stringify({ error: "Image is required" }), {
@@ -53,8 +61,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           version: REPLICATE_MODEL_VERSION,
           input: {
             image,
-            scale,
-            face_enhance: faceEnhance,
+            upscale,
+            codeformer_fidelity: fidelity,
+            background_enhance: backgroundEnhance,
+            face_upsample: faceUpsample,
           },
         }),
       }

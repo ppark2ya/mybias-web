@@ -383,7 +383,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
-      // 1. Start the prediction
+      // 1. Start the prediction with CodeFormer
       const startResponse = await fetch("/api/generate", {
         method: "POST",
         headers: {
@@ -391,8 +391,10 @@ export function Editor({ files, onClose }: EditorProps) {
         },
         body: JSON.stringify({
           image: currentImageState.dataURL,
-          scale: 2,
-          faceEnhance: true,
+          upscale: 2,
+          fidelity: 0.6, // 0.5~0.7 recommended for idol photos
+          backgroundEnhance: true,
+          faceUpsample: true,
         }),
       });
 
