@@ -436,9 +436,45 @@ export function Editor({ files, onClose }: EditorProps) {
 
       const outputUrl = await pollForResult();
 
-      // 3. Convert AI output URL directly to blob URL (no base64 conversion)
-      const enhancedBlobUrl = await urlToBlobUrl(outputUrl);
-      await updateImageState(enhancedBlobUrl);
+      // 3. Immediately show AI result using external URL (faster user feedback)
+      const dimensions = await getImageDimensions(outputUrl);
+      setImageStates((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, {
+          blobUrl: outputUrl, // Use external URL directly for instant display
+          width: dimensions.width,
+          height: dimensions.height,
+        });
+        return newMap;
+      });
+      setHistory((prev) => {
+        const newMap = new Map(prev);
+        const currentHistory = newMap.get(selectedIndex) || [];
+        newMap.set(selectedIndex, [...currentHistory, outputUrl]);
+        return newMap;
+      });
+
+      // 4. Background: Convert to blob URL for reliable download/editing
+      urlToBlobUrl(outputUrl).then((blobUrl) => {
+        setImageStates((prev) => {
+          const newMap = new Map(prev);
+          const current = newMap.get(selectedIndex);
+          if (current && current.blobUrl === outputUrl) {
+            newMap.set(selectedIndex, { ...current, blobUrl });
+          }
+          return newMap;
+        });
+        setHistory((prev) => {
+          const newMap = new Map(prev);
+          const currentHistory = newMap.get(selectedIndex) || [];
+          // Replace external URL with blob URL in history
+          const updatedHistory = currentHistory.map((url) =>
+            url === outputUrl ? blobUrl : url
+          );
+          newMap.set(selectedIndex, updatedHistory);
+          return newMap;
+        });
+      });
     } catch (error) {
       console.error("Failed to enhance image:", error);
       alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
