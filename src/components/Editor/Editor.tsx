@@ -436,14 +436,14 @@ export function Editor({ files, onClose }: EditorProps) {
 
       const outputUrl = await pollForResult();
 
-      // 3. Immediately show AI result using external URL (faster user feedback)
-      const dimensions = await getImageDimensions(outputUrl);
+      // 3. Immediately show AI result - use current dimensions, update later
+      const currentState = imageStates.get(selectedIndex);
       setImageStates((prev) => {
         const newMap = new Map(prev);
         newMap.set(selectedIndex, {
-          blobUrl: outputUrl, // Use external URL directly for instant display
-          width: dimensions.width,
-          height: dimensions.height,
+          blobUrl: outputUrl,
+          width: currentState?.width || 0,
+          height: currentState?.height || 0,
         });
         return newMap;
       });
@@ -454,20 +454,23 @@ export function Editor({ files, onClose }: EditorProps) {
         return newMap;
       });
 
-      // 4. Background: Convert to blob URL for reliable download/editing
-      urlToBlobUrl(outputUrl).then((blobUrl) => {
+      // 4. Background: Get dimensions + convert to blob URL
+      Promise.all([
+        getImageDimensions(outputUrl),
+        urlToBlobUrl(outputUrl),
+      ]).then(([dimensions, blobUrl]) => {
         setImageStates((prev) => {
           const newMap = new Map(prev);
-          const current = newMap.get(selectedIndex);
-          if (current && current.blobUrl === outputUrl) {
-            newMap.set(selectedIndex, { ...current, blobUrl });
-          }
+          newMap.set(selectedIndex, {
+            blobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+          });
           return newMap;
         });
         setHistory((prev) => {
           const newMap = new Map(prev);
           const currentHistory = newMap.get(selectedIndex) || [];
-          // Replace external URL with blob URL in history
           const updatedHistory = currentHistory.map((url) =>
             url === outputUrl ? blobUrl : url
           );
