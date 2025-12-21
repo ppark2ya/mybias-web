@@ -8,9 +8,21 @@ import "./i18n";
 
 import { queryClient } from "./lib/query-client";
 import { routeTree } from "./routeTree.gen";
+import { initGA, trackPageView } from "./utils/analytics";
+
+// Initialize Google Analytics
+initGA();
 
 // Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  defaultPreload: "intent",
+});
+
+// Track page views on route change
+router.subscribe("onResolved", ({ toLocation }) => {
+  trackPageView(toLocation.pathname);
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
