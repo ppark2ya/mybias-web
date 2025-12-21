@@ -22,6 +22,11 @@ import {
   trackAIEnhanceSuccess,
   trackAIEnhanceFail,
 } from "../../utils/analytics";
+import {
+  getRemainingAIUsage,
+  canUseAI,
+  incrementAIUsage,
+} from "../../utils/rateLimit";
 import { toast } from "sonner";
 
 type EditorTool = "CROP" | "BLUR" | "RESIZE" | null;
@@ -51,6 +56,11 @@ export function Editor({ files, onClose }: EditorProps) {
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState("");
+
+  // AI rate limit state
+  const [remainingAIUsage, setRemainingAIUsage] = useState(() =>
+    getRemainingAIUsage()
+  );
 
   // Crop state
   const [cropArea, setCropArea] = useState<CropArea>({
@@ -438,6 +448,14 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleAIEnhance = async () => {
     if (!currentImageState || isProcessing) return;
 
+    // Check rate limit
+    if (!canUseAI()) {
+      toast.error("오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!", {
+        className: "text-center",
+      });
+      return;
+    }
+
     trackAIEnhanceStart();
     setIsProcessing(true);
     setProcessingMessage("이미지 준비 중...");
@@ -530,6 +548,11 @@ export function Editor({ files, onClose }: EditorProps) {
       const outputUrl = await pollForResult();
       const durationMs = Date.now() - startTime;
       trackAIEnhanceSuccess(durationMs);
+
+      // Update rate limit usage on success
+      const remaining = incrementAIUsage();
+      setRemainingAIUsage(remaining);
+
       setProcessingMessage("이미지 다운로드 중...");
 
       // 3. Download and convert to blob URL (blocking for better UX)
@@ -1064,32 +1087,52 @@ export function Editor({ files, onClose }: EditorProps) {
               </span>
             </button>
 
-            <button
-              onClick={handleAIEnhance}
-              disabled={isProcessing || !currentImageState}
-              className={`
-                flex flex-col items-center justify-center gap-0.5 sm:gap-1
-                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
-                transition-all duration-200 cursor-pointer
-                disabled:cursor-not-allowed disabled:opacity-50
-                bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600
-              `}
-              type="button"
-              aria-label="AI Enhance"
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="relative">
+              <button
+                onClick={handleAIEnhance}
+                disabled={isProcessing || !currentImageState || remainingAIUsage === 0}
+                className={`
+                  flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                  px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
+                  transition-all duration-200 cursor-pointer
+                  disabled:cursor-not-allowed disabled:opacity-50
+                  bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600
+                `}
+                type="button"
+                aria-label="AI Enhance"
               >
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-              </svg>
-              <span className="text-[10px] sm:text-xs font-semibold">AI</span>
-            </button>
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                <span className="text-[10px] sm:text-xs font-semibold">AI</span>
+              </button>
+              {/* AI Usage Badge */}
+              <span
+                className={`
+                  absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2
+                  min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px]
+                  flex items-center justify-center
+                  text-[10px] sm:text-xs font-bold
+                  rounded-full
+                  border-2 border-white
+                  shadow-sm
+                  ${remainingAIUsage > 0
+                    ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-white"
+                    : "bg-gray-400 text-white"
+                  }
+                `}
+              >
+                {remainingAIUsage}
+              </span>
+            </div>
 
             <button
               onClick={handleDownload}

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
+import { trackFileUpload } from '../../utils/analytics'
 
 interface UploaderProps {
   onUpload?: (files: File[]) => void
@@ -36,6 +37,8 @@ export function Uploader({ onUpload }: UploaderProps) {
     )
 
     if (files.length > 0) {
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+      trackFileUpload(files.length, totalSize)
       onUpload?.(files)
     }
   }
@@ -44,6 +47,8 @@ export function Uploader({ onUpload }: UploaderProps) {
     const files = e.target.files ? Array.from(e.target.files) : []
 
     if (files.length > 0) {
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+      trackFileUpload(files.length, totalSize)
       onUpload?.(files)
     }
   }
