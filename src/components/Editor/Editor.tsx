@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  fileToDataURL,
+  fileToBlobUrl,
   cropImage,
   blurImage,
   resizeImage,
   getImageDimensions,
   downloadImage,
+  revokeBlobUrl,
+  urlToBlobUrl,
   type CropArea,
 } from "../../utils/imageEditor";
 
@@ -17,7 +19,7 @@ interface EditorProps {
 }
 
 interface ImageState {
-  dataURL: string;
+  blobUrl: string;
   width: number;
   height: number;
 }
@@ -65,14 +67,14 @@ export function Editor({ files, onClose }: EditorProps) {
       const newHistory = new Map<number, string[]>();
 
       for (let i = 0; i < files.length; i++) {
-        const dataURL = await fileToDataURL(files[i]);
-        const dimensions = await getImageDimensions(dataURL);
+        const blobUrl = fileToBlobUrl(files[i]);
+        const dimensions = await getImageDimensions(blobUrl);
         newImageStates.set(i, {
-          dataURL,
+          blobUrl,
           width: dimensions.width,
           height: dimensions.height,
         });
-        newHistory.set(i, [dataURL]);
+        newHistory.set(i, [blobUrl]);
       }
 
       setImageStates(newImageStates);
@@ -80,6 +82,17 @@ export function Editor({ files, onClose }: EditorProps) {
     };
 
     initializeImages();
+
+    // Cleanup blob URLs on unmount
+    return () => {
+      imageStates.forEach((state) => {
+        revokeBlobUrl(state.blobUrl);
+      });
+      history.forEach((urls) => {
+        urls.forEach((url) => revokeBlobUrl(url));
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   // Update resize dimensions when selecting a new image
@@ -116,13 +129,13 @@ export function Editor({ files, onClose }: EditorProps) {
       cropArea.height !== currentImageState.height
     : false;
 
-  const updateImageState = async (newDataURL: string) => {
-    const dimensions = await getImageDimensions(newDataURL);
+  const updateImageState = async (newBlobUrl: string) => {
+    const dimensions = await getImageDimensions(newBlobUrl);
 
     setImageStates((prev) => {
       const newMap = new Map(prev);
       newMap.set(selectedIndex, {
-        dataURL: newDataURL,
+        blobUrl: newBlobUrl,
         width: dimensions.width,
         height: dimensions.height,
       });
@@ -132,7 +145,7 @@ export function Editor({ files, onClose }: EditorProps) {
     setHistory((prev) => {
       const newMap = new Map(prev);
       const currentHistory = newMap.get(selectedIndex) || [];
-      newMap.set(selectedIndex, [...currentHistory, newDataURL]);
+      newMap.set(selectedIndex, [...currentHistory, newBlobUrl]);
       return newMap;
     });
   };
@@ -143,17 +156,24 @@ export function Editor({ files, onClose }: EditorProps) {
     setHistory((prev) => {
       const newMap = new Map(prev);
       const currentHistory = newMap.get(selectedIndex) || [];
+
+      // Revoke the current (last) blob URL being removed
+      const removedUrl = currentHistory[currentHistory.length - 1];
+      if (removedUrl) {
+        revokeBlobUrl(removedUrl);
+      }
+
       const newHistory = currentHistory.slice(0, -1);
       newMap.set(selectedIndex, newHistory);
 
       // Update image state to previous
-      const previousDataURL = newHistory[newHistory.length - 1];
-      if (previousDataURL) {
-        getImageDimensions(previousDataURL).then((dimensions) => {
+      const previousBlobUrl = newHistory[newHistory.length - 1];
+      if (previousBlobUrl) {
+        getImageDimensions(previousBlobUrl).then((dimensions) => {
           setImageStates((prevStates) => {
             const newStatesMap = new Map(prevStates);
             newStatesMap.set(selectedIndex, {
-              dataURL: previousDataURL,
+              blobUrl: previousBlobUrl,
               width: dimensions.width,
               height: dimensions.height,
             });
@@ -269,42 +289,11 @@ export function Editor({ files, onClose }: EditorProps) {
         height: Math.round(cropArea.height),
       };
 
-      const bounds = getDisplayedImageBounds();
-
-      console.log("=== Applying Crop ===");
-      console.log(
-        "Image Natural Size (original):",
-        currentImageState.width,
-        "x",
-        currentImageState.height
-      );
-      console.log(
-        "Image Displayed Size (on screen):",
-        bounds.width,
-        "x",
-        bounds.height
-      );
-      console.log("Scale Factor:", bounds.scale);
-      console.log("Crop Area (image coords):", normalizedCropArea);
-      console.log("Display Bounds:", bounds);
-      console.log("Crop Area (screen coords):", {
-        left: normalizedCropArea.x * bounds.scale + bounds.offsetX,
-        top: normalizedCropArea.y * bounds.scale + bounds.offsetY,
-        width: normalizedCropArea.width * bounds.scale,
-        height: normalizedCropArea.height * bounds.scale,
-      });
-      console.log(
-        "Expected cropped image size:",
-        normalizedCropArea.width,
-        "x",
-        normalizedCropArea.height
-      );
-
-      const croppedDataURL = await cropImage(
-        currentImageState.dataURL,
+      const croppedBlobUrl = await cropImage(
+        currentImageState.blobUrl,
         normalizedCropArea
       );
-      await updateImageState(croppedDataURL);
+      await updateImageState(croppedBlobUrl);
     } catch (error) {
       console.error("Failed to crop image:", error);
     } finally {
@@ -318,10 +307,10 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
-      const blurredDataURL = await blurImage(currentImageState.dataURL, {
+      const blurredBlobUrl = await blurImage(currentImageState.blobUrl, {
         radius: blurRadius,
       });
-      await updateImageState(blurredDataURL);
+      await updateImageState(blurredBlobUrl);
     } catch (error) {
       console.error("Failed to blur image:", error);
     } finally {
@@ -349,12 +338,12 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
-      const resizedDataURL = await resizeImage(currentImageState.dataURL, {
+      const resizedBlobUrl = await resizeImage(currentImageState.blobUrl, {
         width: resizeWidth,
         height: resizeHeight,
         maintainAspectRatio,
       });
-      await updateImageState(resizedDataURL);
+      await updateImageState(resizedBlobUrl);
     } catch (error) {
       console.error("Failed to resize image:", error);
     } finally {
@@ -368,7 +357,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `mybias-${timestamp}.png`;
-    downloadImage(currentImageState.dataURL, filename);
+    downloadImage(currentImageState.blobUrl, filename);
   };
 
   // AI Enhance handler with polling
@@ -377,6 +366,15 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
+      // Convert blob URL to base64 for API request
+      const response = await fetch(currentImageState.blobUrl);
+      const blob = await response.blob();
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+
       // 1. Start the prediction with CodeFormer
       const startResponse = await fetch("/api/generate", {
         method: "POST",
@@ -384,8 +382,8 @@ export function Editor({ files, onClose }: EditorProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          image: currentImageState.dataURL,
-          upscale: 2,
+          image: base64,
+          upscale: 1,
           fidelity: 0.6, // 0.5~0.7 recommended for idol photos
           backgroundEnhance: true,
           faceUpsample: true,
@@ -438,18 +436,9 @@ export function Editor({ files, onClose }: EditorProps) {
 
       const outputUrl = await pollForResult();
 
-      // 3. Fetch the enhanced image and convert to data URL
-      const imageResponse = await fetch(outputUrl);
-      const blob = await imageResponse.blob();
-      const reader = new FileReader();
-
-      const enhancedDataURL = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-
-      await updateImageState(enhancedDataURL);
+      // 3. Convert AI output URL directly to blob URL (no base64 conversion)
+      const enhancedBlobUrl = await urlToBlobUrl(outputUrl);
+      await updateImageState(enhancedBlobUrl);
     } catch (error) {
       console.error("Failed to enhance image:", error);
       alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
@@ -651,7 +640,7 @@ export function Editor({ files, onClose }: EditorProps) {
               <>
                 <img
                   ref={imageRef}
-                  src={currentImageState.dataURL}
+                  src={currentImageState.blobUrl}
                   alt="Editing"
                   className="object-contain max-w-full max-h-full"
                   draggable={false}
@@ -761,7 +750,7 @@ export function Editor({ files, onClose }: EditorProps) {
                     type="button"
                   >
                     <img
-                      src={state?.dataURL || URL.createObjectURL(file)}
+                      src={state?.blobUrl || URL.createObjectURL(file)}
                       alt={file.name}
                       className="object-cover w-full h-full"
                     />

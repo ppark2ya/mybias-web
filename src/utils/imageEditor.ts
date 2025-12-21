@@ -16,7 +16,7 @@ export interface BlurOptions {
 }
 
 /**
- * Load an image from a data URL
+ * Load an image from a URL (blob URL or data URL)
  */
 export function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -28,34 +28,37 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 /**
- * Convert a File to a data URL
+ * Convert a File to a blob URL
  */
-export function fileToDataURL(file: File): Promise<string> {
+export function fileToBlobUrl(file: File): string {
+  return URL.createObjectURL(file)
+}
+
+/**
+ * Convert a canvas to a blob URL
+ */
+export function canvasToBlobUrl(canvas: HTMLCanvasElement): Promise<string> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(URL.createObjectURL(blob))
+      } else {
+        reject(new Error('Failed to convert canvas to blob'))
+      }
+    }, 'image/png')
   })
 }
 
 /**
- * Convert a data URL to a Blob
+ * Convert a blob URL to a Blob
  */
-export function dataURLToBlob(dataURL: string): Blob {
-  const arr = dataURL.split(',')
-  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png'
-  const bstr = atob(arr[1])
-  let n = bstr.length
-  const u8arr = new Uint8Array(n)
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n)
-  }
-  return new Blob([u8arr], { type: mime })
+export async function blobUrlToBlob(blobUrl: string): Promise<Blob> {
+  const response = await fetch(blobUrl)
+  return response.blob()
 }
 
 /**
- * Crop an image
+ * Crop an image - returns blob URL
  */
 export async function cropImage(
   imageSrc: string,
@@ -84,11 +87,11 @@ export async function cropImage(
     cropArea.height
   )
 
-  return canvas.toDataURL('image/png')
+  return canvasToBlobUrl(canvas)
 }
 
 /**
- * Apply blur effect to an image using CSS filter (GPU accelerated)
+ * Apply blur effect to an image using CSS filter (GPU accelerated) - returns blob URL
  */
 export async function blurImage(
   imageSrc: string,
@@ -128,11 +131,11 @@ export async function blurImage(
     0, 0, img.width, img.height
   )
 
-  return outputCanvas.toDataURL('image/png')
+  return canvasToBlobUrl(outputCanvas)
 }
 
 /**
- * Resize an image
+ * Resize an image - returns blob URL
  */
 export async function resizeImage(
   imageSrc: string,
@@ -166,11 +169,11 @@ export async function resizeImage(
 
   ctx.drawImage(img, 0, 0, width, height)
 
-  return canvas.toDataURL('image/png')
+  return canvasToBlobUrl(canvas)
 }
 
 /**
- * Get image dimensions from a data URL
+ * Get image dimensions from a URL (blob URL or data URL)
  */
 export async function getImageDimensions(
   imageSrc: string
@@ -180,19 +183,16 @@ export async function getImageDimensions(
 }
 
 /**
- * Download an image from a data URL
+ * Download an image from a blob URL
  * Works on desktop and mobile browsers (Chrome, Safari, Edge, etc.)
  */
-export function downloadImage(
-  dataURL: string,
+export async function downloadImage(
+  blobUrl: string,
   filename: string = 'edited-image.png'
-): void {
-  const blob = dataURLToBlob(dataURL)
-
-  // Create download link (works on both desktop and mobile)
-  const url = URL.createObjectURL(blob)
+): Promise<void> {
+  // Create download link directly from blob URL
   const link = document.createElement('a')
-  link.href = url
+  link.href = blobUrl
   link.download = filename
 
   // For iOS Safari compatibility
@@ -202,9 +202,26 @@ export function downloadImage(
   // Trigger download
   link.click()
 
-  // Cleanup
+  // Cleanup link element (but not the blob URL - it may still be in use)
   setTimeout(() => {
     document.body.removeChild(link)
-    URL.revokeObjectURL(url)
   }, 100)
+}
+
+/**
+ * Revoke a blob URL to free memory
+ */
+export function revokeBlobUrl(blobUrl: string): void {
+  if (blobUrl.startsWith('blob:')) {
+    URL.revokeObjectURL(blobUrl)
+  }
+}
+
+/**
+ * Convert external image URL to blob URL (for AI-generated images)
+ */
+export async function urlToBlobUrl(url: string): Promise<string> {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  return URL.createObjectURL(blob)
 }
