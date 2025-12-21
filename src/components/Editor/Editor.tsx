@@ -37,6 +37,7 @@ export function Editor({ files, onClose }: EditorProps) {
     () => new Map()
   );
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState("");
 
   // Crop state
   const [cropArea, setCropArea] = useState<CropArea>({
@@ -404,6 +405,7 @@ export function Editor({ files, onClose }: EditorProps) {
     if (!currentImageState || isProcessing) return;
 
     setIsProcessing(true);
+    setProcessingMessage("이미지 준비 중...");
     try {
       // Convert blob URL to base64 for API request
       const response = await fetch(currentImageState.blobUrl);
@@ -413,6 +415,7 @@ export function Editor({ files, onClose }: EditorProps) {
         reader.onload = () => resolve(reader.result as string);
         reader.readAsDataURL(blob);
       });
+      setProcessingMessage("AI 서버에 요청 중...");
 
       // 1. Start the prediction with CodeFormer
       const startResponse = await fetch("/api/generate", {
@@ -441,14 +444,25 @@ export function Editor({ files, onClose }: EditorProps) {
         throw new Error("No prediction ID received");
       }
 
-      // 2. Poll for status
+      // 2. Poll for status with progress messages
+      setProcessingMessage("AI가 얼굴을 분석하고 있어요...");
       const pollForResult = (): Promise<string> => {
         return new Promise((resolve, reject) => {
           const maxAttempts = 120; // 2 minutes max
           let attempts = 0;
+          const messages = [
+            "AI가 얼굴을 분석하고 있어요...",
+            "피부 톤을 보정하고 있어요...",
+            "눈동자를 선명하게 하고 있어요...",
+            "디테일을 살리고 있어요...",
+            "거의 다 됐어요!",
+          ];
 
           const interval = setInterval(async () => {
             attempts++;
+            // Update message every 5 seconds
+            const messageIdx = Math.min(Math.floor(attempts / 5), messages.length - 1);
+            setProcessingMessage(messages[messageIdx]);
 
             try {
               const statusResponse = await fetch(`/api/status/${predictionId}`);
@@ -474,25 +488,29 @@ export function Editor({ files, onClose }: EditorProps) {
       };
 
       const outputUrl = await pollForResult();
+      setProcessingMessage("이미지 다운로드 중...");
 
-      // 3. Immediately show AI result - use current dimensions, update later
-      const currentState = imageStates.get(selectedIndex);
+      // 3. Download and convert to blob URL (blocking for better UX)
+      const [dimensions, blobUrl] = await Promise.all([
+        getImageDimensions(outputUrl),
+        urlToBlobUrl(outputUrl),
+      ]);
+
       const currentIdx = historyIndex.get(selectedIndex) ?? 0;
 
       setImageStates((prev) => {
         const newMap = new Map(prev);
         newMap.set(selectedIndex, {
-          blobUrl: outputUrl,
-          width: currentState?.width || 0,
-          height: currentState?.height || 0,
+          blobUrl,
+          width: dimensions.width,
+          height: dimensions.height,
         });
         return newMap;
       });
       setHistory((prev) => {
         const newMap = new Map(prev);
         const currentHistory = newMap.get(selectedIndex) || [];
-        // Truncate future history if not at end
-        const newHistory = [...currentHistory.slice(0, currentIdx + 1), outputUrl];
+        const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
         newMap.set(selectedIndex, newHistory);
         return newMap;
       });
@@ -501,37 +519,12 @@ export function Editor({ files, onClose }: EditorProps) {
         newMap.set(selectedIndex, currentIdx + 1);
         return newMap;
       });
-
-      // 4. Background: Get dimensions + convert to blob URL
-      const newIdx = currentIdx + 1;
-      Promise.all([
-        getImageDimensions(outputUrl),
-        urlToBlobUrl(outputUrl),
-      ]).then(([dimensions, blobUrl]) => {
-        setImageStates((prev) => {
-          const newMap = new Map(prev);
-          newMap.set(selectedIndex, {
-            blobUrl,
-            width: dimensions.width,
-            height: dimensions.height,
-          });
-          return newMap;
-        });
-        setHistory((prev) => {
-          const newMap = new Map(prev);
-          const currentHistory = newMap.get(selectedIndex) || [];
-          const updatedHistory = currentHistory.map((url, idx) =>
-            idx === newIdx && url === outputUrl ? blobUrl : url
-          );
-          newMap.set(selectedIndex, updatedHistory);
-          return newMap;
-        });
-      });
     } catch (error) {
       console.error("Failed to enhance image:", error);
       alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -842,8 +835,40 @@ export function Editor({ files, onClose }: EditorProps) {
             )}
 
             {isProcessing && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <div className="text-lg text-white">Processing...</div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black/60 backdrop-blur-sm">
+                {/* Animated sparkle loader */}
+                <div className="relative w-20 h-20">
+                  {/* Outer rotating ring */}
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-fuchsia-400 border-r-purple-400 animate-spin" />
+                  {/* Inner pulsing circle */}
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 animate-pulse" />
+                  {/* Center star icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-white animate-bounce"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                    </svg>
+                  </div>
+                </div>
+                {/* Message */}
+                <div className="text-center">
+                  <p className="text-lg font-medium text-white animate-pulse">
+                    {processingMessage || "처리 중..."}
+                  </p>
+                  <p className="mt-1 text-sm text-white/60">
+                    잠시만 기다려주세요
+                  </p>
+                </div>
+                {/* Floating particles */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute w-2 h-2 rounded-full bg-fuchsia-400/50 top-1/4 left-1/4 animate-ping" style={{ animationDuration: '2s' }} />
+                  <div className="absolute w-1.5 h-1.5 rounded-full bg-purple-400/50 top-1/3 right-1/3 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+                  <div className="absolute w-2 h-2 rounded-full bg-violet-400/50 bottom-1/3 left-1/3 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }} />
+                  <div className="absolute w-1 h-1 rounded-full bg-pink-400/50 bottom-1/4 right-1/4 animate-ping" style={{ animationDuration: '2.2s', animationDelay: '0.3s' }} />
+                </div>
               </div>
             )}
           </div>
