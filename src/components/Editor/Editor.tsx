@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import {
-  fileToDataURL,
+  fileToBlobUrl,
   cropImage,
   blurImage,
   resizeImage,
   getImageDimensions,
   downloadImage,
+  revokeBlobUrl,
+  urlToBlobUrl,
   type CropArea,
 } from "../../utils/imageEditor";
 
@@ -17,7 +19,7 @@ interface EditorProps {
 }
 
 interface ImageState {
-  dataURL: string;
+  blobUrl: string;
   width: number;
   height: number;
 }
@@ -31,7 +33,11 @@ export function Editor({ files, onClose }: EditorProps) {
   const [history, setHistory] = useState<Map<number, string[]>>(
     () => new Map()
   );
+  const [historyIndex, setHistoryIndex] = useState<Map<number, number>>(
+    () => new Map()
+  );
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingMessage, setProcessingMessage] = useState("");
 
   // Crop state
   const [cropArea, setCropArea] = useState<CropArea>({
@@ -65,21 +71,38 @@ export function Editor({ files, onClose }: EditorProps) {
       const newHistory = new Map<number, string[]>();
 
       for (let i = 0; i < files.length; i++) {
-        const dataURL = await fileToDataURL(files[i]);
-        const dimensions = await getImageDimensions(dataURL);
+        const blobUrl = fileToBlobUrl(files[i]);
+        const dimensions = await getImageDimensions(blobUrl);
         newImageStates.set(i, {
-          dataURL,
+          blobUrl,
           width: dimensions.width,
           height: dimensions.height,
         });
-        newHistory.set(i, [dataURL]);
+        newHistory.set(i, [blobUrl]);
       }
 
       setImageStates(newImageStates);
       setHistory(newHistory);
+      // Initialize history index to last item (index 0)
+      const newHistoryIndex = new Map<number, number>();
+      for (let i = 0; i < files.length; i++) {
+        newHistoryIndex.set(i, 0);
+      }
+      setHistoryIndex(newHistoryIndex);
     };
 
     initializeImages();
+
+    // Cleanup blob URLs on unmount
+    return () => {
+      imageStates.forEach((state) => {
+        revokeBlobUrl(state.blobUrl);
+      });
+      history.forEach((urls) => {
+        urls.forEach((url) => revokeBlobUrl(url));
+      });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   // Update resize dimensions when selecting a new image
@@ -103,7 +126,9 @@ export function Editor({ files, onClose }: EditorProps) {
 
   const currentImageState = imageStates.get(selectedIndex);
   const currentHistory = history.get(selectedIndex) || [];
-  const canUndo = currentHistory.length > 1;
+  const currentHistoryIdx = historyIndex.get(selectedIndex) ?? 0;
+  const canUndo = currentHistoryIdx > 0;
+  const canRedo = currentHistoryIdx < currentHistory.length - 1;
 
   // Check if tool values have changed from initial state
   const isBlurChanged = blurRadius !== initialBlurRadius;
@@ -116,13 +141,13 @@ export function Editor({ files, onClose }: EditorProps) {
       cropArea.height !== currentImageState.height
     : false;
 
-  const updateImageState = async (newDataURL: string) => {
-    const dimensions = await getImageDimensions(newDataURL);
+  const updateImageState = async (newBlobUrl: string) => {
+    const dimensions = await getImageDimensions(newBlobUrl);
 
     setImageStates((prev) => {
       const newMap = new Map(prev);
       newMap.set(selectedIndex, {
-        dataURL: newDataURL,
+        blobUrl: newBlobUrl,
         width: dimensions.width,
         height: dimensions.height,
       });
@@ -132,7 +157,17 @@ export function Editor({ files, onClose }: EditorProps) {
     setHistory((prev) => {
       const newMap = new Map(prev);
       const currentHistory = newMap.get(selectedIndex) || [];
-      newMap.set(selectedIndex, [...currentHistory, newDataURL]);
+      const currentIdx = historyIndex.get(selectedIndex) ?? 0;
+      // If we're not at the end, truncate future history
+      const newHistory = [...currentHistory.slice(0, currentIdx + 1), newBlobUrl];
+      newMap.set(selectedIndex, newHistory);
+      return newMap;
+    });
+
+    setHistoryIndex((prev) => {
+      const newMap = new Map(prev);
+      const currentIdx = prev.get(selectedIndex) ?? 0;
+      newMap.set(selectedIndex, currentIdx + 1);
       return newMap;
     });
   };
@@ -140,30 +175,55 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleUndo = () => {
     if (!canUndo) return;
 
-    setHistory((prev) => {
-      const newMap = new Map(prev);
-      const currentHistory = newMap.get(selectedIndex) || [];
-      const newHistory = currentHistory.slice(0, -1);
-      newMap.set(selectedIndex, newHistory);
+    const newIdx = currentHistoryIdx - 1;
+    const previousBlobUrl = currentHistory[newIdx];
 
-      // Update image state to previous
-      const previousDataURL = newHistory[newHistory.length - 1];
-      if (previousDataURL) {
-        getImageDimensions(previousDataURL).then((dimensions) => {
-          setImageStates((prevStates) => {
-            const newStatesMap = new Map(prevStates);
-            newStatesMap.set(selectedIndex, {
-              dataURL: previousDataURL,
-              width: dimensions.width,
-              height: dimensions.height,
-            });
-            return newStatesMap;
+    if (previousBlobUrl) {
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, newIdx);
+        return newMap;
+      });
+
+      getImageDimensions(previousBlobUrl).then((dimensions) => {
+        setImageStates((prevStates) => {
+          const newStatesMap = new Map(prevStates);
+          newStatesMap.set(selectedIndex, {
+            blobUrl: previousBlobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
           });
+          return newStatesMap;
         });
-      }
+      });
+    }
+  };
 
-      return newMap;
-    });
+  const handleRedo = () => {
+    if (!canRedo) return;
+
+    const newIdx = currentHistoryIdx + 1;
+    const nextBlobUrl = currentHistory[newIdx];
+
+    if (nextBlobUrl) {
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, newIdx);
+        return newMap;
+      });
+
+      getImageDimensions(nextBlobUrl).then((dimensions) => {
+        setImageStates((prevStates) => {
+          const newStatesMap = new Map(prevStates);
+          newStatesMap.set(selectedIndex, {
+            blobUrl: nextBlobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+          });
+          return newStatesMap;
+        });
+      });
+    }
   };
 
   // Helper to get client coordinates from mouse or touch event
@@ -269,42 +329,11 @@ export function Editor({ files, onClose }: EditorProps) {
         height: Math.round(cropArea.height),
       };
 
-      const bounds = getDisplayedImageBounds();
-
-      console.log("=== Applying Crop ===");
-      console.log(
-        "Image Natural Size (original):",
-        currentImageState.width,
-        "x",
-        currentImageState.height
-      );
-      console.log(
-        "Image Displayed Size (on screen):",
-        bounds.width,
-        "x",
-        bounds.height
-      );
-      console.log("Scale Factor:", bounds.scale);
-      console.log("Crop Area (image coords):", normalizedCropArea);
-      console.log("Display Bounds:", bounds);
-      console.log("Crop Area (screen coords):", {
-        left: normalizedCropArea.x * bounds.scale + bounds.offsetX,
-        top: normalizedCropArea.y * bounds.scale + bounds.offsetY,
-        width: normalizedCropArea.width * bounds.scale,
-        height: normalizedCropArea.height * bounds.scale,
-      });
-      console.log(
-        "Expected cropped image size:",
-        normalizedCropArea.width,
-        "x",
-        normalizedCropArea.height
-      );
-
-      const croppedDataURL = await cropImage(
-        currentImageState.dataURL,
+      const croppedBlobUrl = await cropImage(
+        currentImageState.blobUrl,
         normalizedCropArea
       );
-      await updateImageState(croppedDataURL);
+      await updateImageState(croppedBlobUrl);
     } catch (error) {
       console.error("Failed to crop image:", error);
     } finally {
@@ -318,10 +347,10 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
-      const blurredDataURL = await blurImage(currentImageState.dataURL, {
+      const blurredBlobUrl = await blurImage(currentImageState.blobUrl, {
         radius: blurRadius,
       });
-      await updateImageState(blurredDataURL);
+      await updateImageState(blurredBlobUrl);
     } catch (error) {
       console.error("Failed to blur image:", error);
     } finally {
@@ -349,12 +378,12 @@ export function Editor({ files, onClose }: EditorProps) {
 
     setIsProcessing(true);
     try {
-      const resizedDataURL = await resizeImage(currentImageState.dataURL, {
+      const resizedBlobUrl = await resizeImage(currentImageState.blobUrl, {
         width: resizeWidth,
         height: resizeHeight,
         maintainAspectRatio,
       });
-      await updateImageState(resizedDataURL);
+      await updateImageState(resizedBlobUrl);
     } catch (error) {
       console.error("Failed to resize image:", error);
     } finally {
@@ -368,7 +397,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `mybias-${timestamp}.png`;
-    downloadImage(currentImageState.dataURL, filename);
+    downloadImage(currentImageState.blobUrl, filename);
   };
 
   // AI Enhance handler with polling
@@ -376,7 +405,18 @@ export function Editor({ files, onClose }: EditorProps) {
     if (!currentImageState || isProcessing) return;
 
     setIsProcessing(true);
+    setProcessingMessage("이미지 준비 중...");
     try {
+      // Convert blob URL to base64 for API request
+      const response = await fetch(currentImageState.blobUrl);
+      const blob = await response.blob();
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+      setProcessingMessage("AI 서버에 요청 중...");
+
       // 1. Start the prediction with CodeFormer
       const startResponse = await fetch("/api/generate", {
         method: "POST",
@@ -384,8 +424,8 @@ export function Editor({ files, onClose }: EditorProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          image: currentImageState.dataURL,
-          upscale: 2,
+          image: base64,
+          upscale: 1,
           fidelity: 0.6, // 0.5~0.7 recommended for idol photos
           backgroundEnhance: true,
           faceUpsample: true,
@@ -404,14 +444,25 @@ export function Editor({ files, onClose }: EditorProps) {
         throw new Error("No prediction ID received");
       }
 
-      // 2. Poll for status
+      // 2. Poll for status with progress messages
+      setProcessingMessage("AI가 얼굴을 분석하고 있어요...");
       const pollForResult = (): Promise<string> => {
         return new Promise((resolve, reject) => {
           const maxAttempts = 120; // 2 minutes max
           let attempts = 0;
+          const messages = [
+            "AI가 얼굴을 분석하고 있어요...",
+            "피부 톤을 보정하고 있어요...",
+            "눈동자를 선명하게 하고 있어요...",
+            "디테일을 살리고 있어요...",
+            "거의 다 됐어요!",
+          ];
 
           const interval = setInterval(async () => {
             attempts++;
+            // Update message every 5 seconds
+            const messageIdx = Math.min(Math.floor(attempts / 5), messages.length - 1);
+            setProcessingMessage(messages[messageIdx]);
 
             try {
               const statusResponse = await fetch(`/api/status/${predictionId}`);
@@ -437,24 +488,43 @@ export function Editor({ files, onClose }: EditorProps) {
       };
 
       const outputUrl = await pollForResult();
+      setProcessingMessage("이미지 다운로드 중...");
 
-      // 3. Fetch the enhanced image and convert to data URL
-      const imageResponse = await fetch(outputUrl);
-      const blob = await imageResponse.blob();
-      const reader = new FileReader();
+      // 3. Download and convert to blob URL (blocking for better UX)
+      const [dimensions, blobUrl] = await Promise.all([
+        getImageDimensions(outputUrl),
+        urlToBlobUrl(outputUrl),
+      ]);
 
-      const enhancedDataURL = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+      const currentIdx = historyIndex.get(selectedIndex) ?? 0;
+
+      setImageStates((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, {
+          blobUrl,
+          width: dimensions.width,
+          height: dimensions.height,
+        });
+        return newMap;
       });
-
-      await updateImageState(enhancedDataURL);
+      setHistory((prev) => {
+        const newMap = new Map(prev);
+        const currentHistory = newMap.get(selectedIndex) || [];
+        const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
+        newMap.set(selectedIndex, newHistory);
+        return newMap;
+      });
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, currentIdx + 1);
+        return newMap;
+      });
     } catch (error) {
       console.error("Failed to enhance image:", error);
       alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsProcessing(false);
+      setProcessingMessage("");
     }
   };
 
@@ -511,43 +581,76 @@ export function Editor({ files, onClose }: EditorProps) {
       <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
         {/* Header with Close button, Undo button, and Apply button */}
         <div className="absolute z-10 top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 flex items-center gap-1.5 sm:gap-2">
-          {/* Undo button */}
-          {canUndo && (
-            <button
-              onClick={handleUndo}
-              disabled={isProcessing}
-              className="
-                group flex items-center gap-1 sm:gap-1.5 lg:gap-2
-                px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
-                bg-white/90 backdrop-blur-sm
-                border border-gray-200
-                rounded-full cursor-pointer
-                shadow-lg shadow-black/5
-                transition-all duration-300 ease-out
-                hover:bg-slate-100
-                hover:scale-105
-                active:scale-95
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-              type="button"
-              aria-label="Undo"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-slate-600"
+          {/* Undo/Redo buttons */}
+          {(canUndo || canRedo) && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleUndo}
+                disabled={isProcessing || !canUndo}
+                className="
+                  group flex items-center justify-center
+                  w-8 h-8 sm:w-9 sm:h-9
+                  bg-white/90 backdrop-blur-sm
+                  border border-gray-200
+                  rounded-full cursor-pointer
+                  shadow-lg shadow-black/5
+                  transition-all duration-300 ease-out
+                  hover:bg-slate-100
+                  hover:scale-105
+                  active:scale-95
+                  disabled:opacity-30 disabled:cursor-not-allowed
+                "
+                type="button"
+                aria-label="Undo"
+                title="되돌리기"
               >
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-              </svg>
-              <span className="text-xs font-medium sm:text-sm text-slate-600">
-                되돌리기
-              </span>
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 text-slate-600"
+                >
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                </svg>
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={isProcessing || !canRedo}
+                className="
+                  group flex items-center justify-center
+                  w-8 h-8 sm:w-9 sm:h-9
+                  bg-white/90 backdrop-blur-sm
+                  border border-gray-200
+                  rounded-full cursor-pointer
+                  shadow-lg shadow-black/5
+                  transition-all duration-300 ease-out
+                  hover:bg-slate-100
+                  hover:scale-105
+                  active:scale-95
+                  disabled:opacity-30 disabled:cursor-not-allowed
+                "
+                type="button"
+                aria-label="Redo"
+                title="다시 실행"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 text-slate-600"
+                >
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                </svg>
+              </button>
+            </div>
           )}
           {activeTool && (
             <button
@@ -651,7 +754,7 @@ export function Editor({ files, onClose }: EditorProps) {
               <>
                 <img
                   ref={imageRef}
-                  src={currentImageState.dataURL}
+                  src={currentImageState.blobUrl}
                   alt="Editing"
                   className="object-contain max-w-full max-h-full"
                   draggable={false}
@@ -732,8 +835,40 @@ export function Editor({ files, onClose }: EditorProps) {
             )}
 
             {isProcessing && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <div className="text-lg text-white">Processing...</div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black/60 backdrop-blur-sm">
+                {/* Animated sparkle loader */}
+                <div className="relative w-20 h-20">
+                  {/* Outer rotating ring */}
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-fuchsia-400 border-r-purple-400 animate-spin" />
+                  {/* Inner pulsing circle */}
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 animate-pulse" />
+                  {/* Center star icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-white animate-bounce"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                    </svg>
+                  </div>
+                </div>
+                {/* Message */}
+                <div className="text-center">
+                  <p className="text-lg font-medium text-white animate-pulse">
+                    {processingMessage || "처리 중..."}
+                  </p>
+                  <p className="mt-1 text-sm text-white/60">
+                    잠시만 기다려주세요
+                  </p>
+                </div>
+                {/* Floating particles */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute w-2 h-2 rounded-full bg-fuchsia-400/50 top-1/4 left-1/4 animate-ping" style={{ animationDuration: '2s' }} />
+                  <div className="absolute w-1.5 h-1.5 rounded-full bg-purple-400/50 top-1/3 right-1/3 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
+                  <div className="absolute w-2 h-2 rounded-full bg-violet-400/50 bottom-1/3 left-1/3 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }} />
+                  <div className="absolute w-1 h-1 rounded-full bg-pink-400/50 bottom-1/4 right-1/4 animate-ping" style={{ animationDuration: '2.2s', animationDelay: '0.3s' }} />
+                </div>
               </div>
             )}
           </div>
@@ -761,7 +896,7 @@ export function Editor({ files, onClose }: EditorProps) {
                     type="button"
                   >
                     <img
-                      src={state?.dataURL || URL.createObjectURL(file)}
+                      src={state?.blobUrl || URL.createObjectURL(file)}
                       alt={file.name}
                       className="object-cover w-full h-full"
                     />
