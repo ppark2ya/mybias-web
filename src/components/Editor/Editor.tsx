@@ -22,7 +22,27 @@ import {
   trackAIEnhanceSuccess,
   trackAIEnhanceFail,
 } from "../../utils/analytics";
+import {
+  getRemainingAIUsage,
+  canUseAI,
+  incrementAIUsage,
+} from "../../utils/rateLimit";
 import { toast } from "sonner";
+import {
+  Undo2,
+  Redo2,
+  Check,
+  X,
+  Crop,
+  Sparkles,
+  Maximize,
+  Download,
+  Share2,
+  Lock,
+  Unlock,
+  Star,
+} from "lucide-react";
+import ShareModal from "../ShareModal";
 
 type EditorTool = "CROP" | "BLUR" | "RESIZE" | null;
 
@@ -51,6 +71,14 @@ export function Editor({ files, onClose }: EditorProps) {
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingMessage, setProcessingMessage] = useState("");
+
+  // AI rate limit state
+  const [remainingAIUsage, setRemainingAIUsage] = useState(() =>
+    getRemainingAIUsage()
+  );
+
+  // Share modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Crop state
   const [cropArea, setCropArea] = useState<CropArea>({
@@ -438,6 +466,14 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleAIEnhance = async () => {
     if (!currentImageState || isProcessing) return;
 
+    // Check rate limit
+    if (!canUseAI()) {
+      toast.error("오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!", {
+        className: "text-center",
+      });
+      return;
+    }
+
     trackAIEnhanceStart();
     setIsProcessing(true);
     setProcessingMessage("이미지 준비 중...");
@@ -530,6 +566,11 @@ export function Editor({ files, onClose }: EditorProps) {
       const outputUrl = await pollForResult();
       const durationMs = Date.now() - startTime;
       trackAIEnhanceSuccess(durationMs);
+
+      // Update rate limit usage on success
+      const remaining = incrementAIUsage();
+      setRemainingAIUsage(remaining);
+
       setProcessingMessage("이미지 다운로드 중...");
 
       // 3. Download and convert to blob URL (blocking for better UX)
@@ -645,18 +686,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 aria-label="Undo"
                 title="되돌리기"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4 text-slate-600"
-                >
-                  <polyline points="1 4 1 10 7 10" />
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-                </svg>
+                <Undo2 className="w-4 h-4 text-slate-600" strokeWidth={2.5} />
               </button>
               <button
                 onClick={handleRedo}
@@ -666,18 +696,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 aria-label="Redo"
                 title="다시 실행"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4 text-slate-600"
-                >
-                  <polyline points="23 4 23 10 17 10" />
-                  <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
-                </svg>
+                <Redo2 className="w-4 h-4 text-slate-600" strokeWidth={2.5} />
               </button>
             </div>
           )}
@@ -699,8 +718,8 @@ export function Editor({ files, onClose }: EditorProps) {
                 (activeTool === "RESIZE" && !isResizeChanged)
               }
               className="
-                group flex items-center gap-1 sm:gap-1.5 lg:gap-2
-                px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
+                group flex items-center justify-center
+                w-8 h-8 sm:w-9 sm:h-9
                 bg-gradient-to-r from-fuchsia-500 to-purple-500
                 border border-transparent
                 rounded-full cursor-pointer
@@ -714,28 +733,16 @@ export function Editor({ files, onClose }: EditorProps) {
               "
               type="button"
               aria-label="Apply changes"
+              title="완료"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-white"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span className="text-xs font-medium text-white sm:text-sm">
-                완료
-              </span>
+              <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
             </button>
           )}
           <button
             onClick={onClose}
             className="
-              group flex items-center gap-1 sm:gap-1.5 lg:gap-2
-              px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
+              group flex items-center justify-center
+              w-8 h-8 sm:w-9 sm:h-9
               bg-white/90 backdrop-blur-sm
               border border-gray-200
               rounded-full cursor-pointer
@@ -748,22 +755,9 @@ export function Editor({ files, onClose }: EditorProps) {
             "
             type="button"
             aria-label="Close editor"
+            title="닫기"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-            <span className="text-xs font-medium text-gray-600 transition-colors duration-300 sm:text-sm group-hover:text-white">
-              닫기
-            </span>
+            <X className="w-4 h-4 text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90" strokeWidth={2.5} />
           </button>
         </div>
 
@@ -873,13 +867,7 @@ export function Editor({ files, onClose }: EditorProps) {
                   <div className="absolute rounded-full inset-3 bg-gradient-to-br from-fuchsia-500 to-purple-600 animate-pulse" />
                   {/* Center star icon */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-white animate-bounce"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-                    </svg>
+                    <Star className="w-8 h-8 text-white animate-bounce" fill="currentColor" />
                   </div>
                 </div>
                 {/* Message */}
@@ -977,18 +965,7 @@ export function Editor({ files, onClose }: EditorProps) {
               type="button"
               aria-label="Crop tool"
             >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15" />
-                <path d="M1 6.13L16 6a2 2 0 0 1 2 2v15" />
-              </svg>
+              <Crop className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-[10px] sm:text-xs font-semibold">CROP</span>
             </button>
 
@@ -1046,50 +1023,48 @@ export function Editor({ files, onClose }: EditorProps) {
               type="button"
               aria-label="Resize tool"
             >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 3 21 3 21 8" />
-                <line x1="14" y1="10" x2="21" y2="3" />
-              </svg>
+              <Maximize className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-[10px] sm:text-xs font-semibold">
                 RESIZE
               </span>
             </button>
 
-            <button
-              onClick={handleAIEnhance}
-              disabled={isProcessing || !currentImageState}
-              className={`
-                flex flex-col items-center justify-center gap-0.5 sm:gap-1
-                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
-                transition-all duration-200 cursor-pointer
-                disabled:cursor-not-allowed disabled:opacity-50
-                bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600
-              `}
-              type="button"
-              aria-label="AI Enhance"
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="relative">
+              <button
+                onClick={handleAIEnhance}
+                disabled={isProcessing || !currentImageState || remainingAIUsage === 0}
+                className={`
+                  flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                  px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
+                  transition-all duration-200 cursor-pointer
+                  disabled:cursor-not-allowed disabled:opacity-50
+                  bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600
+                `}
+                type="button"
+                aria-label="AI Enhance"
               >
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-              </svg>
-              <span className="text-[10px] sm:text-xs font-semibold">AI</span>
-            </button>
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                <span className="text-[10px] sm:text-xs font-semibold">AI</span>
+              </button>
+              {/* AI Usage Badge */}
+              <span
+                className={`
+                  absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2
+                  min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-[20px]
+                  flex items-center justify-center
+                  text-[10px] sm:text-xs font-bold
+                  rounded-full
+                  border-2 border-white
+                  shadow-sm
+                  ${remainingAIUsage > 0
+                    ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-white"
+                    : "bg-gray-400 text-white"
+                  }
+                `}
+              >
+                {remainingAIUsage}
+              </span>
+            </div>
 
             <button
               onClick={handleDownload}
@@ -1104,20 +1079,25 @@ export function Editor({ files, onClose }: EditorProps) {
               type="button"
               aria-label="Download"
             >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
+              <Download className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-[10px] sm:text-xs font-semibold">SAVE</span>
+            </button>
+
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              disabled={isProcessing || !currentImageState}
+              className={`
+                flex flex-col items-center justify-center gap-0.5 sm:gap-1
+                px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg
+                transition-all duration-200 cursor-pointer
+                disabled:cursor-not-allowed disabled:opacity-50
+                bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600
+              `}
+              type="button"
+              aria-label="Share"
+            >
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+              <span className="text-[10px] sm:text-xs font-semibold">SHARE</span>
             </button>
           </div>
 
@@ -1171,41 +1151,11 @@ export function Editor({ files, onClose }: EditorProps) {
                     aria-label="Lock aspect ratio"
                     title={maintainAspectRatio ? "비율 고정 해제" : "비율 고정"}
                   >
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {maintainAspectRatio ? (
-                        <>
-                          <rect
-                            x="3"
-                            y="11"
-                            width="18"
-                            height="11"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </>
-                      ) : (
-                        <>
-                          <rect
-                            x="3"
-                            y="11"
-                            width="18"
-                            height="11"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                        </>
-                      )}
-                    </svg>
+                    {maintainAspectRatio ? (
+                      <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
+                    ) : (
+                      <Unlock className="w-4 h-4 sm:w-5 sm:h-5" />
+                    )}
                   </button>
                 </div>
               )}
@@ -1213,6 +1163,13 @@ export function Editor({ files, onClose }: EditorProps) {
           )}
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        imageUrl={currentImageState?.blobUrl || ""}
+      />
     </div>
   );
 }

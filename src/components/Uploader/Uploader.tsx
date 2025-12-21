@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
+import { ImagePlus, Sparkles } from 'lucide-react'
+import { trackFileUpload } from '../../utils/analytics'
 
 interface UploaderProps {
   onUpload?: (files: File[]) => void
@@ -36,6 +38,8 @@ export function Uploader({ onUpload }: UploaderProps) {
     )
 
     if (files.length > 0) {
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+      trackFileUpload(files.length, totalSize)
       onUpload?.(files)
     }
   }
@@ -44,6 +48,8 @@ export function Uploader({ onUpload }: UploaderProps) {
     const files = e.target.files ? Array.from(e.target.files) : []
 
     if (files.length > 0) {
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+      trackFileUpload(files.length, totalSize)
       onUpload?.(files)
     }
   }
@@ -105,19 +111,7 @@ export function Uploader({ onUpload }: UploaderProps) {
             group-hover:shadow-[0_15px_50px_rgba(217,70,239,0.4)]
             ${isDragging ? 'scale-[1.15] -rotate-[5deg] animate-bounce' : ''}
           `}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
+            <ImagePlus className="w-10 h-10 sm:w-12 sm:h-12 lg:w-16 lg:h-16" strokeWidth={1.5} />
           </div>
 
           <h2 className="
@@ -149,7 +143,7 @@ export function Uploader({ onUpload }: UploaderProps) {
             "
             type="button"
           >
-            <span className="text-lg sm:text-xl lg:text-2xl">✨</span>
+            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
             사진 추가하기
           </button>
         </div>
