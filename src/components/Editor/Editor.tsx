@@ -10,6 +10,18 @@ import {
   urlToBlobUrl,
   type CropArea,
 } from "../../utils/imageEditor";
+import {
+  trackEditorOpen,
+  trackEditorClose,
+  trackToolSelect,
+  trackToolApply,
+  trackUndo,
+  trackRedo,
+  trackFileDownload,
+  trackAIEnhanceStart,
+  trackAIEnhanceSuccess,
+  trackAIEnhanceFail,
+} from "../../utils/analytics";
 
 type EditorTool = "CROP" | "BLUR" | "RESIZE" | null;
 
@@ -66,6 +78,9 @@ export function Editor({ files, onClose }: EditorProps) {
 
   // Initialize image states from files
   useEffect(() => {
+    // Track editor open
+    trackEditorOpen(files.length);
+
     const initializeImages = async () => {
       const newImageStates = new Map<number, ImageState>();
       const newHistory = new Map<number, string[]>();
@@ -95,6 +110,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     // Cleanup blob URLs on unmount
     return () => {
+      trackEditorClose();
       imageStates.forEach((state) => {
         revokeBlobUrl(state.blobUrl);
       });
@@ -159,7 +175,10 @@ export function Editor({ files, onClose }: EditorProps) {
       const currentHistory = newMap.get(selectedIndex) || [];
       const currentIdx = historyIndex.get(selectedIndex) ?? 0;
       // If we're not at the end, truncate future history
-      const newHistory = [...currentHistory.slice(0, currentIdx + 1), newBlobUrl];
+      const newHistory = [
+        ...currentHistory.slice(0, currentIdx + 1),
+        newBlobUrl,
+      ];
       newMap.set(selectedIndex, newHistory);
       return newMap;
     });
@@ -172,8 +191,16 @@ export function Editor({ files, onClose }: EditorProps) {
     });
   };
 
+  const handleActiveTool = (tool: EditorTool) => {
+    setActiveTool(tool);
+    if (tool) {
+      trackToolSelect(tool);
+    }
+  };
+
   const handleUndo = () => {
     if (!canUndo) return;
+    trackUndo();
 
     const newIdx = currentHistoryIdx - 1;
     const previousBlobUrl = currentHistory[newIdx];
@@ -201,6 +228,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
   const handleRedo = () => {
     if (!canRedo) return;
+    trackRedo();
 
     const newIdx = currentHistoryIdx + 1;
     const nextBlobUrl = currentHistory[newIdx];
@@ -318,6 +346,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
   const handleApplyCrop = async () => {
     if (!currentImageState || isProcessing) return;
+    trackToolApply("CROP");
 
     setIsProcessing(true);
     try {
@@ -344,6 +373,7 @@ export function Editor({ files, onClose }: EditorProps) {
   // Blur handler
   const handleApplyBlur = async () => {
     if (!currentImageState || isProcessing) return;
+    trackToolApply("BLUR");
 
     setIsProcessing(true);
     try {
@@ -375,6 +405,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
   const handleApplyResize = async () => {
     if (!currentImageState || isProcessing) return;
+    trackToolApply("RESIZE");
 
     setIsProcessing(true);
     try {
@@ -395,6 +426,8 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleDownload = () => {
     if (!currentImageState || isProcessing) return;
 
+    trackFileDownload();
+
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `mybias-${timestamp}.png`;
     downloadImage(currentImageState.blobUrl, filename);
@@ -404,9 +437,12 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleAIEnhance = async () => {
     if (!currentImageState || isProcessing) return;
 
+    trackAIEnhanceStart();
     setIsProcessing(true);
     setProcessingMessage("이미지 준비 중...");
+
     try {
+      const startTime = Date.now();
       // Convert blob URL to base64 for API request
       const response = await fetch(currentImageState.blobUrl);
       const blob = await response.blob();
@@ -461,7 +497,10 @@ export function Editor({ files, onClose }: EditorProps) {
           const interval = setInterval(async () => {
             attempts++;
             // Update message every 5 seconds
-            const messageIdx = Math.min(Math.floor(attempts / 5), messages.length - 1);
+            const messageIdx = Math.min(
+              Math.floor(attempts / 5),
+              messages.length - 1
+            );
             setProcessingMessage(messages[messageIdx]);
 
             try {
@@ -483,11 +522,13 @@ export function Editor({ files, onClose }: EditorProps) {
               clearInterval(interval);
               reject(error);
             }
-          }, 1000);
+          }, 3000);
         });
       };
 
       const outputUrl = await pollForResult();
+      const durationMs = Date.now() - startTime;
+      trackAIEnhanceSuccess(durationMs);
       setProcessingMessage("이미지 다운로드 중...");
 
       // 3. Download and convert to blob URL (blocking for better UX)
@@ -510,7 +551,10 @@ export function Editor({ files, onClose }: EditorProps) {
       setHistory((prev) => {
         const newMap = new Map(prev);
         const currentHistory = newMap.get(selectedIndex) || [];
-        const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
+        const newHistory = [
+          ...currentHistory.slice(0, currentIdx + 1),
+          blobUrl,
+        ];
         newMap.set(selectedIndex, newHistory);
         return newMap;
       });
@@ -521,6 +565,9 @@ export function Editor({ files, onClose }: EditorProps) {
       });
     } catch (error) {
       console.error("Failed to enhance image:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to enhance image";
+      trackAIEnhanceFail(errorMessage);
       alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsProcessing(false);
@@ -587,19 +634,7 @@ export function Editor({ files, onClose }: EditorProps) {
               <button
                 onClick={handleUndo}
                 disabled={isProcessing || !canUndo}
-                className="
-                  group flex items-center justify-center
-                  w-8 h-8 sm:w-9 sm:h-9
-                  bg-white/90 backdrop-blur-sm
-                  border border-gray-200
-                  rounded-full cursor-pointer
-                  shadow-lg shadow-black/5
-                  transition-all duration-300 ease-out
-                  hover:bg-slate-100
-                  hover:scale-105
-                  active:scale-95
-                  disabled:opacity-30 disabled:cursor-not-allowed
-                "
+                className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-out border border-gray-200 rounded-full shadow-lg cursor-pointer group sm:w-9 sm:h-9 bg-white/90 backdrop-blur-sm shadow-black/5 hover:bg-slate-100 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                 type="button"
                 aria-label="Undo"
                 title="되돌리기"
@@ -620,19 +655,7 @@ export function Editor({ files, onClose }: EditorProps) {
               <button
                 onClick={handleRedo}
                 disabled={isProcessing || !canRedo}
-                className="
-                  group flex items-center justify-center
-                  w-8 h-8 sm:w-9 sm:h-9
-                  bg-white/90 backdrop-blur-sm
-                  border border-gray-200
-                  rounded-full cursor-pointer
-                  shadow-lg shadow-black/5
-                  transition-all duration-300 ease-out
-                  hover:bg-slate-100
-                  hover:scale-105
-                  active:scale-95
-                  disabled:opacity-30 disabled:cursor-not-allowed
-                "
+                className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-out border border-gray-200 rounded-full shadow-lg cursor-pointer group sm:w-9 sm:h-9 bg-white/90 backdrop-blur-sm shadow-black/5 hover:bg-slate-100 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                 type="button"
                 aria-label="Redo"
                 title="다시 실행"
@@ -839,9 +862,9 @@ export function Editor({ files, onClose }: EditorProps) {
                 {/* Animated sparkle loader */}
                 <div className="relative w-20 h-20">
                   {/* Outer rotating ring */}
-                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-fuchsia-400 border-r-purple-400 animate-spin" />
+                  <div className="absolute inset-0 border-4 border-transparent rounded-full border-t-fuchsia-400 border-r-purple-400 animate-spin" />
                   {/* Inner pulsing circle */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-fuchsia-500 to-purple-600 animate-pulse" />
+                  <div className="absolute rounded-full inset-3 bg-gradient-to-br from-fuchsia-500 to-purple-600 animate-pulse" />
                   {/* Center star icon */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg
@@ -864,10 +887,28 @@ export function Editor({ files, onClose }: EditorProps) {
                 </div>
                 {/* Floating particles */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <div className="absolute w-2 h-2 rounded-full bg-fuchsia-400/50 top-1/4 left-1/4 animate-ping" style={{ animationDuration: '2s' }} />
-                  <div className="absolute w-1.5 h-1.5 rounded-full bg-purple-400/50 top-1/3 right-1/3 animate-ping" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }} />
-                  <div className="absolute w-2 h-2 rounded-full bg-violet-400/50 bottom-1/3 left-1/3 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }} />
-                  <div className="absolute w-1 h-1 rounded-full bg-pink-400/50 bottom-1/4 right-1/4 animate-ping" style={{ animationDuration: '2.2s', animationDelay: '0.3s' }} />
+                  <div
+                    className="absolute w-2 h-2 rounded-full bg-fuchsia-400/50 top-1/4 left-1/4 animate-ping"
+                    style={{ animationDuration: "2s" }}
+                  />
+                  <div
+                    className="absolute w-1.5 h-1.5 rounded-full bg-purple-400/50 top-1/3 right-1/3 animate-ping"
+                    style={{
+                      animationDuration: "2.5s",
+                      animationDelay: "0.5s",
+                    }}
+                  />
+                  <div
+                    className="absolute w-2 h-2 rounded-full bg-violet-400/50 bottom-1/3 left-1/3 animate-ping"
+                    style={{ animationDuration: "3s", animationDelay: "1s" }}
+                  />
+                  <div
+                    className="absolute w-1 h-1 rounded-full bg-pink-400/50 bottom-1/4 right-1/4 animate-ping"
+                    style={{
+                      animationDuration: "2.2s",
+                      animationDelay: "0.3s",
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -913,7 +954,7 @@ export function Editor({ files, onClose }: EditorProps) {
           <div className="flex items-center justify-center gap-1 p-2 bg-white sm:gap-2 sm:p-3 lg:p-4">
             <button
               onClick={() =>
-                setActiveTool(activeTool === "CROP" ? null : "CROP")
+                handleActiveTool(activeTool === "CROP" ? null : "CROP")
               }
               disabled={isProcessing}
               className={`
@@ -947,7 +988,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
             <button
               onClick={() =>
-                setActiveTool(activeTool === "BLUR" ? null : "BLUR")
+                handleActiveTool(activeTool === "BLUR" ? null : "BLUR")
               }
               disabled={isProcessing}
               className={`
@@ -982,7 +1023,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
             <button
               onClick={() =>
-                setActiveTool(activeTool === "RESIZE" ? null : "RESIZE")
+                handleActiveTool(activeTool === "RESIZE" ? null : "RESIZE")
               }
               disabled={isProcessing}
               className={`
