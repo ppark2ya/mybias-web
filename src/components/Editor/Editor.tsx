@@ -33,6 +33,9 @@ export function Editor({ files, onClose }: EditorProps) {
   const [history, setHistory] = useState<Map<number, string[]>>(
     () => new Map()
   );
+  const [historyIndex, setHistoryIndex] = useState<Map<number, number>>(
+    () => new Map()
+  );
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Crop state
@@ -79,6 +82,12 @@ export function Editor({ files, onClose }: EditorProps) {
 
       setImageStates(newImageStates);
       setHistory(newHistory);
+      // Initialize history index to last item (index 0)
+      const newHistoryIndex = new Map<number, number>();
+      for (let i = 0; i < files.length; i++) {
+        newHistoryIndex.set(i, 0);
+      }
+      setHistoryIndex(newHistoryIndex);
     };
 
     initializeImages();
@@ -116,7 +125,9 @@ export function Editor({ files, onClose }: EditorProps) {
 
   const currentImageState = imageStates.get(selectedIndex);
   const currentHistory = history.get(selectedIndex) || [];
-  const canUndo = currentHistory.length > 1;
+  const currentHistoryIdx = historyIndex.get(selectedIndex) ?? 0;
+  const canUndo = currentHistoryIdx > 0;
+  const canRedo = currentHistoryIdx < currentHistory.length - 1;
 
   // Check if tool values have changed from initial state
   const isBlurChanged = blurRadius !== initialBlurRadius;
@@ -145,7 +156,17 @@ export function Editor({ files, onClose }: EditorProps) {
     setHistory((prev) => {
       const newMap = new Map(prev);
       const currentHistory = newMap.get(selectedIndex) || [];
-      newMap.set(selectedIndex, [...currentHistory, newBlobUrl]);
+      const currentIdx = historyIndex.get(selectedIndex) ?? 0;
+      // If we're not at the end, truncate future history
+      const newHistory = [...currentHistory.slice(0, currentIdx + 1), newBlobUrl];
+      newMap.set(selectedIndex, newHistory);
+      return newMap;
+    });
+
+    setHistoryIndex((prev) => {
+      const newMap = new Map(prev);
+      const currentIdx = prev.get(selectedIndex) ?? 0;
+      newMap.set(selectedIndex, currentIdx + 1);
       return newMap;
     });
   };
@@ -153,37 +174,55 @@ export function Editor({ files, onClose }: EditorProps) {
   const handleUndo = () => {
     if (!canUndo) return;
 
-    setHistory((prev) => {
-      const newMap = new Map(prev);
-      const currentHistory = newMap.get(selectedIndex) || [];
+    const newIdx = currentHistoryIdx - 1;
+    const previousBlobUrl = currentHistory[newIdx];
 
-      // Revoke the current (last) blob URL being removed
-      const removedUrl = currentHistory[currentHistory.length - 1];
-      if (removedUrl) {
-        revokeBlobUrl(removedUrl);
-      }
+    if (previousBlobUrl) {
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, newIdx);
+        return newMap;
+      });
 
-      const newHistory = currentHistory.slice(0, -1);
-      newMap.set(selectedIndex, newHistory);
-
-      // Update image state to previous
-      const previousBlobUrl = newHistory[newHistory.length - 1];
-      if (previousBlobUrl) {
-        getImageDimensions(previousBlobUrl).then((dimensions) => {
-          setImageStates((prevStates) => {
-            const newStatesMap = new Map(prevStates);
-            newStatesMap.set(selectedIndex, {
-              blobUrl: previousBlobUrl,
-              width: dimensions.width,
-              height: dimensions.height,
-            });
-            return newStatesMap;
+      getImageDimensions(previousBlobUrl).then((dimensions) => {
+        setImageStates((prevStates) => {
+          const newStatesMap = new Map(prevStates);
+          newStatesMap.set(selectedIndex, {
+            blobUrl: previousBlobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
           });
+          return newStatesMap;
         });
-      }
+      });
+    }
+  };
 
-      return newMap;
-    });
+  const handleRedo = () => {
+    if (!canRedo) return;
+
+    const newIdx = currentHistoryIdx + 1;
+    const nextBlobUrl = currentHistory[newIdx];
+
+    if (nextBlobUrl) {
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, newIdx);
+        return newMap;
+      });
+
+      getImageDimensions(nextBlobUrl).then((dimensions) => {
+        setImageStates((prevStates) => {
+          const newStatesMap = new Map(prevStates);
+          newStatesMap.set(selectedIndex, {
+            blobUrl: nextBlobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+          });
+          return newStatesMap;
+        });
+      });
+    }
   };
 
   // Helper to get client coordinates from mouse or touch event
@@ -438,6 +477,8 @@ export function Editor({ files, onClose }: EditorProps) {
 
       // 3. Immediately show AI result - use current dimensions, update later
       const currentState = imageStates.get(selectedIndex);
+      const currentIdx = historyIndex.get(selectedIndex) ?? 0;
+
       setImageStates((prev) => {
         const newMap = new Map(prev);
         newMap.set(selectedIndex, {
@@ -450,11 +491,19 @@ export function Editor({ files, onClose }: EditorProps) {
       setHistory((prev) => {
         const newMap = new Map(prev);
         const currentHistory = newMap.get(selectedIndex) || [];
-        newMap.set(selectedIndex, [...currentHistory, outputUrl]);
+        // Truncate future history if not at end
+        const newHistory = [...currentHistory.slice(0, currentIdx + 1), outputUrl];
+        newMap.set(selectedIndex, newHistory);
+        return newMap;
+      });
+      setHistoryIndex((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(selectedIndex, currentIdx + 1);
         return newMap;
       });
 
       // 4. Background: Get dimensions + convert to blob URL
+      const newIdx = currentIdx + 1;
       Promise.all([
         getImageDimensions(outputUrl),
         urlToBlobUrl(outputUrl),
@@ -471,8 +520,8 @@ export function Editor({ files, onClose }: EditorProps) {
         setHistory((prev) => {
           const newMap = new Map(prev);
           const currentHistory = newMap.get(selectedIndex) || [];
-          const updatedHistory = currentHistory.map((url) =>
-            url === outputUrl ? blobUrl : url
+          const updatedHistory = currentHistory.map((url, idx) =>
+            idx === newIdx && url === outputUrl ? blobUrl : url
           );
           newMap.set(selectedIndex, updatedHistory);
           return newMap;
@@ -539,43 +588,76 @@ export function Editor({ files, onClose }: EditorProps) {
       <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-[0_10px_60px_rgba(0,0,0,0.15)] overflow-hidden">
         {/* Header with Close button, Undo button, and Apply button */}
         <div className="absolute z-10 top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 flex items-center gap-1.5 sm:gap-2">
-          {/* Undo button */}
-          {canUndo && (
-            <button
-              onClick={handleUndo}
-              disabled={isProcessing}
-              className="
-                group flex items-center gap-1 sm:gap-1.5 lg:gap-2
-                px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2
-                bg-white/90 backdrop-blur-sm
-                border border-gray-200
-                rounded-full cursor-pointer
-                shadow-lg shadow-black/5
-                transition-all duration-300 ease-out
-                hover:bg-slate-100
-                hover:scale-105
-                active:scale-95
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-              type="button"
-              aria-label="Undo"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4 lg:h-4 text-slate-600"
+          {/* Undo/Redo buttons */}
+          {(canUndo || canRedo) && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleUndo}
+                disabled={isProcessing || !canUndo}
+                className="
+                  group flex items-center justify-center
+                  w-8 h-8 sm:w-9 sm:h-9
+                  bg-white/90 backdrop-blur-sm
+                  border border-gray-200
+                  rounded-full cursor-pointer
+                  shadow-lg shadow-black/5
+                  transition-all duration-300 ease-out
+                  hover:bg-slate-100
+                  hover:scale-105
+                  active:scale-95
+                  disabled:opacity-30 disabled:cursor-not-allowed
+                "
+                type="button"
+                aria-label="Undo"
+                title="되돌리기"
               >
-                <polyline points="1 4 1 10 7 10" />
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-              </svg>
-              <span className="text-xs font-medium sm:text-sm text-slate-600">
-                되돌리기
-              </span>
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 text-slate-600"
+                >
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                </svg>
+              </button>
+              <button
+                onClick={handleRedo}
+                disabled={isProcessing || !canRedo}
+                className="
+                  group flex items-center justify-center
+                  w-8 h-8 sm:w-9 sm:h-9
+                  bg-white/90 backdrop-blur-sm
+                  border border-gray-200
+                  rounded-full cursor-pointer
+                  shadow-lg shadow-black/5
+                  transition-all duration-300 ease-out
+                  hover:bg-slate-100
+                  hover:scale-105
+                  active:scale-95
+                  disabled:opacity-30 disabled:cursor-not-allowed
+                "
+                type="button"
+                aria-label="Redo"
+                title="다시 실행"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4 text-slate-600"
+                >
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10" />
+                </svg>
+              </button>
+            </div>
           )}
           {activeTool && (
             <button
