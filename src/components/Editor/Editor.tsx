@@ -22,6 +22,7 @@ import {
   trackAIEnhanceSuccess,
   trackAIEnhanceFail,
 } from "../../utils/analytics";
+import { toast } from "sonner";
 
 type EditorTool = "CROP" | "BLUR" | "RESIZE" | null;
 
@@ -566,9 +567,14 @@ export function Editor({ files, onClose }: EditorProps) {
     } catch (error) {
       console.error("Failed to enhance image:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Failed to enhance image";
+        error instanceof Error
+          ? error.message
+          : "AI 보정에 실패했습니다. 다시 시도해주세요.";
       trackAIEnhanceFail(errorMessage);
-      alert("AI 보정에 실패했습니다. 다시 시도해주세요.");
+      // alert(errorMessage);
+      toast.error(errorMessage, {
+        className: "text-center",
+      });
     } finally {
       setIsProcessing(false);
       setProcessingMessage("");

@@ -1,6 +1,7 @@
 interface Env {
   REPLICATE_API_TOKEN: string;
   RATE_LIMIT: KVNamespace;
+  MAX_LIMIT: number;
 }
 
 interface GenerateRequest {
@@ -34,11 +35,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const countStr = await env.RATE_LIMIT.get(key);
     const count = countStr ? parseInt(countStr, 10) : 0;
 
-    // 3. 제한 확인 (예: 하루 3회)
-    const MAX_LIMIT = 3;
+    // 3. 제한 확인 (기본값: 하루 3회)
+    const MAX_LIMIT = env.MAX_LIMIT ?? 3;
     if (count >= MAX_LIMIT) {
+      console.error("Rate limit exceeded for IP:", ip, "Count:", count);
       return new Response(
-        JSON.stringify({ error: "일일 무료 사용량을 초과했습니다." }),
+        JSON.stringify({
+          error: `하루 ${MAX_LIMIT}번까지만 변환 가능해요! 내일 또 오세요 💖`,
+        }),
         {
           status: 429, // Too Many Requests
           headers: { "Content-Type": "application/json", ...corsHeaders },

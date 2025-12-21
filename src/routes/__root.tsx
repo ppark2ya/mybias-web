@@ -1,5 +1,13 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { lazy } from "react";
+import { Toaster } from "sonner";
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  TriangleAlertIcon,
+  OctagonXIcon,
+  Loader2Icon,
+} from "lucide-react";
 
 // 1. 배포 환경(production)이 아닐 때만 Devtools를 로드하도록 설정
 const TanStackRouterDevtools = import.meta.env.PROD
@@ -16,6 +24,26 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <Outlet />
+      <Toaster
+        position="top-center"
+        richColors
+        duration={4000}
+        icons={{
+          success: <CircleCheckIcon className="size-4" />,
+          info: <InfoIcon className="size-4" />,
+          warning: <TriangleAlertIcon className="size-4" />,
+          error: <OctagonXIcon className="size-4" />,
+          loading: <Loader2Icon className="size-4 animate-spin" />,
+        }}
+        style={
+          {
+            "--normal-bg": "var(--popover)",
+            "--normal-text": "var(--popover-foreground)",
+            "--normal-border": "var(--border)",
+            "--border-radius": "var(--radius)",
+          } as React.CSSProperties
+        }
+      />
       <TanStackRouterDevtools />
     </>
   ),
