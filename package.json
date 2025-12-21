@@ -25,6 +25,7 @@
     "react-dom": "^19.2.0",
     "react-ga4": "^2.1.0",
     "react-i18next": "^16.5.0",
+    "react-microsoft-clarity": "^2.0.0",
     "replicate": "^1.4.0",
     "tailwind-merge": "^3.4.0"
   },

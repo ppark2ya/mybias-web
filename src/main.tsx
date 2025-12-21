@@ -8,10 +8,7 @@ import "./i18n";
 
 import { queryClient } from "./lib/query-client";
 import { routeTree } from "./routeTree.gen";
-import { initGA, trackPageView } from "./utils/analytics";
-
-// Initialize Google Analytics
-initGA();
+import { initAnalytics, trackPageView } from "./utils/analytics";
 
 // Create a new router instance
 const router = createRouter({
@@ -30,6 +27,22 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
+
+// 🚀 렌더링을 막지 않도록 브라우저가 한가할 때(Idle) 분석 툴 로드 시작
+const startAnalytics = () => {
+  if ("requestIdleCallback" in window) {
+    (window as Window & typeof globalThis).requestIdleCallback(() => {
+      initAnalytics();
+    });
+  } else {
+    // Safari 등 미지원 브라우저 폴백
+    setTimeout(() => {
+      initAnalytics();
+    }, 2000); // 2초 뒤 로드
+  }
+};
+
+startAnalytics();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
