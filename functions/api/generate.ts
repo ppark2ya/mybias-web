@@ -1,5 +1,6 @@
 interface Env {
   REPLICATE_API_TOKEN: string;
+  RATE_LIMIT: KVNamespace;
 }
 
 interface GenerateRequest {
@@ -22,13 +23,42 @@ const corsHeaders = {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
+    const { request, env } = context;
+
+    // 1. 사용자 IP 가져오기
+    const ip = request.headers.get("CF-Connecting-IP");
+    const today = new Date().toISOString().slice(0, 10); // e.g.) 2025-12-21
+    const key = `limit:${today}:${ip}`; // 오늘 날짜 + IP 로 키 생성
+
+    // 2. KV에서 현재 사용 횟수 조회
+    const countStr = await env.RATE_LIMIT.get(key);
+    const count = countStr ? parseInt(countStr, 10) : 0;
+
+    // 3. 제한 확인 (예: 하루 3회)
+    const MAX_LIMIT = 3;
+    if (count >= MAX_LIMIT) {
+      return new Response(
+        JSON.stringify({ error: "일일 무료 사용량을 초과했습니다." }),
+        {
+          status: 429, // Too Many Requests
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // 4. 호출 성공 시 카운트 증가 및 저장 (TTL: 24시간 후 자동 삭제)
+    // waitUntil을 쓰면 응답을 먼저 보내고 백그라운드에서 저장해 속도 저하를 막습니다.
+    context.waitUntil(
+      env.RATE_LIMIT.put(key, (count + 1).toString(), { expirationTtl: 86400 })
+    );
+
     const {
       image,
       upscale = 2,
       fidelity = 0.6,
       backgroundEnhance = true,
       faceUpsample = true,
-    }: GenerateRequest = await context.request.json();
+    }: GenerateRequest = await request.json();
 
     if (!image) {
       return new Response(JSON.stringify({ error: "Image is required" }), {
@@ -37,7 +67,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
     }
 
-    const apiToken = context.env.REPLICATE_API_TOKEN;
+    const apiToken = env.REPLICATE_API_TOKEN;
     if (!apiToken) {
       return new Response(
         JSON.stringify({ error: "API token not configured" }),
