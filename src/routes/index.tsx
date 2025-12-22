@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import Uploader from "../components/Uploader";
 import Editor from "../components/Editor";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import SeoContent from "../components/SeoContent";
+import Footer from "../components/Footer";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -46,6 +48,12 @@ export function Home() {
           <Uploader onUpload={handleUpload} />
         )}
       </main>
+
+      {/* SEO Content - Visible below main content for search engine optimization */}
+      {!isEditing && <SeoContent />}
+
+      {/* Footer with legal links */}
+      {!isEditing && <Footer />}
     </div>
   );
 }
