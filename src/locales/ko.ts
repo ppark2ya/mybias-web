@@ -1,7 +1,7 @@
 export default {
   translation: {
     // Home page
-    "home.title": "나만의 바이어스 갤러리",
+    "home.title": "나만의 최애 갤러리",
     "home.subtitle": "소중한 추억을 아름답게 담아보세요",
 
     // Uploader
@@ -21,7 +21,8 @@ export default {
     "editor.pleaseWait": "잠시만 기다려주세요",
 
     // Editor - AI Enhancement
-    "editor.ai.limitReached": "오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!",
+    "editor.ai.limitReached":
+      "오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!",
     "editor.ai.preparingImage": "이미지 준비 중...",
     "editor.ai.requestingServer": "AI 서버에 요청 중...",
     "editor.ai.analyzingFaces": "AI가 얼굴을 분석하고 있어요...",
@@ -38,7 +39,8 @@ export default {
     "share.copyLink": "링크 복사",
     "share.saveImage": "이미지 저장",
     "share.message": "나만의 바이어스 갤러리에서 만든 사진이에요!",
-    "share.linkCopiedKakao": "링크가 복사되었습니다. 카카오톡에서 붙여넣기 해주세요!",
+    "share.linkCopiedKakao":
+      "링크가 복사되었습니다. 카카오톡에서 붙여넣기 해주세요!",
     "share.shareFromKakaoApp": "카카오톡 앱에서 직접 공유해주세요.",
     "share.linkCopied": "링크가 복사되었습니다!",
     "share.copyFailed": "링크 복사에 실패했습니다.",

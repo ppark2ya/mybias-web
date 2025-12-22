@@ -8,6 +8,7 @@ i18n
   .use(initReactI18next) // ✅ Connect with React
   .init({
     resources,
+    supportedLngs: ["en", "ko", "es", "ja", "zh"], // Supported languages
     fallbackLng: "en", // Default language if detection fails
     debug: false, // Set to false in production
 
@@ -17,8 +18,10 @@ i18n
 
     // Detection options
     detection: {
-      order: ["querystring", "cookie", "localStorage", "navigator", "htmlTag"],
-      caches: ["localStorage", "cookie"], // Save selected language in browser
+      order: ["localStorage", "navigator", "htmlTag"], // Check localStorage first, then browser language
+      caches: ["localStorage"], // Save selected language
+      lookupLocalStorage: "i18nextLng",
+      convertDetectedLanguage: (lng: string) => lng.split("-")[0], // Convert "ko-KR" to "ko"
     },
   });
 
