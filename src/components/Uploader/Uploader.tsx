@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import type { DragEvent, ChangeEvent } from 'react'
 import { ImagePlus, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { trackFileUpload } from '../../utils/analytics'
 
 interface UploaderProps {
@@ -8,6 +9,7 @@ interface UploaderProps {
 }
 
 export function Uploader({ onUpload }: UploaderProps) {
+  const { t } = useTranslation()
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -119,13 +121,13 @@ export function Uploader({ onUpload }: UploaderProps) {
             bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400
             bg-clip-text text-transparent
           ">
-            소중한 순간을 담아주세요
+            {t('uploader.title')}
           </h2>
 
           <p className="text-sm sm:text-base lg:text-lg text-gray-500 m-0 mb-4 sm:mb-6 lg:mb-8 leading-relaxed">
             {isDragging
-              ? '여기에 놓아주세요'
-              : '사진을 드래그하거나 클릭해서 추가하세요'}
+              ? t('uploader.dragActive')
+              : t('uploader.dragInactive')}
           </p>
 
           <button
@@ -144,7 +146,7 @@ export function Uploader({ onUpload }: UploaderProps) {
             type="button"
           >
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
-            사진 추가하기
+            {t('uploader.button')}
           </button>
         </div>
       </div>

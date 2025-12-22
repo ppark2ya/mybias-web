@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   fileToBlobUrl,
   cropImage,
@@ -58,6 +59,7 @@ interface ImageState {
 }
 
 export function Editor({ files, onClose }: EditorProps) {
+  const { t } = useTranslation();
   const [activeTool, setActiveTool] = useState<EditorTool>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [imageStates, setImageStates] = useState<Map<number, ImageState>>(
@@ -468,7 +470,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     // Check rate limit
     if (!canUseAI()) {
-      toast.error("오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!", {
+      toast.error(t("editor.ai.limitReached"), {
         className: "text-center",
       });
       return;
@@ -476,7 +478,7 @@ export function Editor({ files, onClose }: EditorProps) {
 
     trackAIEnhanceStart();
     setIsProcessing(true);
-    setProcessingMessage("이미지 준비 중...");
+    setProcessingMessage(t("editor.ai.preparingImage"));
 
     try {
       const startTime = Date.now();
@@ -488,7 +490,7 @@ export function Editor({ files, onClose }: EditorProps) {
         reader.onload = () => resolve(reader.result as string);
         reader.readAsDataURL(blob);
       });
-      setProcessingMessage("AI 서버에 요청 중...");
+      setProcessingMessage(t("editor.ai.requestingServer"));
 
       // 1. Start the prediction with CodeFormer
       const startResponse = await fetch("/api/generate", {
@@ -518,17 +520,17 @@ export function Editor({ files, onClose }: EditorProps) {
       }
 
       // 2. Poll for status with progress messages
-      setProcessingMessage("AI가 얼굴을 분석하고 있어요...");
+      setProcessingMessage(t("editor.ai.analyzingFaces"));
       const pollForResult = (): Promise<string> => {
         return new Promise((resolve, reject) => {
           const maxAttempts = 120; // 2 minutes max
           let attempts = 0;
           const messages = [
-            "AI가 얼굴을 분석하고 있어요...",
-            "피부 톤을 보정하고 있어요...",
-            "눈동자를 선명하게 하고 있어요...",
-            "디테일을 살리고 있어요...",
-            "거의 다 됐어요!",
+            t("editor.ai.analyzingFaces"),
+            t("editor.ai.enhancingSkinTone"),
+            t("editor.ai.sharpeningEyes"),
+            t("editor.ai.enhancingDetails"),
+            t("editor.ai.almostDone"),
           ];
 
           const interval = setInterval(async () => {
@@ -571,7 +573,7 @@ export function Editor({ files, onClose }: EditorProps) {
       const remaining = incrementAIUsage();
       setRemainingAIUsage(remaining);
 
-      setProcessingMessage("이미지 다운로드 중...");
+      setProcessingMessage(t("editor.ai.downloadingImage"));
 
       // 3. Download and convert to blob URL (blocking for better UX)
       const [dimensions, blobUrl] = await Promise.all([
@@ -610,7 +612,7 @@ export function Editor({ files, onClose }: EditorProps) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "AI 보정에 실패했습니다. 다시 시도해주세요.";
+          : t("editor.ai.failed");
       trackAIEnhanceFail(errorMessage);
       // alert(errorMessage);
       toast.error(errorMessage, {
@@ -684,7 +686,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-out border border-gray-200 rounded-full shadow-lg cursor-pointer group sm:w-9 sm:h-9 bg-white/90 backdrop-blur-sm shadow-black/5 hover:bg-slate-100 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                 type="button"
                 aria-label="Undo"
-                title="되돌리기"
+                title={t("editor.undo")}
               >
                 <Undo2 className="w-4 h-4 text-slate-600" strokeWidth={2.5} />
               </button>
@@ -694,7 +696,7 @@ export function Editor({ files, onClose }: EditorProps) {
                 className="flex items-center justify-center w-8 h-8 transition-all duration-300 ease-out border border-gray-200 rounded-full shadow-lg cursor-pointer group sm:w-9 sm:h-9 bg-white/90 backdrop-blur-sm shadow-black/5 hover:bg-slate-100 hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
                 type="button"
                 aria-label="Redo"
-                title="다시 실행"
+                title={t("editor.redo")}
               >
                 <Redo2 className="w-4 h-4 text-slate-600" strokeWidth={2.5} />
               </button>
@@ -733,7 +735,7 @@ export function Editor({ files, onClose }: EditorProps) {
               "
               type="button"
               aria-label="Apply changes"
-              title="완료"
+              title={t("editor.apply")}
             >
               <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
             </button>
@@ -755,7 +757,7 @@ export function Editor({ files, onClose }: EditorProps) {
             "
             type="button"
             aria-label="Close editor"
-            title="닫기"
+            title={t("editor.close")}
           >
             <X className="w-4 h-4 text-gray-500 transition-all duration-300 group-hover:text-white group-hover:rotate-90" strokeWidth={2.5} />
           </button>
@@ -873,10 +875,10 @@ export function Editor({ files, onClose }: EditorProps) {
                 {/* Message */}
                 <div className="text-center">
                   <p className="text-lg font-medium text-white animate-pulse">
-                    {processingMessage || "처리 중..."}
+                    {processingMessage || t("editor.processing")}
                   </p>
                   <p className="mt-1 text-sm text-white/60">
-                    잠시만 기다려주세요
+                    {t("editor.pleaseWait")}
                   </p>
                 </div>
                 {/* Floating particles */}
@@ -1149,7 +1151,7 @@ export function Editor({ files, onClose }: EditorProps) {
                         : "text-gray-400 bg-gray-100"
                     }`}
                     aria-label="Lock aspect ratio"
-                    title={maintainAspectRatio ? "비율 고정 해제" : "비율 고정"}
+                    title={maintainAspectRatio ? t("editor.unlockAspectRatio") : t("editor.lockAspectRatio")}
                   >
                     {maintainAspectRatio ? (
                       <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
