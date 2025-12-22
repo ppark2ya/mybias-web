@@ -144,7 +144,7 @@ export function useAIEnhance(
       const currentIdx = historyIndex.get(selectedIndex) ?? 0;
 
       setImageStates((prev) => {
-        const newMap = new Map(prev);
+        const newMap = new Map(prev || new Map());
         newMap.set(selectedIndex, {
           blobUrl,
           width: dimensions.width,
@@ -153,14 +153,14 @@ export function useAIEnhance(
         return newMap;
       });
       setHistory((prev) => {
-        const newMap = new Map(prev);
+        const newMap = new Map(prev || new Map());
         const currentHistory = newMap.get(selectedIndex) || [];
         const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
         newMap.set(selectedIndex, newHistory);
         return newMap;
       });
       setHistoryIndex((prev) => {
-        const newMap = new Map(prev);
+        const newMap = new Map(prev || new Map());
         newMap.set(selectedIndex, currentIdx + 1);
         return newMap;
       });

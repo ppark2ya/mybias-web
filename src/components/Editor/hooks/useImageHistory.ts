@@ -12,8 +12,11 @@ export function useImageHistory(
   const [history, setHistory] = useState<Map<number, string[]>>(() => new Map());
   const [historyIndex, setHistoryIndex] = useState<Map<number, number>>(() => new Map());
 
-  // Initialize history from image states
+  // Initialize history from image states only once
   useEffect(() => {
+    // Only initialize if history is empty
+    if (history.size > 0) return;
+
     const newHistory = new Map<number, string[]>();
     const newHistoryIndex = new Map<number, number>();
 
@@ -25,9 +28,12 @@ export function useImageHistory(
       }
     }
 
-    setHistory(newHistory);
-    setHistoryIndex(newHistoryIndex);
-  }, [files, imageStates]);
+    if (newHistory.size > 0) {
+      setHistory(newHistory);
+      setHistoryIndex(newHistoryIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imageStates]);
 
   const currentHistory = history.get(selectedIndex) || [];
   const currentHistoryIdx = historyIndex.get(selectedIndex) ?? 0;
