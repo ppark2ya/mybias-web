@@ -53,7 +53,6 @@ export function Editor({ files, onClose }: EditorProps) {
   // History management
   const historyHook = useImageHistory(files, imageStates, setImageStates, selectedIndex);
   const {
-    history,
     historyIndex,
     canUndo,
     canRedo,

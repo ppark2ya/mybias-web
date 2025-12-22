@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 interface IconButtonProps {
-  onClick: () => void;
+  onClick: (() => void) | (() => Promise<void>) | undefined;
   disabled?: boolean;
   icon: ReactNode;
   label: string;

@@ -22,7 +22,6 @@ export function useAIEnhance(
   selectedIndex: number,
   setImageStates: React.Dispatch<React.SetStateAction<Map<number, ImageState>>>,
   historyIndex: Map<number, number>,
-  history: Map<number, string[]>,
   setHistory: React.Dispatch<React.SetStateAction<Map<number, string[]>>>,
   setHistoryIndex: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   setProcessingMessage: (message: string) => void,
