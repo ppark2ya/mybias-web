@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { blurImage } from "../../../utils/imageEditor";
 import { trackToolApply } from "../../../utils/analytics";
 import type { ImageState } from "./useEditorState";
+
+const DEFAULT_BLUR_RADIUS = 0;
 
 export function useBlurTool(
   currentImageState: ImageState | undefined,
@@ -9,21 +11,28 @@ export function useBlurTool(
   setIsProcessing: (value: boolean) => void,
   updateImageState: (blobUrl: string) => Promise<void>
 ) {
-  const [blurRadius, setBlurRadius] = useState(5);
-  const [initialBlurRadius] = useState(5);
+  // Preview blur radius (for CSS filter)
+  const [previewBlurRadius, setPreviewBlurRadius] = useState(DEFAULT_BLUR_RADIUS);
 
-  const isBlurChanged = blurRadius !== initialBlurRadius;
+  const isBlurChanged = previewBlurRadius !== DEFAULT_BLUR_RADIUS;
+
+  // Reset blur radius when tool is closed or applied
+  const resetBlurRadius = useCallback(() => {
+    setPreviewBlurRadius(DEFAULT_BLUR_RADIUS);
+  }, []);
 
   const handleApplyBlur = async () => {
-    if (!currentImageState || isProcessing) return;
+    if (!currentImageState || isProcessing || !isBlurChanged) return;
     trackToolApply("BLUR");
 
     setIsProcessing(true);
     try {
       const blurredBlobUrl = await blurImage(currentImageState.blobUrl, {
-        radius: blurRadius,
+        radius: previewBlurRadius,
       });
       await updateImageState(blurredBlobUrl);
+      // Reset preview after applying
+      resetBlurRadius();
     } catch (error) {
       console.error("Failed to blur image:", error);
     } finally {
@@ -32,9 +41,10 @@ export function useBlurTool(
   };
 
   return {
-    blurRadius,
-    setBlurRadius,
+    blurRadius: previewBlurRadius,
+    setBlurRadius: setPreviewBlurRadius,
     isBlurChanged,
     handleApplyBlur,
+    resetBlurRadius,
   };
 }

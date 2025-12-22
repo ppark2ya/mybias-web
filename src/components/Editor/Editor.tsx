@@ -82,7 +82,7 @@ export function Editor({ files, onClose }: EditorProps) {
   );
 
   // Blur tool
-  const { blurRadius, setBlurRadius, isBlurChanged, handleApplyBlur } =
+  const { blurRadius, setBlurRadius, isBlurChanged, handleApplyBlur, resetBlurRadius } =
     useBlurTool(
       currentImageState,
       isProcessing,
@@ -122,6 +122,10 @@ export function Editor({ files, onClose }: EditorProps) {
   );
 
   const handleActiveTool = (tool: typeof activeTool) => {
+    // Reset blur preview when switching away from blur tool
+    if (activeTool === "BLUR" && tool !== "BLUR") {
+      resetBlurRadius();
+    }
     setActiveTool(tool);
     if (tool) {
       trackToolSelect(tool);
@@ -213,7 +217,12 @@ export function Editor({ files, onClose }: EditorProps) {
                   ref={imageRef}
                   src={currentImageState.blobUrl}
                   alt="Editing"
-                  className="object-contain max-w-full max-h-full"
+                  className="object-contain max-w-full max-h-full transition-[filter] duration-150"
+                  style={{
+                    filter: activeTool === "BLUR" && blurRadius > 0
+                      ? `blur(${blurRadius}px)`
+                      : undefined,
+                  }}
                   draggable={false}
                 />
 
