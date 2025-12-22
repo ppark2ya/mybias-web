@@ -44,7 +44,7 @@ export function useImageHistory(
     const dimensions = await getImageDimensions(newBlobUrl);
 
     setImageStates((prev) => {
-      const newMap = new Map(prev);
+      const newMap = new Map(prev || new Map());
       newMap.set(selectedIndex, {
         blobUrl: newBlobUrl,
         width: dimensions.width,
@@ -54,7 +54,7 @@ export function useImageHistory(
     });
 
     setHistory((prev) => {
-      const newMap = new Map(prev);
+      const newMap = new Map(prev || new Map());
       const currentHistory = newMap.get(selectedIndex) || [];
       const currentIdx = historyIndex.get(selectedIndex) ?? 0;
       const newHistory = [...currentHistory.slice(0, currentIdx + 1), newBlobUrl];
@@ -63,8 +63,8 @@ export function useImageHistory(
     });
 
     setHistoryIndex((prev) => {
-      const newMap = new Map(prev);
-      const currentIdx = prev.get(selectedIndex) ?? 0;
+      const newMap = new Map(prev || new Map());
+      const currentIdx = newMap.get(selectedIndex) ?? 0;
       newMap.set(selectedIndex, currentIdx + 1);
       return newMap;
     });
@@ -79,14 +79,14 @@ export function useImageHistory(
 
     if (previousBlobUrl) {
       setHistoryIndex((prev) => {
-        const newMap = new Map(prev);
+        const newMap = new Map(prev || new Map());
         newMap.set(selectedIndex, newIdx);
         return newMap;
       });
 
       getImageDimensions(previousBlobUrl).then((dimensions) => {
         setImageStates((prevStates) => {
-          const newStatesMap = new Map(prevStates);
+          const newStatesMap = new Map(prevStates || new Map());
           newStatesMap.set(selectedIndex, {
             blobUrl: previousBlobUrl,
             width: dimensions.width,
@@ -107,14 +107,14 @@ export function useImageHistory(
 
     if (nextBlobUrl) {
       setHistoryIndex((prev) => {
-        const newMap = new Map(prev);
+        const newMap = new Map(prev || new Map());
         newMap.set(selectedIndex, newIdx);
         return newMap;
       });
 
       getImageDimensions(nextBlobUrl).then((dimensions) => {
         setImageStates((prevStates) => {
-          const newStatesMap = new Map(prevStates);
+          const newStatesMap = new Map(prevStates || new Map());
           newStatesMap.set(selectedIndex, {
             blobUrl: nextBlobUrl,
             width: dimensions.width,
