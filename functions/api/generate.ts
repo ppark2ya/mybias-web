@@ -1,7 +1,7 @@
 interface Env {
   REPLICATE_API_TOKEN: string;
-  RATE_LIMIT: KVNamespace;
-  MAX_LIMIT: number;
+  RATE_LIMIT?: KVNamespace;
+  MAX_LIMIT?: number;
 }
 
 interface GenerateRequest {
@@ -31,30 +31,41 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const today = new Date().toISOString().slice(0, 10); // e.g.) 2025-12-21
     const key = `limit:${today}:${ip}`; // 오늘 날짜 + IP 로 키 생성
 
-    // 2. KV에서 현재 사용 횟수 조회
-    const countStr = await env.RATE_LIMIT.get(key);
-    const count = countStr ? parseInt(countStr, 10) : 0;
+    // 2. Rate limiting (KV namespace가 설정된 경우에만)
+    if (env.RATE_LIMIT) {
+      try {
+        // 2-1. KV에서 현재 사용 횟수 조회
+        const countStr = await env.RATE_LIMIT.get(key);
+        const count = countStr ? parseInt(countStr, 10) : 0;
 
-    // 3. 제한 확인 (기본값: 하루 3회)
-    const MAX_LIMIT = env.MAX_LIMIT ?? 3;
-    if (count >= MAX_LIMIT) {
-      console.error("Rate limit exceeded for IP:", ip, "Count:", count);
-      return new Response(
-        JSON.stringify({
-          error: `하루 ${MAX_LIMIT}번까지만 변환 가능해요! 내일 또 오세요 💖`,
-        }),
-        {
-          status: 429, // Too Many Requests
-          headers: { "Content-Type": "application/json", ...corsHeaders },
+        // 2-2. 제한 확인 (기본값: 하루 3회)
+        const MAX_LIMIT = env.MAX_LIMIT ?? 3;
+        if (count >= MAX_LIMIT) {
+          console.error("Rate limit exceeded for IP:", ip, "Count:", count);
+          return new Response(
+            JSON.stringify({
+              error: `하루 ${MAX_LIMIT}번까지만 변환 가능해요! 내일 또 오세요 💖`,
+            }),
+            {
+              status: 429, // Too Many Requests
+              headers: { "Content-Type": "application/json", ...corsHeaders },
+            }
+          );
         }
-      );
-    }
 
-    // 4. 호출 성공 시 카운트 증가 및 저장 (TTL: 24시간 후 자동 삭제)
-    // waitUntil을 쓰면 응답을 먼저 보내고 백그라운드에서 저장해 속도 저하를 막습니다.
-    context.waitUntil(
-      env.RATE_LIMIT.put(key, (count + 1).toString(), { expirationTtl: 86400 })
-    );
+        // 2-3. 호출 성공 시 카운트 증가 및 저장 (TTL: 24시간 후 자동 삭제)
+        context.waitUntil(
+          env.RATE_LIMIT.put(key, (count + 1).toString(), {
+            expirationTtl: 86400,
+          })
+        );
+      } catch (error) {
+        // Rate limiting 실패 시 경고만 로그하고 계속 진행
+        console.warn("Rate limiting error (continuing):", error);
+      }
+    } else {
+      console.warn("RATE_LIMIT KV namespace not configured - rate limiting disabled");
+    }
 
     const {
       image,
