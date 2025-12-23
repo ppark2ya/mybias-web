@@ -43,5 +43,34 @@ export default {
     "share.linkCopied": "¡Enlace copiado!",
     "share.copyFailed": "Error al copiar enlace.",
     "share.viewOnWeb": "Ver en Web",
+
+    // Login
+    "login.title": "Bienvenido de Nuevo",
+    "login.subtitle": "Continuar a Mi Galería de Bias",
+    "login.continueWithGoogle": "Continuar con Google",
+    "login.continueWithApple": "Continuar con Apple",
+    "login.continueWithKakao": "Continuar con Kakao",
+    "login.continueWithEmail": "Continuar con Email",
+    "login.or": "o",
+    "login.emailLabel": "Dirección de Email",
+    "login.emailPlaceholder": "Ingresa tu email",
+    "login.continue": "Continuar",
+    "login.back": "Volver",
+    "login.backToHome": "Volver al Inicio",
+    "login.comingSoon": "¡Inicio de sesión próximamente!",
+    "login.enterEmail": "Por favor ingresa tu email",
+    "login.invalidEmail": "Por favor ingresa un email válido",
+    "login.termsText": "Al continuar, aceptas nuestros",
+    "login.termsLink": "Términos de Servicio",
+    "login.and": "y",
+    "login.privacyLink": "Política de Privacidad",
+
+    // Footer
+    "footer.rights": "Todos los derechos reservados.",
+    "footer.terms": "Términos de Servicio",
+    "footer.privacy": "Política de Privacidad",
+
+    // Legal Pages Common
+    "legal.backToHome": "Volver al Inicio",
   },
 };

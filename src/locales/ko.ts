@@ -93,6 +93,27 @@ export default {
     "seo.faq.a4":
       "아니요. MyBias는 사용자의 개인정보를 소중하게 생각합니다. 처리된 이미지는 여러분이 다운로드할 수 있도록 잠시 임시 저장소에 머물다가, 짧은 시간 내에 자동으로 파기됩니다.",
 
+    // Login
+    "login.title": "환영합니다",
+    "login.subtitle": "나만의 바이어스 갤러리로 계속하기",
+    "login.continueWithGoogle": "Google로 계속하기",
+    "login.continueWithApple": "Apple로 계속하기",
+    "login.continueWithKakao": "카카오로 계속하기",
+    "login.continueWithEmail": "이메일로 계속하기",
+    "login.or": "또는",
+    "login.emailLabel": "이메일 주소",
+    "login.emailPlaceholder": "이메일을 입력하세요",
+    "login.continue": "계속하기",
+    "login.back": "뒤로",
+    "login.backToHome": "홈으로",
+    "login.comingSoon": "로그인 기능 준비 중입니다!",
+    "login.enterEmail": "이메일을 입력해주세요",
+    "login.invalidEmail": "올바른 이메일을 입력해주세요",
+    "login.termsText": "계속 진행하면 다음에 동의하는 것으로 간주됩니다:",
+    "login.termsLink": "이용약관",
+    "login.and": "및",
+    "login.privacyLink": "개인정보처리방침",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "이용약관",

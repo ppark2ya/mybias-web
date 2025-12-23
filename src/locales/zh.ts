@@ -43,5 +43,34 @@ export default {
     "share.linkCopied": "链接已复制！",
     "share.copyFailed": "复制链接失败。",
     "share.viewOnWeb": "在网页查看",
+
+    // Login
+    "login.title": "欢迎回来",
+    "login.subtitle": "继续使用我的偏爱画廊",
+    "login.continueWithGoogle": "使用Google继续",
+    "login.continueWithApple": "使用Apple继续",
+    "login.continueWithKakao": "使用Kakao继续",
+    "login.continueWithEmail": "使用电子邮件继续",
+    "login.or": "或",
+    "login.emailLabel": "电子邮箱地址",
+    "login.emailPlaceholder": "输入您的电子邮箱",
+    "login.continue": "继续",
+    "login.back": "返回",
+    "login.backToHome": "返回主页",
+    "login.comingSoon": "登录功能即将推出！",
+    "login.enterEmail": "请输入您的电子邮箱",
+    "login.invalidEmail": "请输入有效的电子邮箱",
+    "login.termsText": "继续即表示您同意我们的",
+    "login.termsLink": "服务条款",
+    "login.and": "和",
+    "login.privacyLink": "隐私政策",
+
+    // Footer
+    "footer.rights": "All rights reserved.",
+    "footer.terms": "服务条款",
+    "footer.privacy": "隐私政策",
+
+    // Legal Pages Common
+    "legal.backToHome": "返回主页",
   },
 };

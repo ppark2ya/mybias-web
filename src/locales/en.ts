@@ -91,6 +91,27 @@ export default {
     "seo.faq.a4":
       "No. MyBias values your privacy. Processed images are temporarily stored so you can download them, then automatically deleted within a short time.",
 
+    // Login
+    "login.title": "Welcome Back",
+    "login.subtitle": "Continue to My Bias Gallery",
+    "login.continueWithGoogle": "Continue with Google",
+    "login.continueWithApple": "Continue with Apple",
+    "login.continueWithKakao": "Continue with Kakao",
+    "login.continueWithEmail": "Continue with Email",
+    "login.or": "or",
+    "login.emailLabel": "Email Address",
+    "login.emailPlaceholder": "Enter your email",
+    "login.continue": "Continue",
+    "login.back": "Back",
+    "login.backToHome": "Back to Home",
+    "login.comingSoon": "login coming soon!",
+    "login.enterEmail": "Please enter your email",
+    "login.invalidEmail": "Please enter a valid email",
+    "login.termsText": "By continuing, you agree to our",
+    "login.termsLink": "Terms of Service",
+    "login.and": "and",
+    "login.privacyLink": "Privacy Policy",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "Terms of Service",
