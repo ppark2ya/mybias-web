@@ -78,9 +78,12 @@ export function UserAvatar() {
           animate-in fade-in slide-in-from-top-2 duration-200
         "
         >
-          <Link
-            to="/profile"
-            onClick={() => setIsOpen(false)}
+          <button
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              // TODO: Navigate to profile page when implemented
+            }}
             className="
               w-full flex items-center gap-3 px-4 py-3
               text-left text-sm text-gray-700
@@ -90,7 +93,7 @@ export function UserAvatar() {
           >
             <UserCircle className="w-4 h-4" />
             <span>{t("user.profile")}</span>
-          </Link>
+          </button>
 
           <button
             type="button"
