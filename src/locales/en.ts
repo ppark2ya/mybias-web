@@ -91,6 +91,12 @@ export default {
     "seo.faq.a4":
       "No. MyBias values your privacy. Processed images are temporarily stored so you can download them, then automatically deleted within a short time.",
 
+    // User
+    "user.login": "Login",
+    "user.menu": "User Menu",
+    "user.profile": "Profile",
+    "user.logout": "Logout",
+
     // Login
     "login.title": "Welcome Back",
     "login.subtitle": "Continue to My Bias Gallery",

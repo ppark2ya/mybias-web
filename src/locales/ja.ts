@@ -44,6 +44,12 @@ export default {
     "share.copyFailed": "リンクのコピーに失敗しました。",
     "share.viewOnWeb": "Webで見る",
 
+    // User
+    "user.login": "ログイン",
+    "user.menu": "ユーザーメニュー",
+    "user.profile": "プロフィール",
+    "user.logout": "ログアウト",
+
     // Login
     "login.title": "おかえりなさい",
     "login.subtitle": "マイバイアスギャラリーに続ける",

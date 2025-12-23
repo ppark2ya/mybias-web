@@ -93,6 +93,12 @@ export default {
     "seo.faq.a4":
       "아니요. MyBias는 사용자의 개인정보를 소중하게 생각합니다. 처리된 이미지는 여러분이 다운로드할 수 있도록 잠시 임시 저장소에 머물다가, 짧은 시간 내에 자동으로 파기됩니다.",
 
+    // User
+    "user.login": "로그인",
+    "user.menu": "사용자 메뉴",
+    "user.profile": "프로필",
+    "user.logout": "로그아웃",
+
     // Login
     "login.title": "환영합니다",
     "login.subtitle": "나만의 바이어스 갤러리로 계속하기",

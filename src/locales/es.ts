@@ -44,6 +44,12 @@ export default {
     "share.copyFailed": "Error al copiar enlace.",
     "share.viewOnWeb": "Ver en Web",
 
+    // User
+    "user.login": "Iniciar Sesión",
+    "user.menu": "Menú de Usuario",
+    "user.profile": "Perfil",
+    "user.logout": "Cerrar Sesión",
+
     // Login
     "login.title": "Bienvenido de Nuevo",
     "login.subtitle": "Continuar a Mi Galería de Bias",

@@ -44,6 +44,12 @@ export default {
     "share.copyFailed": "复制链接失败。",
     "share.viewOnWeb": "在网页查看",
 
+    // User
+    "user.login": "登录",
+    "user.menu": "用户菜单",
+    "user.profile": "个人资料",
+    "user.logout": "退出登录",
+
     // Login
     "login.title": "欢迎回来",
     "login.subtitle": "继续使用我的偏爱画廊",
