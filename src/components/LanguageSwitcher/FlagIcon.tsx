@@ -1,12 +1,12 @@
-import type { SVGProps } from "react";
-import { LanguageCode } from "../../constants/locales";
+import type { SVGProps, ReactElement } from "react";
+import { LanguageCode, type LanguageCodeType } from "../../constants/locales";
 
 interface FlagIconProps extends SVGProps<SVGSVGElement> {
-  code: LanguageCode;
+  code: LanguageCodeType;
 }
 
 export function FlagIcon({ code, ...props }: FlagIconProps) {
-  const flags: Record<LanguageCode, JSX.Element> = {
+  const flags: Record<LanguageCodeType, ReactElement> = {
     [LanguageCode.EN]: (
       // US Flag (Stars and Stripes simplified)
       <svg viewBox="0 0 24 24" fill="none" {...props}>

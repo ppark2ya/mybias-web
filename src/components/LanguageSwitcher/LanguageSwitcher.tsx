@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown } from "lucide-react";
 import { FlagIcon } from "./FlagIcon";
-import { LANGUAGES, DEFAULT_LANGUAGE } from "../../constants/locales";
+import { LANGUAGES } from "../../constants/locales";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();

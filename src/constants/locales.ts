@@ -1,19 +1,24 @@
 /**
  * Supported language codes
  */
-export enum LanguageCode {
-  EN = "en",
-  KO = "ko",
-  ES = "es",
-  JA = "ja",
-  ZH = "zh",
-}
+export const LanguageCode = {
+  EN: "en",
+  KO: "ko",
+  ES: "es",
+  JA: "ja",
+  ZH: "zh",
+} as const;
+
+/**
+ * Language code type
+ */
+export type LanguageCodeType = typeof LanguageCode[keyof typeof LanguageCode];
 
 /**
  * Language configuration
  */
 export interface Language {
-  code: LanguageCode;
+  code: LanguageCodeType;
   name: string;
 }
 
