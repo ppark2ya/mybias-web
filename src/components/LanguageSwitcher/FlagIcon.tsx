@@ -1,12 +1,13 @@
 import type { SVGProps } from "react";
+import { LanguageCode } from "../../constants/locales";
 
 interface FlagIconProps extends SVGProps<SVGSVGElement> {
-  code: "en" | "ko" | "es" | "ja" | "zh";
+  code: LanguageCode;
 }
 
 export function FlagIcon({ code, ...props }: FlagIconProps) {
-  const flags = {
-    en: (
+  const flags: Record<LanguageCode, JSX.Element> = {
+    [LanguageCode.EN]: (
       // US Flag (Stars and Stripes simplified)
       <svg viewBox="0 0 24 24" fill="none" {...props}>
         <rect width="24" height="24" rx="2" fill="#B22234" />
@@ -32,7 +33,7 @@ export function FlagIcon({ code, ...props }: FlagIconProps) {
         <circle cx="7.5" cy="10" r="0.5" fill="white" />
       </svg>
     ),
-    ko: (
+    [LanguageCode.KO]: (
       // South Korean Flag (Taegukgi simplified)
       <svg viewBox="0 0 24 24" fill="none" {...props}>
         <rect width="24" height="24" rx="2" fill="white" />
@@ -49,7 +50,7 @@ export function FlagIcon({ code, ...props }: FlagIconProps) {
         </g>
       </svg>
     ),
-    es: (
+    [LanguageCode.ES]: (
       // Spanish Flag
       <svg viewBox="0 0 24 24" fill="none" {...props}>
         <rect width="24" height="24" rx="2" fill="#AA151B" />
@@ -57,14 +58,14 @@ export function FlagIcon({ code, ...props }: FlagIconProps) {
         <circle cx="8" cy="12" r="2" fill="#AA151B" />
       </svg>
     ),
-    ja: (
+    [LanguageCode.JA]: (
       // Japanese Flag (Hinomaru)
       <svg viewBox="0 0 24 24" fill="none" {...props}>
         <rect width="24" height="24" rx="2" fill="white" />
         <circle cx="12" cy="12" r="5" fill="#BC002D" />
       </svg>
     ),
-    zh: (
+    [LanguageCode.ZH]: (
       // Chinese Flag
       <svg viewBox="0 0 24 24" fill="none" {...props}>
         <rect width="24" height="24" rx="2" fill="#DE2910" />

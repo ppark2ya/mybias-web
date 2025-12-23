@@ -2,14 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown } from "lucide-react";
 import { FlagIcon } from "./FlagIcon";
-
-const languages = [
-  { code: "en" as const, name: "English" },
-  { code: "ko" as const, name: "한국어" },
-  { code: "es" as const, name: "Español" },
-  { code: "ja" as const, name: "日本語" },
-  { code: "zh" as const, name: "中文" },
-];
+import { LANGUAGES, DEFAULT_LANGUAGE } from "../../constants/locales";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -17,7 +10,7 @@ export function LanguageSwitcher() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage =
-    languages.find((lang) => lang.code === i18n.language) || languages[0];
+    LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,7 +69,7 @@ export function LanguageSwitcher() {
           animate-in fade-in slide-in-from-top-2 duration-200
         "
         >
-          {languages.map((lang) => (
+          {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
