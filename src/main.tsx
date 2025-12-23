@@ -8,6 +8,7 @@ import "./i18n";
 
 import { queryClient } from "./lib/query-client";
 import { routeTree } from "./routeTree.gen";
+import { AuthProvider } from "./contexts/AuthContext";
 import { initAnalytics, trackPageView } from "./utils/analytics";
 
 // Create a new router instance
@@ -47,8 +48,10 @@ startAnalytics();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ReactQueryDevtools initialIsOpen={false} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>
 );
