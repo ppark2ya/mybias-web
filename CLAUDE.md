@@ -372,8 +372,8 @@ export function useCustomHook(initialValue: string) {
 ### Git Workflow
 
 **Branch Naming:**
-- Feature: `claude/feature-name-<session-id>`
-- Fix: `claude/fix-name-<session-id>`
+- Feature: `feature/<feature-name>`
+- Fix: `fix/<fix-name>`
 
 **Commit Messages:**
 - Clear, descriptive messages
@@ -384,6 +384,59 @@ export function useCustomHook(initialValue: string) {
 ```bash
 bun run lint    # Must pass
 bun run build   # Must succeed
+```
+
+### Pull Request Workflow
+
+**IMPORTANT: Always create a Pull Request after completing code changes.**
+
+After finishing any code implementation, bug fix, or feature:
+
+1. **Create a new branch** (if not already on a feature branch):
+   ```bash
+   git checkout -b feature/<feature-name>
+   ```
+
+2. **Commit your changes:**
+   ```bash
+   git add .
+   git commit -m "feat: descriptive commit message"
+   ```
+
+3. **Push to remote:**
+   ```bash
+   git push -u origin <branch-name>
+   ```
+
+4. **Create a Pull Request:**
+   ```bash
+   gh pr create --title "PR Title" --body "Description of changes"
+   ```
+
+**PR Title Convention:**
+- Feature: `feat: Add <feature description>`
+- Fix: `fix: Fix <bug description>`
+- Refactor: `refactor: Refactor <description>`
+- Style: `style: Update <style description>`
+- Docs: `docs: Update <documentation>`
+
+**PR Body Template:**
+```markdown
+## Summary
+- Brief description of changes
+
+## Changes
+- List of specific changes made
+
+## Test Plan
+- How to test the changes
+```
+
+**After PR is approved:**
+```bash
+gh pr merge --squash
+git checkout main
+git pull
 ```
 
 ## Troubleshooting
