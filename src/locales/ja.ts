@@ -43,5 +43,40 @@ export default {
     "share.linkCopied": "リンクがコピーされました！",
     "share.copyFailed": "リンクのコピーに失敗しました。",
     "share.viewOnWeb": "Webで見る",
+
+    // User
+    "user.login": "ログイン",
+    "user.menu": "ユーザーメニュー",
+    "user.profile": "プロフィール",
+    "user.logout": "ログアウト",
+
+    // Login
+    "login.title": "おかえりなさい",
+    "login.subtitle": "マイバイアスギャラリーに続ける",
+    "login.continueWithGoogle": "Googleで続ける",
+    "login.continueWithApple": "Appleで続ける",
+    "login.continueWithKakao": "Kakaoで続ける",
+    "login.continueWithEmail": "メールで続ける",
+    "login.or": "または",
+    "login.emailLabel": "メールアドレス",
+    "login.emailPlaceholder": "メールアドレスを入力",
+    "login.continue": "続ける",
+    "login.back": "戻る",
+    "login.backToHome": "ホームに戻る",
+    "login.comingSoon": "ログイン機能準備中！",
+    "login.enterEmail": "メールアドレスを入力してください",
+    "login.invalidEmail": "有効なメールアドレスを入力してください",
+    "login.termsText": "続行すると、以下に同意したことになります：",
+    "login.termsLink": "利用規約",
+    "login.and": "と",
+    "login.privacyLink": "プライバシーポリシー",
+
+    // Footer
+    "footer.rights": "All rights reserved.",
+    "footer.terms": "利用規約",
+    "footer.privacy": "プライバシーポリシー",
+
+    // Legal Pages Common
+    "legal.backToHome": "ホームに戻る",
   },
 };

@@ -1,14 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown } from "lucide-react";
-
-const languages = [
-  { code: "en", name: "English", flag: "🇺🇸" },
-  { code: "ko", name: "한국어", flag: "🇰🇷" },
-  { code: "es", name: "Español", flag: "🇪🇸" },
-  { code: "ja", name: "日本語", flag: "🇯🇵" },
-  { code: "zh", name: "中文", flag: "🇨🇳" },
-];
+import { FlagIcon } from "./FlagIcon";
+import { LANGUAGES } from "../../constants/locales";
 
 export function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -16,7 +10,7 @@ export function LanguageSwitcher() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage =
-    languages.find((lang) => lang.code === i18n.language) || languages[0];
+    LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,7 +50,7 @@ export function LanguageSwitcher() {
         type="button"
         aria-label="Change language"
       >
-        <span className="text-lg sm:text-xl">{currentLanguage.flag}</span>
+        <FlagIcon code={currentLanguage.code} className="w-5 h-5 sm:w-6 sm:h-6" />
         <span className="hidden sm:inline">{currentLanguage.name}</span>
         <ChevronDown
           className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
@@ -75,7 +69,7 @@ export function LanguageSwitcher() {
           animate-in fade-in slide-in-from-top-2 duration-200
         "
         >
-          {languages.map((lang) => (
+          {LANGUAGES.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
@@ -91,7 +85,7 @@ export function LanguageSwitcher() {
               `}
               type="button"
             >
-              <span className="text-xl">{lang.flag}</span>
+              <FlagIcon code={lang.code} className="w-5 h-5" />
               <span>{lang.name}</span>
             </button>
           ))}

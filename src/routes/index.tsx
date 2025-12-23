@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import Uploader from "../components/Uploader";
 import Editor from "../components/Editor";
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import UserAvatar from "../components/UserAvatar";
 import SeoContent from "../components/SeoContent";
 import Footer from "../components/Footer";
 
@@ -27,8 +28,9 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 py-4 px-2 sm:py-6 sm:px-4 lg:py-8 lg:px-6">
-      {/* Language Switcher - Fixed position on top right */}
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+      {/* User Avatar & Language Switcher - Fixed position on top right */}
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 flex items-center gap-2 sm:gap-3">
+        <UserAvatar />
         <LanguageSwitcher />
       </div>
 
