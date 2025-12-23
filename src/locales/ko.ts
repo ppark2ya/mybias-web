@@ -98,6 +98,8 @@ export default {
     "user.menu": "사용자 메뉴",
     "user.profile": "프로필",
     "user.logout": "로그아웃",
+    "user.language": "언어",
+    "user.back": "뒤로",
 
     // Login
     "login.title": "환영합니다",

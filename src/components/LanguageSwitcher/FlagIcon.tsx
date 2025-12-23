@@ -34,19 +34,30 @@ export function FlagIcon({ code, ...props }: FlagIconProps) {
       </svg>
     ),
     [LanguageCode.KO]: (
-      // South Korean Flag (Taegukgi simplified)
-      <svg viewBox="0 0 24 24" fill="none" {...props}>
-        <rect width="24" height="24" rx="2" fill="white" />
-        <circle cx="12" cy="12" r="5" fill="#CD2E3A" />
-        <path
-          d="M12 7 A5 5 0 0 1 12 17 A5 5 0 0 0 12 7"
-          fill="#0047A0"
-        />
-        {/* Simplified trigrams */}
-        <g stroke="#000000" strokeWidth="0.8">
-          <line x1="17" y1="5" x2="19" y2="5" />
-          <line x1="17" y1="6.5" x2="19" y2="6.5" />
-          <line x1="17" y1="8" x2="19" y2="8" />
+      // South Korean Flag (Taegukgi) - simplified for small icon
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="-72 -48 144 96"
+      >
+        <path fill="#fff" d="M-72-48v96H72v-96z" />
+        <g stroke="#000" stroke-width="4">
+          <path
+            transform="rotate(33.69006752598)"
+            d="M-50-12v24m6 0v-24m6 0v24m76 0V1m0-2v-11m6 0v11m0 2v11m6 0V1m0-2v-11"
+          />
+          <path
+            transform="rotate(-33.69006752598)"
+            d="M-50-12v24m6 0V1m0-2v-11m6 0v24m76 0V1m0-2v-11m6 0v24m6 0V1m0-2v-11"
+          />
+        </g>
+        <g transform="rotate(33.69006752598)">
+          <path fill="#cd2e3a" d="M12 0a18 18 0 11-36 0 24 24 0 1148 0" />
+          <path
+            fill="#0047a0"
+            d="M0 0a12 12 0 1124 0 24 24 0 11-48 0 12 12 0 1024 0"
+          />
         </g>
       </svg>
     ),

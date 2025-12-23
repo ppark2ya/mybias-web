@@ -96,6 +96,8 @@ export default {
     "user.menu": "User Menu",
     "user.profile": "Profile",
     "user.logout": "Logout",
+    "user.language": "Language",
+    "user.back": "Back",
 
     // Login
     "login.title": "Welcome Back",
