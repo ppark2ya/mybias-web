@@ -32,6 +32,24 @@ export default {
     "editor.ai.downloadingImage": "画像をダウンロード中...",
     "editor.ai.failed": "AI補正に失敗しました。もう一度試してください。",
 
+    // Editor - AI Preview Modal
+    "editor.ai.preview.title": "AI補正",
+    "editor.ai.preview.subtitle": "予想される結果をプレビュー",
+    "editor.ai.preview.before": "補正前",
+    "editor.ai.preview.after": "補正後（プレビュー）",
+    "editor.ai.preview.info": "実際のAI結果はこのプレビューと異なる場合があります。AI補正は顔のディテールを復元し、肌色を改善し、全体的な画質を向上させます。",
+    "editor.ai.preview.remaining": "本日残り{{count}}回",
+    "editor.ai.preview.cancel": "キャンセル",
+    "editor.ai.preview.enhance": "AI補正を開始",
+
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "補正完了",
+    "editor.ai.result.subtitle": "補正前後を比較",
+    "editor.ai.result.before": "補正前",
+    "editor.ai.result.after": "補正後",
+    "editor.ai.result.info": "AIが顔のディテールを復元し、肌色を改善し、全体的な画質を向上させました。元に戻すボタンで復元できます。",
+    "editor.ai.result.confirm": "確認",
+
     // Share Modal
     "share.title": "共有",
     "share.kakaotalk": "KakaoTalk",

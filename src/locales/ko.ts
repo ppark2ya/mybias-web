@@ -33,6 +33,24 @@ export default {
     "editor.ai.downloadingImage": "이미지 다운로드 중...",
     "editor.ai.failed": "AI 보정에 실패했습니다. 다시 시도해주세요.",
 
+    // Editor - AI Preview Modal
+    "editor.ai.preview.title": "AI 보정",
+    "editor.ai.preview.subtitle": "예상 결과를 미리 확인하세요",
+    "editor.ai.preview.before": "보정 전",
+    "editor.ai.preview.after": "보정 후 (예상)",
+    "editor.ai.preview.info": "실제 AI 보정 결과는 미리보기와 다를 수 있습니다. AI가 얼굴 디테일을 복원하고 피부 톤을 개선하며 전체적인 화질을 선명하게 만들어 드립니다.",
+    "editor.ai.preview.remaining": "오늘 {{count}}회 남음",
+    "editor.ai.preview.cancel": "취소",
+    "editor.ai.preview.enhance": "AI 보정 시작",
+
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "보정 완료",
+    "editor.ai.result.subtitle": "보정 전후를 비교해보세요",
+    "editor.ai.result.before": "보정 전",
+    "editor.ai.result.after": "보정 후",
+    "editor.ai.result.info": "AI가 얼굴 디테일을 복원하고 피부 톤을 개선하며 전체적인 화질을 선명하게 만들었습니다. 되돌리기 버튼으로 원본으로 복원할 수 있습니다.",
+    "editor.ai.result.confirm": "확인",
+
     // Share Modal
     "share.title": "공유하기",
     "share.kakaotalk": "카카오톡",

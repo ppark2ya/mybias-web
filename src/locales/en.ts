@@ -32,6 +32,24 @@ export default {
     "editor.ai.downloadingImage": "Downloading image...",
     "editor.ai.failed": "AI enhancement failed. Please try again.",
 
+    // Editor - AI Preview Modal
+    "editor.ai.preview.title": "AI Enhancement",
+    "editor.ai.preview.subtitle": "Preview the expected result",
+    "editor.ai.preview.before": "BEFORE",
+    "editor.ai.preview.after": "AFTER (Preview)",
+    "editor.ai.preview.info": "The actual AI result may differ from this preview. AI enhancement restores facial details, improves skin tone, and sharpens overall image quality.",
+    "editor.ai.preview.remaining": "{{count}} uses remaining today",
+    "editor.ai.preview.cancel": "Cancel",
+    "editor.ai.preview.enhance": "Enhance with AI",
+
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "Enhancement Complete",
+    "editor.ai.result.subtitle": "Compare the before and after",
+    "editor.ai.result.before": "BEFORE",
+    "editor.ai.result.after": "AFTER",
+    "editor.ai.result.info": "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
+    "editor.ai.result.confirm": "Done",
+
     // Share Modal
     "share.title": "Share",
     "share.kakaotalk": "KakaoTalk",
