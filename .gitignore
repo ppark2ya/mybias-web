@@ -32,3 +32,4 @@ dist-ssr
 *.sw?
 .dev.vars
 .wrangler
+.claude
