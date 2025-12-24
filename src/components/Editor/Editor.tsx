@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { downloadImage } from "../../utils/imageEditor";
 import { trackToolSelect, trackFileDownload } from "../../utils/analytics";
@@ -13,6 +14,7 @@ import {
   Share2,
 } from "lucide-react";
 import ShareModal from "../ShareModal";
+import AIPreviewModal from "../AIPreviewModal";
 import { useEditorState } from "./hooks/useEditorState";
 import { useImageHistory } from "./hooks/useImageHistory";
 import { useCropTool } from "./hooks/useCropTool";
@@ -32,6 +34,7 @@ interface EditorProps {
 
 export function Editor({ files, onClose }: EditorProps) {
   const { t } = useTranslation();
+  const [isAIPreviewModalOpen, setIsAIPreviewModalOpen] = useState(false);
 
   // Editor state
   const {
@@ -138,6 +141,11 @@ export function Editor({ files, onClose }: EditorProps) {
     const timestamp = new Date().toISOString().slice(0, 10);
     const filename = `mybias-${timestamp}.png`;
     downloadImage(currentImageState.blobUrl, filename);
+  };
+
+  const openAIPreviewModal = () => {
+    if (!currentImageState || isProcessing || remainingAIUsage === 0) return;
+    setIsAIPreviewModalOpen(true);
   };
 
   return (
@@ -323,7 +331,7 @@ export function Editor({ files, onClose }: EditorProps) {
             />
 
             <ToolButton
-              onClick={handleAIEnhance}
+              onClick={openAIPreviewModal}
               disabled={isProcessing || !currentImageState || remainingAIUsage === 0}
               icon={<Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
               label="AI"
@@ -368,6 +376,15 @@ export function Editor({ files, onClose }: EditorProps) {
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         imageUrl={currentImageState?.blobUrl || ""}
+      />
+
+      {/* AI Preview Modal */}
+      <AIPreviewModal
+        isOpen={isAIPreviewModalOpen}
+        onClose={() => setIsAIPreviewModalOpen(false)}
+        onConfirm={handleAIEnhance}
+        imageUrl={currentImageState?.blobUrl || ""}
+        remainingUsage={remainingAIUsage}
       />
     </div>
   );

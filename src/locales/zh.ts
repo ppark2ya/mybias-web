@@ -32,6 +32,16 @@ export default {
     "editor.ai.downloadingImage": "下载图像中...",
     "editor.ai.failed": "AI增强失败。请重试。",
 
+    // Editor - AI Preview Modal
+    "editor.ai.preview.title": "AI增强",
+    "editor.ai.preview.subtitle": "预览预期效果",
+    "editor.ai.preview.before": "增强前",
+    "editor.ai.preview.after": "增强后（预览）",
+    "editor.ai.preview.info": "实际AI结果可能与此预览不同。AI增强可恢复面部细节、改善肤色并提升整体图像质量。",
+    "editor.ai.preview.remaining": "今日剩余{{count}}次",
+    "editor.ai.preview.cancel": "取消",
+    "editor.ai.preview.enhance": "开始AI增强",
+
     // Share Modal
     "share.title": "分享",
     "share.kakaotalk": "KakaoTalk",

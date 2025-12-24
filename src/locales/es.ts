@@ -32,6 +32,16 @@ export default {
     "editor.ai.downloadingImage": "Descargando imagen...",
     "editor.ai.failed": "La mejora de IA falló. Inténtalo de nuevo.",
 
+    // Editor - AI Preview Modal
+    "editor.ai.preview.title": "Mejora con IA",
+    "editor.ai.preview.subtitle": "Vista previa del resultado esperado",
+    "editor.ai.preview.before": "ANTES",
+    "editor.ai.preview.after": "DESPUÉS (Vista previa)",
+    "editor.ai.preview.info": "El resultado real de IA puede diferir de esta vista previa. La mejora con IA restaura detalles faciales, mejora el tono de piel y aumenta la calidad general de la imagen.",
+    "editor.ai.preview.remaining": "{{count}} usos restantes hoy",
+    "editor.ai.preview.cancel": "Cancelar",
+    "editor.ai.preview.enhance": "Mejorar con IA",
+
     // Share Modal
     "share.title": "Compartir",
     "share.kakaotalk": "KakaoTalk",
