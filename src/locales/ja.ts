@@ -42,6 +42,14 @@ export default {
     "editor.ai.preview.cancel": "キャンセル",
     "editor.ai.preview.enhance": "AI補正を開始",
 
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "補正完了",
+    "editor.ai.result.subtitle": "補正前後を比較",
+    "editor.ai.result.before": "補正前",
+    "editor.ai.result.after": "補正後",
+    "editor.ai.result.info": "AIが顔のディテールを復元し、肌色を改善し、全体的な画質を向上させました。元に戻すボタンで復元できます。",
+    "editor.ai.result.confirm": "確認",
+
     // Share Modal
     "share.title": "共有",
     "share.kakaotalk": "KakaoTalk",

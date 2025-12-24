@@ -42,6 +42,14 @@ export default {
     "editor.ai.preview.cancel": "Cancel",
     "editor.ai.preview.enhance": "Enhance with AI",
 
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "Enhancement Complete",
+    "editor.ai.result.subtitle": "Compare the before and after",
+    "editor.ai.result.before": "BEFORE",
+    "editor.ai.result.after": "AFTER",
+    "editor.ai.result.info": "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
+    "editor.ai.result.confirm": "Done",
+
     // Share Modal
     "share.title": "Share",
     "share.kakaotalk": "KakaoTalk",

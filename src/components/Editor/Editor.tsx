@@ -35,6 +35,11 @@ interface EditorProps {
 export function Editor({ files, onClose }: EditorProps) {
   const { t } = useTranslation();
   const [isAIPreviewModalOpen, setIsAIPreviewModalOpen] = useState(false);
+  const [isAIResultModalOpen, setIsAIResultModalOpen] = useState(false);
+  const [aiResultImages, setAIResultImages] = useState<{
+    beforeImageUrl: string;
+    afterImageUrl: string;
+  } | null>(null);
 
   // Editor state
   const {
@@ -121,7 +126,11 @@ export function Editor({ files, onClose }: EditorProps) {
     historyHook.setHistoryIndex,
     setProcessingMessage,
     isProcessing,
-    setIsProcessing
+    setIsProcessing,
+    (result) => {
+      setAIResultImages(result);
+      setIsAIResultModalOpen(true);
+    }
   );
 
   const handleActiveTool = (tool: typeof activeTool) => {
@@ -383,8 +392,18 @@ export function Editor({ files, onClose }: EditorProps) {
         isOpen={isAIPreviewModalOpen}
         onClose={() => setIsAIPreviewModalOpen(false)}
         onConfirm={handleAIEnhance}
-        imageUrl={currentImageState?.blobUrl || ""}
+        beforeImageUrl={currentImageState?.blobUrl || ""}
         remainingUsage={remainingAIUsage}
+        mode="preview"
+      />
+
+      {/* AI Result Modal */}
+      <AIPreviewModal
+        isOpen={isAIResultModalOpen}
+        onClose={() => setIsAIResultModalOpen(false)}
+        beforeImageUrl={aiResultImages?.beforeImageUrl || ""}
+        afterImageUrl={aiResultImages?.afterImageUrl || ""}
+        mode="result"
       />
     </div>
   );

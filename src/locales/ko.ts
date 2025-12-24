@@ -43,6 +43,14 @@ export default {
     "editor.ai.preview.cancel": "취소",
     "editor.ai.preview.enhance": "AI 보정 시작",
 
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "보정 완료",
+    "editor.ai.result.subtitle": "보정 전후를 비교해보세요",
+    "editor.ai.result.before": "보정 전",
+    "editor.ai.result.after": "보정 후",
+    "editor.ai.result.info": "AI가 얼굴 디테일을 복원하고 피부 톤을 개선하며 전체적인 화질을 선명하게 만들었습니다. 되돌리기 버튼으로 원본으로 복원할 수 있습니다.",
+    "editor.ai.result.confirm": "확인",
+
     // Share Modal
     "share.title": "공유하기",
     "share.kakaotalk": "카카오톡",

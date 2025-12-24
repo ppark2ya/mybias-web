@@ -42,6 +42,14 @@ export default {
     "editor.ai.preview.cancel": "Cancelar",
     "editor.ai.preview.enhance": "Mejorar con IA",
 
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "Mejora Completada",
+    "editor.ai.result.subtitle": "Compara el antes y después",
+    "editor.ai.result.before": "ANTES",
+    "editor.ai.result.after": "DESPUÉS",
+    "editor.ai.result.info": "La IA ha restaurado detalles faciales, mejorado el tono de piel y aumentado la calidad general de la imagen. Usa deshacer si quieres revertir.",
+    "editor.ai.result.confirm": "Hecho",
+
     // Share Modal
     "share.title": "Compartir",
     "share.kakaotalk": "KakaoTalk",

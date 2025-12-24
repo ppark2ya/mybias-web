@@ -42,6 +42,14 @@ export default {
     "editor.ai.preview.cancel": "取消",
     "editor.ai.preview.enhance": "开始AI增强",
 
+    // Editor - AI Result Modal
+    "editor.ai.result.title": "增强完成",
+    "editor.ai.result.subtitle": "对比增强前后效果",
+    "editor.ai.result.before": "增强前",
+    "editor.ai.result.after": "增强后",
+    "editor.ai.result.info": "AI已恢复面部细节、改善肤色并提升整体图像质量。如需恢复原图可使用撤销按钮。",
+    "editor.ai.result.confirm": "确认",
+
     // Share Modal
     "share.title": "分享",
     "share.kakaotalk": "KakaoTalk",
