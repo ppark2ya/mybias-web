@@ -91,6 +91,11 @@ export default {
     "login.and": "y",
     "login.privacyLink": "Política de Privacidad",
 
+    // Auth Callback
+    "auth.signingIn": "Iniciando sesión...",
+    "auth.error": "Error de inicio de sesión",
+    "auth.tryAgain": "Intentar de nuevo",
+
     // Footer
     "footer.rights": "Todos los derechos reservados.",
     "footer.terms": "Términos de Servicio",

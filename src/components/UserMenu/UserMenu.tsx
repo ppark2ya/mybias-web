@@ -4,16 +4,18 @@ import { useTranslation } from "react-i18next";
 import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check } from "lucide-react";
 import { FlagIcon } from "../LanguageSwitcher/FlagIcon";
 import { LANGUAGES } from "../../constants/locales";
+import { useAuth } from "../../hooks/useAuth";
 
 export function UserMenu() {
   const { t, i18n } = useTranslation();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // TODO: Replace with actual auth state management
-  const isLoggedIn = false;
-  const userName = "User";
+  // Get user display info from metadata
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "User";
 
   const currentLanguage =
     LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
@@ -60,20 +62,36 @@ export function UserMenu() {
     }
   };
 
+  const handleSignOut = async () => {
+    setIsOpen(false);
+    await signOut();
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Avatar Button - Always visible */}
       <button
         onClick={handleToggleMenu}
-        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-white transition-all duration-200 border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 hover:scale-105 active:scale-95"
+        className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-white transition-all duration-200 border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 hover:scale-105 active:scale-95 overflow-hidden"
         type="button"
         aria-label={t("user.menu")}
+        disabled={isLoading}
       >
-        {isLoggedIn ? (
-          <User className="w-5 h-5" />
-        ) : (
-          <User className="w-5 h-5" />
-        )}
+        {isLoading ? (
+          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : isAuthenticated && avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={userName}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to User icon if image fails to load
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling?.classList.remove("hidden");
+            }}
+          />
+        ) : null}
+        <User className={`w-5 h-5 ${isAuthenticated && avatarUrl ? "hidden" : ""}`} />
       </button>
 
       {/* Dropdown Menu */}
@@ -127,11 +145,27 @@ export function UserMenu() {
           ) : (
             /* Main Menu View */
             <>
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 /* Logged In Menu */
                 <>
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{userName}</p>
+                  <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={userName}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <User className="w-4 h-4 text-purple-600" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
+                      {user?.email && (
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      )}
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -171,14 +205,11 @@ export function UserMenu() {
                 </div>
               </button>
 
-              {isLoggedIn && (
+              {isAuthenticated && (
                 /* Logout Button */
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsOpen(false);
-                    // TODO: Implement logout
-                  }}
+                  onClick={handleSignOut}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 border-t border-gray-100"
                 >
                   <LogOut className="w-4 h-4" />

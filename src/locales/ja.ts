@@ -91,6 +91,11 @@ export default {
     "login.and": "と",
     "login.privacyLink": "プライバシーポリシー",
 
+    // Auth Callback
+    "auth.signingIn": "ログイン中...",
+    "auth.error": "ログインエラー",
+    "auth.tryAgain": "再試行",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "利用規約",

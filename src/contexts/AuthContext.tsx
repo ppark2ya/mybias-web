@@ -76,13 +76,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (mounted) {
           setSession(initialSession);
           setUser(initialSession?.user ?? null);
-
-          if (initialSession?.user) {
-            const profileData = await fetchProfile(initialSession.user.id);
-            setProfile(profileData);
-          }
-
+          // Mark loading as done immediately after session check
           setIsLoading(false);
+
+          // Fetch profile in background (non-blocking)
+          if (initialSession?.user) {
+            fetchProfile(initialSession.user.id).then((profileData) => {
+              if (mounted) {
+                setProfile(profileData);
+              }
+            });
+          }
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
@@ -97,21 +101,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return;
 
       setSession(newSession);
       setUser(newSession?.user ?? null);
 
-      if (newSession?.user) {
-        const profileData = await fetchProfile(newSession.user.id);
-        setProfile(profileData);
-      } else {
-        setProfile(null);
-      }
-
       // Handle specific auth events
       if (event === "SIGNED_OUT") {
+        setProfile(null);
+      } else if (newSession?.user) {
+        // Fetch profile in background (non-blocking)
+        fetchProfile(newSession.user.id).then((profileData) => {
+          if (mounted) {
+            setProfile(profileData);
+          }
+        });
+      } else {
         setProfile(null);
       }
     });

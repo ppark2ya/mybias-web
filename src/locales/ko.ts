@@ -142,6 +142,11 @@ export default {
     "login.and": "및",
     "login.privacyLink": "개인정보처리방침",
 
+    // Auth Callback
+    "auth.signingIn": "로그인 중...",
+    "auth.error": "로그인 오류",
+    "auth.tryAgain": "다시 시도하기",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "이용약관",

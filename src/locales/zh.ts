@@ -91,6 +91,11 @@ export default {
     "login.and": "和",
     "login.privacyLink": "隐私政策",
 
+    // Auth Callback
+    "auth.signingIn": "登录中...",
+    "auth.error": "登录错误",
+    "auth.tryAgain": "重试",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "服务条款",

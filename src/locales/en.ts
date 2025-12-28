@@ -140,6 +140,11 @@ export default {
     "login.and": "and",
     "login.privacyLink": "Privacy Policy",
 
+    // Auth Callback
+    "auth.signingIn": "Signing you in...",
+    "auth.error": "Sign In Error",
+    "auth.tryAgain": "Try Again",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "Terms of Service",
