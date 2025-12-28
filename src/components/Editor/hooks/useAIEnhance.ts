@@ -17,6 +17,11 @@ import {
 } from "../../../utils/rateLimit";
 import type { ImageState } from "./useEditorState";
 
+export interface AIEnhanceResult {
+  beforeImageUrl: string;
+  afterImageUrl: string;
+}
+
 export function useAIEnhance(
   currentImageState: ImageState | undefined,
   selectedIndex: number,
@@ -26,7 +31,8 @@ export function useAIEnhance(
   setHistoryIndex: React.Dispatch<React.SetStateAction<Map<number, number>>>,
   setProcessingMessage: (message: string) => void,
   isProcessing: boolean,
-  setIsProcessing: (value: boolean) => void
+  setIsProcessing: (value: boolean) => void,
+  onEnhanceComplete?: (result: AIEnhanceResult) => void
 ) {
   const { t } = useTranslation();
   const [remainingAIUsage, setRemainingAIUsage] = useState(() =>
@@ -42,6 +48,9 @@ export function useAIEnhance(
       });
       return;
     }
+
+    // Store the original image URL before processing
+    const beforeImageUrl = currentImageState.blobUrl;
 
     trackAIEnhanceStart();
     setIsProcessing(true);
@@ -164,6 +173,14 @@ export function useAIEnhance(
         newMap.set(selectedIndex, currentIdx + 1);
         return newMap;
       });
+
+      // Call the completion callback with before/after URLs
+      if (onEnhanceComplete) {
+        onEnhanceComplete({
+          beforeImageUrl,
+          afterImageUrl: blobUrl,
+        });
+      }
     } catch (error) {
       console.error("Failed to enhance image:", error);
       const errorMessage =
