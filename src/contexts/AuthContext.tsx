@@ -16,8 +16,6 @@ export type AuthContextType = {
   isLoading: boolean;
   isAuthenticated: boolean;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
-  signInWithKakao: () => Promise<{ error: AuthError | null }>;
-  signInWithApple: () => Promise<{ error: AuthError | null }>;
   signInWithEmail: (email: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
@@ -135,28 +133,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return { error };
   };
 
-  // Sign in with Kakao
-  const signInWithKakao = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
-  };
-
-  // Sign in with Apple
-  const signInWithApple = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "apple",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
-  };
-
   // Sign in with Email (Magic Link)
   const signInWithEmail = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
@@ -186,8 +162,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isLoading,
     isAuthenticated: !!user,
     signInWithGoogle,
-    signInWithKakao,
-    signInWithApple,
     signInWithEmail,
     signOut,
     refreshProfile,

@@ -1,20 +1,18 @@
 import type { ReactNode } from "react";
 
 interface SocialButtonProps {
-  provider: "google" | "apple" | "facebook" | "kakao";
+  provider: "google";
   onClick?: () => void;
   children: ReactNode;
+  disabled?: boolean;
 }
 
-export function SocialButton({ provider, onClick, children }: SocialButtonProps) {
+export function SocialButton({ provider, onClick, children, disabled }: SocialButtonProps) {
   const baseStyles =
-    "w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl font-medium text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl font-medium text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const providerStyles = {
-    google: "bg-white text-gray-800 border-2 border-gray-200 hover:border-gray-300 hover:shadow-md focus:ring-blue-500",
-    apple: "bg-black text-white hover:bg-gray-900 hover:shadow-lg focus:ring-gray-500",
-    facebook: "bg-[#1877F2] text-white hover:bg-[#166FE5] hover:shadow-lg focus:ring-blue-400",
-    kakao: "bg-[#FEE500] text-[#191919] hover:bg-[#FDD835] hover:shadow-lg focus:ring-yellow-400",
+    google: "bg-white text-gray-800 border-2 border-gray-200 hover:border-gray-300 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus:ring-blue-500 disabled:hover:scale-100 disabled:hover:shadow-none",
   };
 
   const icons = {
@@ -38,27 +36,13 @@ export function SocialButton({ provider, onClick, children }: SocialButtonProps)
         />
       </svg>
     ),
-    apple: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-      </svg>
-    ),
-    facebook: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-      </svg>
-    ),
-    kakao: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 3C6.477 3 2 6.56 2 10.93c0 2.8 1.89 5.26 4.71 6.63-.2.7-.66 2.31-.76 2.68-.11.46.17.46.36.33.14-.09 2.24-1.52 3.1-2.11.52.07 1.06.11 1.59.11 5.523 0 10-3.56 10-7.93S17.523 3 12 3z" />
-      </svg>
-    ),
   };
 
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={`${baseStyles} ${providerStyles[provider]}`}
     >
       {icons[provider]}
