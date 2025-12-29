@@ -167,17 +167,14 @@ export function UserMenu() {
                       )}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsOpen(false);
-                      // TODO: Navigate to profile
-                    }}
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <UserCircle className="w-4 h-4" />
                     <span>{t("user.profile")}</span>
-                  </button>
+                  </Link>
                 </>
               ) : (
                 /* Not Logged In - Login Button */
