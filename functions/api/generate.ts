@@ -82,7 +82,7 @@ const REPLICATE_MODEL_VERSION =
 async function saveGenerationRecord(
   env: Env,
   predictionId: string,
-  userId?: string
+  userId: string | null
 ): Promise<void> {
   const response = await fetch(
     `${env.SUPABASE_URL}/rest/v1/image_generations`,
