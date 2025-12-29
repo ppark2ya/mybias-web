@@ -67,6 +67,17 @@ export default {
     "user.menu": "用户菜单",
     "user.profile": "个人资料",
     "user.logout": "退出登录",
+    "user.language": "语言",
+    "user.back": "返回",
+
+    // Profile
+    "profile.title": "我的资料",
+    "profile.backToHome": "返回主页",
+    "profile.email": "电子邮箱",
+    "profile.memberSince": "注册日期",
+    "profile.aiCredits": "AI积分",
+    "profile.creditsRemaining": "剩余{{count}}次",
+    "profile.charge": "充值",
 
     // Login
     "login.title": "欢迎回来",

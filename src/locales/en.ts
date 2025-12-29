@@ -117,6 +117,15 @@ export default {
     "user.language": "Language",
     "user.back": "Back",
 
+    // Profile
+    "profile.title": "My Profile",
+    "profile.backToHome": "Home",
+    "profile.email": "Email",
+    "profile.memberSince": "Member Since",
+    "profile.aiCredits": "AI Credits",
+    "profile.creditsRemaining": "{{count}} remaining",
+    "profile.charge": "Top Up Credits",
+
     // Login
     "login.title": "Welcome Back",
     "login.subtitle": "Continue to My Bias Gallery",

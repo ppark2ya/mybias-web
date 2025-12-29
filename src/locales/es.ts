@@ -67,6 +67,17 @@ export default {
     "user.menu": "Menú de Usuario",
     "user.profile": "Perfil",
     "user.logout": "Cerrar Sesión",
+    "user.language": "Idioma",
+    "user.back": "Volver",
+
+    // Profile
+    "profile.title": "Mi Perfil",
+    "profile.backToHome": "Volver al Inicio",
+    "profile.email": "Email",
+    "profile.memberSince": "Miembro Desde",
+    "profile.aiCredits": "Créditos de IA",
+    "profile.creditsRemaining": "{{count}} restantes",
+    "profile.charge": "Recargar Créditos",
 
     // Login
     "login.title": "Bienvenido de Nuevo",

@@ -67,6 +67,17 @@ export default {
     "user.menu": "ユーザーメニュー",
     "user.profile": "プロフィール",
     "user.logout": "ログアウト",
+    "user.language": "言語",
+    "user.back": "戻る",
+
+    // Profile
+    "profile.title": "マイプロフィール",
+    "profile.backToHome": "ホームに戻る",
+    "profile.email": "メール",
+    "profile.memberSince": "登録日",
+    "profile.aiCredits": "AIクレジット",
+    "profile.creditsRemaining": "残り{{count}}回",
+    "profile.charge": "チャージする",
 
     // Login
     "login.title": "おかえりなさい",

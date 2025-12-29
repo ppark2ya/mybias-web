@@ -119,6 +119,15 @@ export default {
     "user.language": "언어",
     "user.back": "뒤로",
 
+    // Profile
+    "profile.title": "내 프로필",
+    "profile.backToHome": "홈으로",
+    "profile.email": "이메일",
+    "profile.memberSince": "가입일",
+    "profile.aiCredits": "AI 크레딧",
+    "profile.creditsRemaining": "{{count}}회 남음",
+    "profile.charge": "충전하기",
+
     // Login
     "login.title": "환영합니다",
     "login.subtitle": "나만의 바이어스 갤러리로 계속하기",
