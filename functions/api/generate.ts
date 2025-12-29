@@ -13,7 +13,63 @@ interface GenerateRequest {
   fidelity?: number;
   backgroundEnhance?: boolean;
   faceUpsample?: boolean;
-  userId?: string; // Optional user ID for tracking
+}
+
+interface ReplicatePredictionResponse {
+  id: string;
+  model: string;
+  version: string;
+  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
+  input: Record<string, unknown>;
+  output?: string | string[] | null;
+  error?: string | null;
+  logs?: string;
+  metrics?: {
+    predict_time?: number;
+  };
+  created_at: string;
+  started_at?: string;
+  completed_at?: string;
+  urls: {
+    get: string;
+    cancel: string;
+  };
+}
+
+/**
+ * Extract user ID from Supabase JWT token in Authorization header
+ */
+async function getUserIdFromAuth(
+  request: Request,
+  env: Env
+): Promise<string | null> {
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    // Verify token with Supabase
+    const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      console.warn("Failed to verify user token:", response.status);
+      return null;
+    }
+
+    const user = (await response.json()) as { id: string };
+    return user.id;
+  } catch (error) {
+    console.warn("Error verifying user token:", error);
+    return null;
+  }
 }
 
 // CodeFormer - Face Restoration model (sczhou/codeformer)
@@ -55,7 +111,7 @@ async function saveGenerationRecord(
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -109,8 +165,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       fidelity = 0.6,
       backgroundEnhance = true,
       faceUpsample = true,
-      userId,
     }: GenerateRequest = await request.json();
+
+    // Get user ID from Authorization header (optional)
+    const userId = await getUserIdFromAuth(request, env);
 
     if (!image) {
       return new Response(JSON.stringify({ error: "Image is required" }), {
@@ -170,7 +228,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
-    const result = await response.json();
+    const result: ReplicatePredictionResponse = await response.json();
 
     // Save generation record to database (non-blocking)
     if (env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY && result.id) {
