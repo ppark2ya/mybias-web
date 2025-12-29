@@ -2,6 +2,9 @@ interface Env {
   REPLICATE_API_TOKEN: string;
   RATE_LIMIT?: KVNamespace;
   MAX_LIMIT?: number;
+  BASE_URL: string;
+  SUPABASE_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
 }
 
 interface GenerateRequest {
@@ -10,11 +13,44 @@ interface GenerateRequest {
   fidelity?: number;
   backgroundEnhance?: boolean;
   faceUpsample?: boolean;
+  userId?: string; // Optional user ID for tracking
 }
 
 // CodeFormer - Face Restoration model (sczhou/codeformer)
 const REPLICATE_MODEL_VERSION =
   "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2";
+
+/**
+ * Save image generation record to Supabase
+ */
+async function saveGenerationRecord(
+  env: Env,
+  predictionId: string,
+  userId?: string
+): Promise<void> {
+  const response = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/image_generations`,
+    {
+      method: "POST",
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        prediction_id: predictionId,
+        user_id: userId || null,
+        status: "pending",
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to save generation record: ${errorText}`);
+  }
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,6 +109,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       fidelity = 0.6,
       backgroundEnhance = true,
       faceUpsample = true,
+      userId,
     }: GenerateRequest = await request.json();
 
     if (!image) {
@@ -93,7 +130,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
-    // Create prediction - don't wait, just return the id
+    // Build webhook URL for completed predictions
+    const webhookUrl = env.BASE_URL
+      ? `${env.BASE_URL}/api/webhook/replicate`
+      : null;
+
+    // Create prediction with webhook
     const response = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
       headers: {
@@ -109,6 +151,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           background_enhance: backgroundEnhance,
           face_upsample: faceUpsample,
         },
+        ...(webhookUrl && {
+          webhook: webhookUrl,
+          webhook_events_filter: ["completed"],
+        }),
       }),
     });
 
@@ -125,6 +171,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     const result = await response.json();
+
+    // Save generation record to database (non-blocking)
+    if (env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY && result.id) {
+      context.waitUntil(
+        saveGenerationRecord(env, result.id, userId).catch((err) => {
+          console.error("Failed to save generation record:", err);
+        })
+      );
+    }
 
     // Return immediately with prediction id
     return new Response(JSON.stringify(result), {
