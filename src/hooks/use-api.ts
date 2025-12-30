@@ -1,7 +1,12 @@
-import { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from '@tanstack/react-query'
-import { apiClient } from '@/api/axios-instance'
-import type { ApiResponse, ApiError } from '@/types'
-import type { AxiosError } from 'axios'
+import {
+  useQuery,
+  useMutation,
+  type UseQueryOptions,
+  type UseMutationOptions,
+} from "@tanstack/react-query";
+import { apiClient } from "@/lib/axios";
+import type { ApiResponse, ApiError } from "@/types";
+import type { AxiosError } from "axios";
 
 interface UseApiQueryOptions<T> extends Omit<UseQueryOptions<ApiResponse<T>, AxiosError<ApiError>>, 'queryKey' | 'queryFn'> {
   endpoint: string
