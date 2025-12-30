@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "ngrok": "./update_ngrok.sh",
-    "pages:dev": "wrangler pages dev --kv RATE_LIMIT --proxy 5173 -- bun run dev",
+    "pages:dev": "wrangler pages dev",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
