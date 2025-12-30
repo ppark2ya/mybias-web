@@ -1,3 +1,7 @@
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { imageGenerations } from "../../src/db/schema";
+
 interface Env {
   REPLICATE_API_TOKEN: string;
   RATE_LIMIT?: KVNamespace;
@@ -5,6 +9,7 @@ interface Env {
   BASE_URL: string;
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
+  DATABASE_URL: string;
 }
 
 interface GenerateRequest {
@@ -77,34 +82,24 @@ const REPLICATE_MODEL_VERSION =
   "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2";
 
 /**
- * Save image generation record to Supabase
+ * Save image generation record to database using drizzle-orm
  */
 async function saveGenerationRecord(
   env: Env,
   predictionId: string,
   userId: string | null
 ): Promise<void> {
-  const response = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/image_generations`,
-    {
-      method: "POST",
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify({
-        prediction_id: predictionId,
-        user_id: userId || null,
-        status: "pending",
-      }),
-    }
-  );
+  const client = postgres(env.DATABASE_URL, { prepare: false });
+  const db = drizzle(client);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to save generation record: ${errorText}`);
+  try {
+    await db.insert(imageGenerations).values({
+      predictionId,
+      userId: userId || null,
+      status: "pending",
+    });
+  } finally {
+    await client.end();
   }
 }
 
@@ -230,16 +225,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const result: ReplicatePredictionResponse = await response.json();
 
-    // Save generation record to database (non-blocking)
-    if (env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY && result.id) {
-      context.waitUntil(
-        saveGenerationRecord(env, result.id, userId).catch((err) => {
-          console.error("Failed to save generation record:", err);
-        })
-      );
+    // Save generation record to database (synchronous - fail fast if DB write fails)
+    if (env.DATABASE_URL && result.id) {
+      try {
+        await saveGenerationRecord(env, result.id, userId);
+      } catch (err) {
+        console.error("Failed to save generation record:", err);
+        return new Response(
+          JSON.stringify({ error: "Failed to save generation record" }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
     }
 
-    // Return immediately with prediction id
+    // Return with prediction id
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
