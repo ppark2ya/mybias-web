@@ -2,6 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import {
+  generateImage,
+  createGenerateRequest,
+  getStatus,
+  getOutputUrl,
+} from "../../../api";
+import { POLLING } from "../../../constants/times";
+import {
   getImageDimensions,
   urlToBlobUrl,
 } from "../../../utils/imageEditor";
@@ -67,27 +74,8 @@ export function useAIEnhance(
       });
       setProcessingMessage(t("editor.ai.requestingServer"));
 
-      const startResponse = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image: base64,
-          upscale: 1,
-          fidelity: 0.6,
-          backgroundEnhance: true,
-          faceUpsample: true,
-        }),
-      });
-
-      if (!startResponse.ok) {
-        const errorData = await startResponse.json();
-        throw new Error(errorData.error || "Failed to start enhancement");
-      }
-
-      const startData = await startResponse.json();
-      const predictionId = startData.id;
+      const generateResponse = await generateImage(createGenerateRequest(base64));
+      const predictionId = generateResponse.id;
 
       if (!predictionId) {
         throw new Error("No prediction ID received");
@@ -115,12 +103,16 @@ export function useAIEnhance(
             setProcessingMessage(messages[messageIdx]);
 
             try {
-              const statusResponse = await fetch(`/api/status/${predictionId}`);
-              const statusData = await statusResponse.json();
+              const statusData = await getStatus(predictionId);
 
               if (statusData.status === "succeeded") {
                 clearInterval(interval);
-                resolve(statusData.output);
+                const outputUrl = getOutputUrl(statusData);
+                if (outputUrl) {
+                  resolve(outputUrl);
+                } else {
+                  reject(new Error("No output URL received"));
+                }
               } else if (statusData.status === "failed") {
                 clearInterval(interval);
                 reject(new Error(statusData.error || "Enhancement failed"));
@@ -132,7 +124,7 @@ export function useAIEnhance(
               clearInterval(interval);
               reject(error);
             }
-          }, 3000);
+          }, POLLING.DEFAULT);
         });
       };
 
