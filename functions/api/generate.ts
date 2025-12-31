@@ -1,10 +1,13 @@
+import { imageGenerations, ImageGenerationStatus } from "../../src/db/schema";
+import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
+import { getDb } from "../lib/db";
+import type { ContextData } from "./_middleware";
+
 interface Env {
   REPLICATE_API_TOKEN: string;
   RATE_LIMIT?: KVNamespace;
   MAX_LIMIT?: number;
   BASE_URL: string;
-  SUPABASE_URL: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
 }
 
 interface GenerateRequest {
@@ -19,7 +22,7 @@ interface ReplicatePredictionResponse {
   id: string;
   model: string;
   version: string;
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
+  status: ReplicatePredictionStatusType;
   input: Record<string, unknown>;
   output?: string | string[] | null;
   error?: string | null;
@@ -36,76 +39,23 @@ interface ReplicatePredictionResponse {
   };
 }
 
-/**
- * Extract user ID from Supabase JWT token in Authorization header
- */
-async function getUserIdFromAuth(
-  request: Request,
-  env: Env
-): Promise<string | null> {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = authHeader.slice(7);
-
-  try {
-    // Verify token with Supabase
-    const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-      },
-    });
-
-    if (!response.ok) {
-      console.warn("Failed to verify user token:", response.status);
-      return null;
-    }
-
-    const user = (await response.json()) as { id: string };
-    return user.id;
-  } catch (error) {
-    console.warn("Error verifying user token:", error);
-    return null;
-  }
-}
-
 // CodeFormer - Face Restoration model (sczhou/codeformer)
 const REPLICATE_MODEL_VERSION =
   "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2";
 
 /**
- * Save image generation record to Supabase
+ * Save image generation record to database using drizzle-orm
  */
 async function saveGenerationRecord(
-  env: Env,
   predictionId: string,
   userId: string | null
 ): Promise<void> {
-  const response = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/image_generations`,
-    {
-      method: "POST",
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify({
-        prediction_id: predictionId,
-        user_id: userId || null,
-        status: "pending",
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to save generation record: ${errorText}`);
-  }
+  const db = getDb();
+  await db.insert(imageGenerations).values({
+    predictionId,
+    userId: userId || null,
+    status: ImageGenerationStatus.PENDING,
+  });
 }
 
 const corsHeaders = {
@@ -114,9 +64,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
+  context
+) => {
   try {
-    const { request, env } = context;
+    const { request, env, data } = context;
+
+    // Get user from middleware context (optional)
+    const userId = data.user?.id ?? null;
 
     // 1. 사용자 IP 가져오기
     const ip = request.headers.get("CF-Connecting-IP");
@@ -166,9 +121,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       backgroundEnhance = true,
       faceUpsample = true,
     }: GenerateRequest = await request.json();
-
-    // Get user ID from Authorization header (optional)
-    const userId = await getUserIdFromAuth(request, env);
 
     if (!image) {
       return new Response(JSON.stringify({ error: "Image is required" }), {
@@ -230,16 +182,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const result: ReplicatePredictionResponse = await response.json();
 
-    // Save generation record to database (non-blocking)
-    if (env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY && result.id) {
-      context.waitUntil(
-        saveGenerationRecord(env, result.id, userId).catch((err) => {
-          console.error("Failed to save generation record:", err);
-        })
-      );
+    // Save generation record to database (synchronous - fail fast if DB write fails)
+    if (result.id) {
+      try {
+        await saveGenerationRecord(result.id, userId);
+      } catch (err) {
+        console.error("Failed to save generation record:", err);
+        return new Response(
+          JSON.stringify({ error: "Failed to save generation record" }),
+          {
+            status: 500,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
+      }
     }
 
-    // Return immediately with prediction id
+    // Return with prediction id
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },

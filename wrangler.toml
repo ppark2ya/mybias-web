@@ -1,0 +1,10 @@
+name = "mybias-web"
+compatibility_date = "2024-04-01"
+compatibility_flags = [ "nodejs_compat" ]
+pages_build_output_dir = "dist"
+
+# KV 바인딩 설정
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "44703de0abc4464bad57bea032a16b08"
+preview_id = "44703de0abc4464bad57bea032a16b08"
