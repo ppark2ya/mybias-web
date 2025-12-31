@@ -3,36 +3,48 @@
  * Singleton pattern for connection reuse across requests in the same isolate
  */
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import postgres, { type Sql } from "postgres";
+import postgres from "postgres";
 
 export type DbClient = PostgresJsDatabase;
 
-// Cache for database connections (singleton per DATABASE_URL)
-const dbCache = new Map<string, { client: Sql; db: DbClient }>();
+// Singleton database instance
+let dbInstance: DbClient | null = null;
 
 /**
- * Get a singleton database instance for the given connection URL
- * Reuses existing connections within the same Cloudflare Workers isolate
+ * Initialize the database connection (call once in middleware)
  *
  * @param databaseUrl - PostgreSQL connection string
- * @returns Drizzle database client
  *
  * @example
  * ```ts
- * const db = getDb(env.DATABASE_URL);
+ * // In middleware
+ * initDb(env.DATABASE_URL);
+ * ```
+ */
+export function initDb(databaseUrl: string): void {
+  if (dbInstance) return;
+
+  const client = postgres(databaseUrl, { prepare: false });
+  dbInstance = drizzle(client);
+}
+
+/**
+ * Get the singleton database instance
+ * Must call initDb() first (typically in middleware)
+ *
+ * @returns Drizzle database client
+ * @throws Error if database is not initialized
+ *
+ * @example
+ * ```ts
+ * const db = getDb();
  * const users = await db.select().from(usersTable);
  * ```
  */
-export function getDb(databaseUrl: string): DbClient {
-  const cached = dbCache.get(databaseUrl);
-  if (cached) {
-    return cached.db;
+export function getDb(): DbClient {
+  if (!dbInstance) {
+    throw new Error("Database not initialized. Call initDb() first.");
   }
 
-  const client = postgres(databaseUrl, { prepare: false });
-  const db = drizzle(client);
-
-  dbCache.set(databaseUrl, { client, db });
-
-  return db;
+  return dbInstance;
 }

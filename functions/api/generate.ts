@@ -7,7 +7,6 @@ interface Env {
   RATE_LIMIT?: KVNamespace;
   MAX_LIMIT?: number;
   BASE_URL: string;
-  DATABASE_URL: string;
 }
 
 interface GenerateRequest {
@@ -47,11 +46,10 @@ const REPLICATE_MODEL_VERSION =
  * Save image generation record to database using drizzle-orm
  */
 async function saveGenerationRecord(
-  databaseUrl: string,
   predictionId: string,
   userId: string | null
 ): Promise<void> {
-  const db = getDb(databaseUrl);
+  const db = getDb();
   await db.insert(imageGenerations).values({
     predictionId,
     userId: userId || null,
@@ -184,9 +182,9 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     const result: ReplicatePredictionResponse = await response.json();
 
     // Save generation record to database (synchronous - fail fast if DB write fails)
-    if (env.DATABASE_URL && result.id) {
+    if (result.id) {
       try {
-        await saveGenerationRecord(env.DATABASE_URL, result.id, userId);
+        await saveGenerationRecord(result.id, userId);
       } catch (err) {
         console.error("Failed to save generation record:", err);
         return new Response(
