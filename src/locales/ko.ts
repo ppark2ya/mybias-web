@@ -21,6 +21,9 @@ export default {
     "editor.pleaseWait": "잠시만 기다려주세요",
 
     // Editor - AI Enhancement
+    "editor.ai.loginRequired": "AI 보정 기능을 사용하려면 로그인이 필요합니다.",
+    "editor.ai.insufficientCredits":
+      "크레딧이 부족합니다. 충전 후 다시 시도해주세요.",
     "editor.ai.limitReached":
       "오늘의 AI 보정 횟수를 모두 사용했습니다. 내일 다시 시도해주세요!",
     "editor.ai.preparingImage": "이미지 준비 중...",

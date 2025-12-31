@@ -21,6 +21,8 @@ export default {
     "editor.pleaseWait": "お待ちください",
 
     // Editor - AI Enhancement
+    "editor.ai.loginRequired": "AI補正機能を使用するにはログインが必要です。",
+    "editor.ai.insufficientCredits": "クレジットが不足しています。チャージしてから再試行してください。",
     "editor.ai.limitReached": "本日のAI補正回数を使い切りました。明日また試してください！",
     "editor.ai.preparingImage": "画像を準備中...",
     "editor.ai.requestingServer": "AIサーバーに要請中...",
