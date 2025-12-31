@@ -1,14 +1,13 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { imageGenerations } from "../../src/db/schema";
+import type { ContextData } from "./_middleware";
 
 interface Env {
   REPLICATE_API_TOKEN: string;
   RATE_LIMIT?: KVNamespace;
   MAX_LIMIT?: number;
   BASE_URL: string;
-  SUPABASE_URL: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
   DATABASE_URL: string;
 }
 
@@ -39,42 +38,6 @@ interface ReplicatePredictionResponse {
     get: string;
     cancel: string;
   };
-}
-
-/**
- * Extract user ID from Supabase JWT token in Authorization header
- */
-async function getUserIdFromAuth(
-  request: Request,
-  env: Env
-): Promise<string | null> {
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = authHeader.slice(7);
-
-  try {
-    // Verify token with Supabase
-    const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-      },
-    });
-
-    if (!response.ok) {
-      console.warn("Failed to verify user token:", response.status);
-      return null;
-    }
-
-    const user = (await response.json()) as { id: string };
-    return user.id;
-  } catch (error) {
-    console.warn("Error verifying user token:", error);
-    return null;
-  }
 }
 
 // CodeFormer - Face Restoration model (sczhou/codeformer)
@@ -109,9 +72,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
+  context
+) => {
   try {
-    const { request, env } = context;
+    const { request, env, data } = context;
+
+    // Get user from middleware context (optional)
+    const userId = data.user?.id ?? null;
 
     // 1. 사용자 IP 가져오기
     const ip = request.headers.get("CF-Connecting-IP");
@@ -161,9 +129,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       backgroundEnhance = true,
       faceUpsample = true,
     }: GenerateRequest = await request.json();
-
-    // Get user ID from Authorization header (optional)
-    const userId = await getUserIdFromAuth(request, env);
 
     if (!image) {
       return new Response(JSON.stringify({ error: "Image is required" }), {
