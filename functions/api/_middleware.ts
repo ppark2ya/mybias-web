@@ -6,7 +6,7 @@ import { createClient, type User } from "@supabase/supabase-js";
 
 interface Env {
   SUPABASE_URL: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
+  SUPABASE_SECRET_KEY: string;
 }
 
 export type { User };
@@ -30,7 +30,7 @@ async function getUserFromAuth(
   const token = authHeader.slice(7);
 
   try {
-    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,

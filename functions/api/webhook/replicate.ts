@@ -5,7 +5,7 @@ import { withDb } from "../../lib/db";
 interface Env {
   REPLICATE_WEBHOOK_SECRET?: string;
   SUPABASE_URL: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
+  SUPABASE_SECRET_KEY: string;
   R2_BUCKET: R2Bucket;
   R2_PUBLIC_URL: string;
   DATABASE_URL: string;
