@@ -2,17 +2,14 @@
  * Middleware for API routes
  * Extracts user information from Authorization header and adds to context
  */
+import { createClient, type User } from "@supabase/supabase-js";
 
 interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
 }
 
-export interface User {
-  id: string;
-  email?: string;
-  [key: string]: unknown;
-}
+export type { User };
 
 export interface ContextData {
   user: User | null;
@@ -33,20 +30,21 @@ async function getUserFromAuth(
   const token = authHeader.slice(7);
 
   try {
-    const response = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     });
 
-    if (!response.ok) {
-      console.warn("Failed to verify user token:", response.status);
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error) {
+      console.warn("Failed to verify user token:", error.message);
       return null;
     }
 
-    const user = (await response.json()) as User;
-    return user;
+    return data.user;
   } catch (error) {
     console.warn("Error verifying user token:", error);
     return null;
