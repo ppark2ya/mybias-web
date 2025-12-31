@@ -56,6 +56,20 @@ export const imageGenerationStatusEnum = pgEnum("image_generation_status", [
 ]);
 
 /**
+ * Image generation status constants for type-safe usage
+ */
+export const ImageGenerationStatus = {
+  PENDING: "pending",
+  PROCESSING: "processing",
+  SUCCEEDED: "succeeded",
+  FAILED: "failed",
+  CANCELED: "canceled",
+} as const;
+
+export type ImageGenerationStatusType =
+  (typeof ImageGenerationStatus)[keyof typeof ImageGenerationStatus];
+
+/**
  * Image generations table - tracks AI image generation requests
  * Maps Replicate prediction IDs to users and stores results
  */

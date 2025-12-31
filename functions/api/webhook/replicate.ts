@@ -1,5 +1,9 @@
 import { eq } from "drizzle-orm";
-import { imageGenerations } from "../../../src/db/schema";
+import {
+  imageGenerations,
+  ImageGenerationStatus,
+  type ImageGenerationStatusType,
+} from "../../../src/db/schema";
 import { getDb } from "../../lib/db";
 
 interface Env {
@@ -121,7 +125,7 @@ async function uploadToR2(
 async function updateGenerationRecord(
   predictionId: string,
   updates: {
-    status: "pending" | "processing" | "succeeded" | "failed" | "canceled";
+    status: ImageGenerationStatusType;
     outputImageUrl?: string;
     replicateOutputUrl?: string;
     errorMessage?: string;
@@ -169,7 +173,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       if (!outputUrl) {
         console.error("No output URL in succeeded prediction:", predictionId);
         await updateGenerationRecord(predictionId, {
-          status: "failed",
+          status: ImageGenerationStatus.FAILED,
           errorMessage: "No output URL received",
           completedAt: completed_at ? new Date(completed_at) : new Date(),
         });
@@ -187,7 +191,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         console.error("Failed to upload to R2:", uploadError);
         // Still update record with Replicate URL as fallback
         await updateGenerationRecord(predictionId, {
-          status: "succeeded",
+          status: ImageGenerationStatus.SUCCEEDED,
           replicateOutputUrl: outputUrl,
           errorMessage: `R2 upload failed: ${uploadError instanceof Error ? uploadError.message : "Unknown error"}`,
           completedAt: completed_at ? new Date(completed_at) : new Date(),
@@ -203,22 +207,27 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       // Update database record
       await updateGenerationRecord(predictionId, {
-        status: "succeeded",
+        status: ImageGenerationStatus.SUCCEEDED,
         outputImageUrl: publicUrl,
         replicateOutputUrl: outputUrl,
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
 
       console.log("Successfully processed prediction:", predictionId, "->", publicUrl);
-    } else if (status === "failed" || status === "canceled") {
-      // Update record with error status
+    } else if (status === "failed") {
       await updateGenerationRecord(predictionId, {
-        status,
-        errorMessage: error || `Prediction ${status}`,
+        status: ImageGenerationStatus.FAILED,
+        errorMessage: error || "Prediction failed",
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
-
-      console.log("Prediction failed/canceled:", predictionId, error);
+      console.log("Prediction failed:", predictionId, error);
+    } else if (status === "canceled") {
+      await updateGenerationRecord(predictionId, {
+        status: ImageGenerationStatus.CANCELED,
+        errorMessage: error || "Prediction canceled",
+        completedAt: completed_at ? new Date(completed_at) : new Date(),
+      });
+      console.log("Prediction canceled:", predictionId, error);
     }
 
     return new Response(JSON.stringify({ received: true }), {

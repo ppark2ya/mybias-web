@@ -1,4 +1,4 @@
-import { imageGenerations } from "../../src/db/schema";
+import { imageGenerations, ImageGenerationStatus } from "../../src/db/schema";
 import { getDb } from "../lib/db";
 import type { ContextData } from "./_middleware";
 
@@ -53,7 +53,7 @@ async function saveGenerationRecord(
   await db.insert(imageGenerations).values({
     predictionId,
     userId: userId || null,
-    status: "pending",
+    status: ImageGenerationStatus.PENDING,
   });
 }
 
