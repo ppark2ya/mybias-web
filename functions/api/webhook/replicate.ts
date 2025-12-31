@@ -4,6 +4,10 @@ import {
   ImageGenerationStatus,
   type ImageGenerationStatusType,
 } from "../../../src/db/schema";
+import {
+  ReplicatePredictionStatus,
+  type ReplicatePredictionStatusType,
+} from "../../../src/constants/replicate";
 import { getDb } from "../../lib/db";
 
 interface Env {
@@ -14,7 +18,7 @@ interface Env {
 
 interface ReplicateWebhookPayload {
   id: string;
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
+  status: ReplicatePredictionStatusType;
   output?: string | string[];
   error?: string;
   created_at: string;
@@ -166,7 +170,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { id: predictionId, status, output, error, completed_at } = payload;
 
     // Handle different statuses
-    if (status === "succeeded" && output) {
+    if (status === ReplicatePredictionStatus.SUCCEEDED && output) {
       // Get the output URL (can be string or array)
       const outputUrl = Array.isArray(output) ? output[0] : output;
 
@@ -214,14 +218,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       });
 
       console.log("Successfully processed prediction:", predictionId, "->", publicUrl);
-    } else if (status === "failed") {
+    } else if (status === ReplicatePredictionStatus.FAILED) {
       await updateGenerationRecord(predictionId, {
         status: ImageGenerationStatus.FAILED,
         errorMessage: error || "Prediction failed",
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
       console.log("Prediction failed:", predictionId, error);
-    } else if (status === "canceled") {
+    } else if (status === ReplicatePredictionStatus.CANCELED) {
       await updateGenerationRecord(predictionId, {
         status: ImageGenerationStatus.CANCELED,
         errorMessage: error || "Prediction canceled",

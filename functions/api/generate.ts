@@ -1,4 +1,5 @@
 import { imageGenerations, ImageGenerationStatus } from "../../src/db/schema";
+import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
 import { getDb } from "../lib/db";
 import type { ContextData } from "./_middleware";
 
@@ -21,7 +22,7 @@ interface ReplicatePredictionResponse {
   id: string;
   model: string;
   version: string;
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
+  status: ReplicatePredictionStatusType;
   input: Record<string, unknown>;
   output?: string | string[] | null;
   error?: string | null;
