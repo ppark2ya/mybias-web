@@ -8,6 +8,11 @@ import {
 } from "drizzle-orm/pg-core";
 
 /**
+ * Default credits for new users
+ */
+export const DEFAULT_USER_CREDITS = 5;
+
+/**
  * Profiles table - extends Supabase auth.users
  * Stores additional user information
  */
@@ -16,6 +21,7 @@ export const profiles = pgTable("profiles", {
   email: text("email"),
   fullName: text("full_name"),
   avatarUrl: text("avatar_url"),
+  credits: integer("credits").default(DEFAULT_USER_CREDITS).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
