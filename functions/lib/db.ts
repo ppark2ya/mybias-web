@@ -1,36 +1,38 @@
 /**
  * Database utility for Cloudflare Pages Functions
- * Provides a wrapper for drizzle-orm with automatic connection management
+ * Singleton pattern for connection reuse across requests in the same isolate
  */
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import postgres, { type Sql } from "postgres";
 
 export type DbClient = PostgresJsDatabase;
 
+// Cache for database connections (singleton per DATABASE_URL)
+const dbCache = new Map<string, { client: Sql; db: DbClient }>();
+
 /**
- * Execute a database operation with automatic connection management
+ * Get a singleton database instance for the given connection URL
+ * Reuses existing connections within the same Cloudflare Workers isolate
  *
  * @param databaseUrl - PostgreSQL connection string
- * @param callback - Function to execute with the database client
- * @returns The result of the callback function
+ * @returns Drizzle database client
  *
  * @example
  * ```ts
- * const users = await withDb(env.DATABASE_URL, async (db) => {
- *   return db.select().from(usersTable);
- * });
+ * const db = getDb(env.DATABASE_URL);
+ * const users = await db.select().from(usersTable);
  * ```
  */
-export async function withDb<T>(
-  databaseUrl: string,
-  callback: (db: DbClient) => Promise<T>
-): Promise<T> {
+export function getDb(databaseUrl: string): DbClient {
+  const cached = dbCache.get(databaseUrl);
+  if (cached) {
+    return cached.db;
+  }
+
   const client = postgres(databaseUrl, { prepare: false });
   const db = drizzle(client);
 
-  try {
-    return await callback(db);
-  } finally {
-    await client.end();
-  }
+  dbCache.set(databaseUrl, { client, db });
+
+  return db;
 }

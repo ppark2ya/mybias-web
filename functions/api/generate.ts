@@ -1,5 +1,5 @@
 import { imageGenerations } from "../../src/db/schema";
-import { withDb } from "../lib/db";
+import { getDb } from "../lib/db";
 import type { ContextData } from "./_middleware";
 
 interface Env {
@@ -51,12 +51,11 @@ async function saveGenerationRecord(
   predictionId: string,
   userId: string | null
 ): Promise<void> {
-  await withDb(databaseUrl, async (db) => {
-    await db.insert(imageGenerations).values({
-      predictionId,
-      userId: userId || null,
-      status: "pending",
-    });
+  const db = getDb(databaseUrl);
+  await db.insert(imageGenerations).values({
+    predictionId,
+    userId: userId || null,
+    status: "pending",
   });
 }
 

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { imageGenerations } from "../../../src/db/schema";
-import { withDb } from "../../lib/db";
+import { getDb } from "../../lib/db";
 
 interface Env {
   REPLICATE_WEBHOOK_SECRET?: string;
@@ -132,19 +132,18 @@ async function updateGenerationRecord(
     completedAt?: Date;
   }
 ): Promise<void> {
-  await withDb(databaseUrl, async (db) => {
-    await db
-      .update(imageGenerations)
-      .set({
-        status: updates.status,
-        outputImageUrl: updates.outputImageUrl,
-        replicateOutputUrl: updates.replicateOutputUrl,
-        errorMessage: updates.errorMessage,
-        completedAt: updates.completedAt,
-        updatedAt: new Date(),
-      })
-      .where(eq(imageGenerations.predictionId, predictionId));
-  });
+  const db = getDb(databaseUrl);
+  await db
+    .update(imageGenerations)
+    .set({
+      status: updates.status,
+      outputImageUrl: updates.outputImageUrl,
+      replicateOutputUrl: updates.replicateOutputUrl,
+      errorMessage: updates.errorMessage,
+      completedAt: updates.completedAt,
+      updatedAt: new Date(),
+    })
+    .where(eq(imageGenerations.predictionId, predictionId));
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
