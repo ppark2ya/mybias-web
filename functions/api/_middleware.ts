@@ -11,7 +11,7 @@ interface Env {
 
 export type { User };
 
-export interface ContextData {
+export interface ContextData extends Record<string, unknown> {
   user: User | null;
 }
 
