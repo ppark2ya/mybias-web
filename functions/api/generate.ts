@@ -1,6 +1,5 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import { imageGenerations } from "../../src/db/schema";
+import { withDb } from "../lib/db";
 import type { ContextData } from "./_middleware";
 
 interface Env {
@@ -48,22 +47,17 @@ const REPLICATE_MODEL_VERSION =
  * Save image generation record to database using drizzle-orm
  */
 async function saveGenerationRecord(
-  env: Env,
+  databaseUrl: string,
   predictionId: string,
   userId: string | null
 ): Promise<void> {
-  const client = postgres(env.DATABASE_URL, { prepare: false });
-  const db = drizzle(client);
-
-  try {
+  await withDb(databaseUrl, async (db) => {
     await db.insert(imageGenerations).values({
       predictionId,
       userId: userId || null,
       status: "pending",
     });
-  } finally {
-    await client.end();
-  }
+  });
 }
 
 const corsHeaders = {
@@ -193,7 +187,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     // Save generation record to database (synchronous - fail fast if DB write fails)
     if (env.DATABASE_URL && result.id) {
       try {
-        await saveGenerationRecord(env, result.id, userId);
+        await saveGenerationRecord(env.DATABASE_URL, result.id, userId);
       } catch (err) {
         console.error("Failed to save generation record:", err);
         return new Response(

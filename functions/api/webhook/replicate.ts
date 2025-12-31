@@ -1,7 +1,6 @@
-import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import postgres from "postgres";
 import { imageGenerations } from "../../../src/db/schema";
+import { withDb } from "../../lib/db";
 
 interface Env {
   REPLICATE_WEBHOOK_SECRET?: string;
@@ -123,7 +122,7 @@ async function uploadToR2(
  * Update generation record in database using drizzle-orm
  */
 async function updateGenerationRecord(
-  env: Env,
+  databaseUrl: string,
   predictionId: string,
   updates: {
     status: "pending" | "processing" | "succeeded" | "failed" | "canceled";
@@ -133,10 +132,7 @@ async function updateGenerationRecord(
     completedAt?: Date;
   }
 ): Promise<void> {
-  const client = postgres(env.DATABASE_URL, { prepare: false });
-  const db = drizzle(client);
-
-  try {
+  await withDb(databaseUrl, async (db) => {
     await db
       .update(imageGenerations)
       .set({
@@ -148,9 +144,7 @@ async function updateGenerationRecord(
         updatedAt: new Date(),
       })
       .where(eq(imageGenerations.predictionId, predictionId));
-  } finally {
-    await client.end();
-  }
+  });
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -179,7 +173,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       if (!outputUrl) {
         console.error("No output URL in succeeded prediction:", predictionId);
-        await updateGenerationRecord(env, predictionId, {
+        await updateGenerationRecord(env.DATABASE_URL, predictionId, {
           status: "failed",
           errorMessage: "No output URL received",
           completedAt: completed_at ? new Date(completed_at) : new Date(),
@@ -197,7 +191,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       } catch (uploadError) {
         console.error("Failed to upload to R2:", uploadError);
         // Still update record with Replicate URL as fallback
-        await updateGenerationRecord(env, predictionId, {
+        await updateGenerationRecord(env.DATABASE_URL, predictionId, {
           status: "succeeded",
           replicateOutputUrl: outputUrl,
           errorMessage: `R2 upload failed: ${uploadError instanceof Error ? uploadError.message : "Unknown error"}`,
@@ -213,7 +207,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const publicUrl = `${env.R2_PUBLIC_URL}/${r2Key}`;
 
       // Update database record
-      await updateGenerationRecord(env, predictionId, {
+      await updateGenerationRecord(env.DATABASE_URL, predictionId, {
         status: "succeeded",
         outputImageUrl: publicUrl,
         replicateOutputUrl: outputUrl,
@@ -223,7 +217,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       console.log("Successfully processed prediction:", predictionId, "->", publicUrl);
     } else if (status === "failed" || status === "canceled") {
       // Update record with error status
-      await updateGenerationRecord(env, predictionId, {
+      await updateGenerationRecord(env.DATABASE_URL, predictionId, {
         status,
         errorMessage: error || `Prediction ${status}`,
         completedAt: completed_at ? new Date(completed_at) : new Date(),
