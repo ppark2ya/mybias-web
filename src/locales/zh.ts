@@ -21,6 +21,8 @@ export default {
     "editor.pleaseWait": "请稍候",
 
     // Editor - AI Enhancement
+    "editor.ai.loginRequired": "请登录以使用AI增强功能。",
+    "editor.ai.insufficientCredits": "积分不足。请充值后重试。",
     "editor.ai.limitReached": "今天的AI增强次数已用完。请明天再试！",
     "editor.ai.preparingImage": "准备图像中...",
     "editor.ai.requestingServer": "请求AI服务器中...",

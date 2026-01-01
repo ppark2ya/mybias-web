@@ -21,6 +21,8 @@ export default {
     "editor.pleaseWait": "Por favor espera",
 
     // Editor - AI Enhancement
+    "editor.ai.loginRequired": "Por favor inicia sesión para usar la mejora con IA.",
+    "editor.ai.insufficientCredits": "Créditos insuficientes. Por favor recarga e inténtalo de nuevo.",
     "editor.ai.limitReached": "Has usado todas las mejoras de IA por hoy. ¡Inténtalo de nuevo mañana!",
     "editor.ai.preparingImage": "Preparando imagen...",
     "editor.ai.requestingServer": "Solicitando servidor de IA...",

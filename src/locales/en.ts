@@ -21,6 +21,8 @@ export default {
     "editor.pleaseWait": "Please wait",
 
     // Editor - AI Enhancement
+    "editor.ai.loginRequired": "Please log in to use AI enhancement.",
+    "editor.ai.insufficientCredits": "Insufficient credits. Please top up and try again.",
     "editor.ai.limitReached": "You've used all AI enhancements for today. Please try again tomorrow!",
     "editor.ai.preparingImage": "Preparing image...",
     "editor.ai.requestingServer": "Requesting AI server...",

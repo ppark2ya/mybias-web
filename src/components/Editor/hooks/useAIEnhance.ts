@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 import {
   generateImage,
   createGenerateRequest,
   getStatus,
   getOutputUrl,
 } from "../../../api";
+import type { GenerateErrorResponse } from "../../../api/generate/types";
 import { POLLING } from "../../../constants/times";
 import {
   getImageDimensions,
@@ -17,11 +19,7 @@ import {
   trackAIEnhanceSuccess,
   trackAIEnhanceFail,
 } from "../../../utils/analytics";
-import {
-  getRemainingAIUsage,
-  canUseAI,
-  incrementAIUsage,
-} from "../../../utils/rateLimit";
+import { useAuth } from "../../../hooks/useAuth";
 import type { ImageState } from "./useEditorState";
 
 export interface AIEnhanceResult {
@@ -42,15 +40,32 @@ export function useAIEnhance(
   onEnhanceComplete?: (result: AIEnhanceResult) => void
 ) {
   const { t } = useTranslation();
-  const [remainingAIUsage, setRemainingAIUsage] = useState(() =>
-    getRemainingAIUsage()
+  const { profile, isAuthenticated, refreshProfile } = useAuth();
+
+  // Get remaining credits from profile (server-side)
+  const [remainingAIUsage, setRemainingAIUsage] = useState<number>(
+    profile?.credits ?? 0
   );
+
+  // Sync with profile changes
+  if (profile?.credits !== undefined && profile.credits !== remainingAIUsage) {
+    setRemainingAIUsage(profile.credits);
+  }
 
   const handleAIEnhance = async () => {
     if (!currentImageState || isProcessing) return;
 
-    if (!canUseAI()) {
-      toast.error(t("editor.ai.limitReached"), {
+    // Check authentication
+    if (!isAuthenticated) {
+      toast.error(t("editor.ai.loginRequired"), {
+        className: "text-center",
+      });
+      return;
+    }
+
+    // Check credits (client-side pre-check)
+    if (remainingAIUsage <= 0) {
+      toast.error(t("editor.ai.insufficientCredits"), {
         className: "text-center",
       });
       return;
@@ -76,6 +91,11 @@ export function useAIEnhance(
 
       const generateResponse = await generateImage(createGenerateRequest(base64));
       const predictionId = generateResponse.id;
+
+      // Update remaining credits from server response
+      if (generateResponse.remainingCredits !== undefined) {
+        setRemainingAIUsage(generateResponse.remainingCredits);
+      }
 
       if (!predictionId) {
         throw new Error("No prediction ID received");
@@ -132,8 +152,8 @@ export function useAIEnhance(
       const durationMs = Date.now() - startTime;
       trackAIEnhanceSuccess(durationMs);
 
-      const remaining = incrementAIUsage();
-      setRemainingAIUsage(remaining);
+      // Refresh profile to sync credits
+      refreshProfile();
 
       setProcessingMessage(t("editor.ai.downloadingImage"));
 
@@ -175,10 +195,29 @@ export function useAIEnhance(
       }
     } catch (error) {
       console.error("Failed to enhance image:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : t("editor.ai.failed");
-      trackAIEnhanceFail(errorMessage);
-      toast.error(errorMessage, {
+
+      // Handle API error responses
+      const axiosError = error as AxiosError<GenerateErrorResponse>;
+      const errorCode = axiosError.response?.data?.code;
+      const errorMessage = axiosError.response?.data?.error;
+
+      let displayMessage: string;
+
+      if (errorCode === "UNAUTHORIZED") {
+        displayMessage = t("editor.ai.loginRequired");
+      } else if (errorCode === "INSUFFICIENT_CREDITS") {
+        displayMessage = t("editor.ai.insufficientCredits");
+        setRemainingAIUsage(0);
+      } else if (errorMessage) {
+        displayMessage = errorMessage;
+      } else if (error instanceof Error) {
+        displayMessage = error.message;
+      } else {
+        displayMessage = t("editor.ai.failed");
+      }
+
+      trackAIEnhanceFail(displayMessage);
+      toast.error(displayMessage, {
         className: "text-center",
       });
     } finally {

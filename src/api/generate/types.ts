@@ -59,11 +59,19 @@ export interface GenerateResponse {
     get: string;
     cancel: string;
   };
+  /** Remaining credits after this request */
+  remainingCredits?: number;
 }
+
+/**
+ * Error codes for generate API
+ */
+export type GenerateErrorCode = "UNAUTHORIZED" | "INSUFFICIENT_CREDITS";
 
 /**
  * Error response type
  */
 export interface GenerateErrorResponse {
   error: string;
+  code?: GenerateErrorCode;
 }
