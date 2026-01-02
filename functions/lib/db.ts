@@ -24,7 +24,7 @@ let dbInstance: DbClient | null = null;
 export function initDb(databaseUrl: string): void {
   if (dbInstance) return;
 
-  const client = postgres(databaseUrl, { prepare: false });
+  const client = postgres(databaseUrl, { prepare: false, max: 1 });
   dbInstance = drizzle(client);
 }
 
