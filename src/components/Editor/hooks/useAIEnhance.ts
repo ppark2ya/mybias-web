@@ -131,18 +131,27 @@ export function useAIEnhance(
                 if (outputUrl) {
                   resolve(outputUrl);
                 } else {
-                  reject(new Error("No output URL received"));
+                  // Log technical error for debugging
+                  console.error("No output URL in succeeded status");
+                  reject(new Error(t("editor.ai.failed")));
                 }
               } else if (statusData.status === "failed") {
                 clearInterval(interval);
-                reject(new Error(statusData.error || "Enhancement failed"));
+                // Log technical error for debugging, show user-friendly message
+                if (statusData.error) {
+                  console.error("AI enhancement failed:", statusData.error);
+                }
+                reject(new Error(t("editor.ai.failed")));
               } else if (attempts >= maxAttempts) {
                 clearInterval(interval);
-                reject(new Error("Enhancement timed out"));
+                console.error("AI enhancement timed out after", maxAttempts, "attempts");
+                reject(new Error(t("editor.ai.timeout")));
               }
             } catch (error) {
               clearInterval(interval);
-              reject(error);
+              // Log technical error, reject with user-friendly message
+              console.error("Status polling error:", error);
+              reject(new Error(t("editor.ai.failed")));
             }
           }, POLLING.DEFAULT);
         });
@@ -199,18 +208,20 @@ export function useAIEnhance(
       // Handle API error responses
       const axiosError = error as AxiosError<GenerateErrorResponse>;
       const errorCode = axiosError.response?.data?.code;
-      const errorMessage = axiosError.response?.data?.error;
 
       let displayMessage: string;
 
+      // Map error codes to user-friendly messages
       if (errorCode === "UNAUTHORIZED") {
         displayMessage = t("editor.ai.loginRequired");
       } else if (errorCode === "INSUFFICIENT_CREDITS") {
         displayMessage = t("editor.ai.insufficientCredits");
         setRemainingAIUsage(0);
-      } else if (errorMessage) {
-        displayMessage = errorMessage;
-      } else if (error instanceof Error) {
+      } else if (errorCode === "INTERNAL_ERROR") {
+        // Server internal error - show generic message
+        displayMessage = t("editor.ai.failed");
+      } else if (error instanceof Error && error.message) {
+        // Error message already translated (from pollForResult)
         displayMessage = error.message;
       } else {
         displayMessage = t("editor.ai.failed");

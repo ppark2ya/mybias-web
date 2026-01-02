@@ -15,10 +15,15 @@ export interface GenerateRequest {
 }
 
 /**
- * Prediction status types from Replicate API
+ * Prediction status types
+ * - pending: Initial state when generation is created
+ * - processing: AI is processing the image
+ * - succeeded: Generation completed successfully
+ * - failed: Generation failed
+ * - canceled: Generation was canceled
  */
 export type PredictionStatus =
-  | "starting"
+  | "pending"
   | "processing"
   | "succeeded"
   | "failed"

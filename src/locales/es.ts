@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "¡Casi listo!",
     "editor.ai.downloadingImage": "Descargando imagen...",
     "editor.ai.failed": "La mejora de IA falló. Inténtalo de nuevo.",
+    "editor.ai.timeout": "La respuesta del servidor de IA se retrasa. Por favor, inténtalo más tarde.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "Mejora con IA",
@@ -68,9 +69,21 @@ export default {
     "user.login": "Iniciar Sesión",
     "user.menu": "Menú de Usuario",
     "user.profile": "Perfil",
+    "user.gallery": "Mi Galería",
     "user.logout": "Cerrar Sesión",
     "user.language": "Idioma",
     "user.back": "Volver",
+
+    // Gallery
+    "gallery.title": "Mi Galería",
+    "gallery.subtitle": "Fotos mejoradas con IA",
+    "gallery.backToHome": "Volver al Inicio",
+    "gallery.loading": "Cargando fotos...",
+    "gallery.loadError": "Error al cargar las fotos.",
+    "gallery.empty": "Aún no hay fotos mejoradas",
+    "gallery.emptyHint": "Prueba la función de mejora con IA",
+    "gallery.startCreating": "Empezar a Crear",
+    "gallery.download": "Descargar",
 
     // Profile
     "profile.title": "Mi Perfil",

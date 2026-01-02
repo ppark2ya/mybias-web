@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "もうすぐ完了！",
     "editor.ai.downloadingImage": "画像をダウンロード中...",
     "editor.ai.failed": "AI補正に失敗しました。もう一度試してください。",
+    "editor.ai.timeout": "AIサーバーの応答が遅延しています。しばらくしてから再試行してください。",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI補正",
@@ -68,9 +69,21 @@ export default {
     "user.login": "ログイン",
     "user.menu": "ユーザーメニュー",
     "user.profile": "プロフィール",
+    "user.gallery": "マイギャラリー",
     "user.logout": "ログアウト",
     "user.language": "言語",
     "user.back": "戻る",
+
+    // Gallery
+    "gallery.title": "マイギャラリー",
+    "gallery.subtitle": "AI補正した写真",
+    "gallery.backToHome": "ホームに戻る",
+    "gallery.loading": "写真を読み込み中...",
+    "gallery.loadError": "写真の読み込みに失敗しました。",
+    "gallery.empty": "補正した写真がまだありません",
+    "gallery.emptyHint": "AI補正機能を使ってみてください",
+    "gallery.startCreating": "写真を補正する",
+    "gallery.download": "ダウンロード",
 
     // Profile
     "profile.title": "マイプロフィール",

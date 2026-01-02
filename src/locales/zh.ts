@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "快完成了！",
     "editor.ai.downloadingImage": "下载图像中...",
     "editor.ai.failed": "AI增强失败。请重试。",
+    "editor.ai.timeout": "AI服务器响应延迟。请稍后再试。",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI增强",
@@ -68,9 +69,21 @@ export default {
     "user.login": "登录",
     "user.menu": "用户菜单",
     "user.profile": "个人资料",
+    "user.gallery": "我的相册",
     "user.logout": "退出登录",
     "user.language": "语言",
     "user.back": "返回",
+
+    // Gallery
+    "gallery.title": "我的相册",
+    "gallery.subtitle": "AI增强的照片",
+    "gallery.backToHome": "返回主页",
+    "gallery.loading": "加载照片中...",
+    "gallery.loadError": "加载照片失败。",
+    "gallery.empty": "还没有增强的照片",
+    "gallery.emptyHint": "试试AI增强功能",
+    "gallery.startCreating": "开始创作",
+    "gallery.download": "下载",
 
     // Profile
     "profile.title": "我的资料",

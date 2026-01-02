@@ -17,7 +17,7 @@ export async function getStatus(predictionId: string): Promise<StatusResponse> {
  * Check if prediction is still processing
  */
 export function isProcessing(status: StatusResponse["status"]): boolean {
-  return status === "starting" || status === "processing";
+  return status === "pending" || status === "processing";
 }
 
 /**
@@ -38,5 +38,5 @@ export function getOutputUrl(response: StatusResponse): string | undefined {
   if (response.status !== "succeeded" || !response.output) {
     return undefined;
   }
-  return Array.isArray(response.output) ? response.output[0] : response.output;
+  return response.output;
 }

@@ -35,6 +35,7 @@ export default {
     "editor.ai.almostDone": "거의 다 됐어요!",
     "editor.ai.downloadingImage": "이미지 다운로드 중...",
     "editor.ai.failed": "AI 보정에 실패했습니다. 다시 시도해주세요.",
+    "editor.ai.timeout": "AI 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI 보정",
@@ -118,9 +119,21 @@ export default {
     "user.login": "로그인",
     "user.menu": "사용자 메뉴",
     "user.profile": "프로필",
+    "user.gallery": "내 사진함",
     "user.logout": "로그아웃",
     "user.language": "언어",
     "user.back": "뒤로",
+
+    // Gallery
+    "gallery.title": "내 사진함",
+    "gallery.subtitle": "AI로 보정한 사진들",
+    "gallery.backToHome": "홈으로",
+    "gallery.loading": "사진을 불러오는 중...",
+    "gallery.loadError": "사진을 불러오는데 실패했습니다.",
+    "gallery.empty": "아직 보정한 사진이 없습니다",
+    "gallery.emptyHint": "AI 보정 기능을 사용해보세요",
+    "gallery.startCreating": "사진 보정하러 가기",
+    "gallery.download": "다운로드",
 
     // Profile
     "profile.title": "내 프로필",

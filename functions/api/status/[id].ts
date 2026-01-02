@@ -1,73 +1,90 @@
-interface Env {
-  REPLICATE_API_TOKEN: string;
-}
+import { eq } from "drizzle-orm";
+import { imageGenerations } from "../../../src/db/schema";
+import { getDb } from "../../lib/db";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
-export const onRequestGet: PagesFunction<Env> = async (context) => {
+export const onRequestGet: PagesFunction = async (context) => {
   try {
     const id = context.params.id as string;
 
     if (!id) {
-      return new Response(JSON.stringify({ error: "Prediction ID is required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
-
-    const apiToken = context.env.REPLICATE_API_TOKEN;
-    if (!apiToken) {
       return new Response(
-        JSON.stringify({ error: "API token not configured" }),
+        JSON.stringify({ error: "Prediction ID is required" }),
         {
-          status: 500,
+          status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
 
-    // Check prediction status
-    const response = await fetch(
-      `https://api.replicate.com/v1/predictions/${id}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Token ${apiToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // Query image_generations table by prediction ID
+    const db = getDb();
+    const result = await db
+      .select()
+      .from(imageGenerations)
+      .where(eq(imageGenerations.predictionId, id))
+      .limit(1);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Replicate API error:", errorText);
+    // If no record found, return pending status (DB write may be in progress)
+    if (result.length === 0) {
       return new Response(
-        JSON.stringify({ error: "Failed to get prediction status" }),
+        JSON.stringify({
+          id,
+          status: "pending",
+          output: null,
+          error: null,
+          created_at: new Date().toISOString(),
+          completed_at: null,
+        }),
         {
-          status: response.status,
+          status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
 
-    const result = await response.json();
+    const generation = result[0];
 
-    return new Response(JSON.stringify(result), {
+    // Fallback to Replicate URL if R2 upload failed
+    const outputUrl = generation.outputImageUrl || generation.replicateOutputUrl || null;
+
+    // Return simplified response based on DB record
+    const response = {
+      id: generation.predictionId,
+      status: generation.status,
+      output: outputUrl,
+      error: generation.errorMessage || null,
+      created_at: generation.createdAt.toISOString(),
+      completed_at: generation.completedAt?.toISOString() || null,
+    };
+
+    return new Response(JSON.stringify(response), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {
+    // Log technical error for debugging
     console.error("Status check error:", error);
+
+    // Return pending status on DB error (connection may be initializing)
+    // Client will continue polling and eventually get the real status
+    const id = context.params.id as string;
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        id: id || "unknown",
+        status: "pending",
+        output: null,
+        error: null,
+        created_at: new Date().toISOString(),
+        completed_at: null,
       }),
       {
-        status: 500,
+        status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
