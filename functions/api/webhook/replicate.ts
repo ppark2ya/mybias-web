@@ -8,9 +8,11 @@ import {
   ReplicatePredictionStatus,
   type ReplicatePredictionStatusType,
 } from "../../../src/constants/replicate";
-import { getDb } from "../../lib/db";
+import { createDbClient } from "../../lib/db";
+import type { DbClient } from "../../types";
 
 interface Env {
+  DATABASE_URL: string;
   REPLICATE_WEBHOOK_SECRET?: string;
   R2_BUCKET: R2Bucket;
   R2_PUBLIC_URL: string;
@@ -35,7 +37,9 @@ async function validateWebhook(
 ): Promise<boolean> {
   // If no secret configured, skip validation (not recommended for production)
   if (!secret) {
-    console.warn("REPLICATE_WEBHOOK_SECRET not configured - skipping validation");
+    console.warn(
+      "REPLICATE_WEBHOOK_SECRET not configured - skipping validation"
+    );
     return true;
   }
 
@@ -109,14 +113,16 @@ async function uploadToR2(
   const ext = extMap[contentType] || "png";
 
   // Generate R2 key with date-based path for organization
+  const fileName = `${predictionId}.${ext}`;
   const date = new Date();
   const datePrefix = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-  const key = `generations/${datePrefix}/${predictionId}.${ext}`;
+  const key = `generations/${datePrefix}/${fileName}`;
 
   // Upload to R2
   await bucket.put(key, imageBuffer, {
     httpMetadata: {
       contentType,
+      contentDisposition: `attachment; filename="${fileName}"`,
     },
   });
 
@@ -127,6 +133,7 @@ async function uploadToR2(
  * Update generation record in database using drizzle-orm
  */
 async function updateGenerationRecord(
+  db: DbClient,
   predictionId: string,
   updates: {
     status: ImageGenerationStatusType;
@@ -136,7 +143,6 @@ async function updateGenerationRecord(
     completedAt?: Date;
   }
 ): Promise<void> {
-  const db = getDb();
   await db
     .update(imageGenerations)
     .set({
@@ -155,13 +161,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { request, env } = context;
 
     // Validate webhook signature
-    const isValid = await validateWebhook(request, env.REPLICATE_WEBHOOK_SECRET);
+    const isValid = await validateWebhook(
+      request,
+      env.REPLICATE_WEBHOOK_SECRET
+    );
     if (!isValid) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Create database client (webhook doesn't go through middleware)
+    const db = createDbClient(env.DATABASE_URL);
 
     // Parse webhook payload
     const payload: ReplicateWebhookPayload = await request.json();
@@ -176,7 +188,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       if (!outputUrl) {
         console.error("No output URL in succeeded prediction:", predictionId);
-        await updateGenerationRecord(predictionId, {
+        await updateGenerationRecord(db, predictionId, {
           status: ImageGenerationStatus.FAILED,
           errorMessage: "No output URL received",
           completedAt: completed_at ? new Date(completed_at) : new Date(),
@@ -194,7 +206,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       } catch (uploadError) {
         console.error("Failed to upload to R2:", uploadError);
         // Still update record with Replicate URL as fallback
-        await updateGenerationRecord(predictionId, {
+        await updateGenerationRecord(db, predictionId, {
           status: ImageGenerationStatus.SUCCEEDED,
           replicateOutputUrl: outputUrl,
           errorMessage: `R2 upload failed: ${uploadError instanceof Error ? uploadError.message : "Unknown error"}`,
@@ -210,23 +222,28 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const publicUrl = `${env.R2_PUBLIC_URL}/${r2Key}`;
 
       // Update database record
-      await updateGenerationRecord(predictionId, {
+      await updateGenerationRecord(db, predictionId, {
         status: ImageGenerationStatus.SUCCEEDED,
         outputImageUrl: publicUrl,
         replicateOutputUrl: outputUrl,
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
 
-      console.log("Successfully processed prediction:", predictionId, "->", publicUrl);
+      console.log(
+        "Successfully processed prediction:",
+        predictionId,
+        "->",
+        publicUrl
+      );
     } else if (status === ReplicatePredictionStatus.FAILED) {
-      await updateGenerationRecord(predictionId, {
+      await updateGenerationRecord(db, predictionId, {
         status: ImageGenerationStatus.FAILED,
         errorMessage: error || "Prediction failed",
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
       console.log("Prediction failed:", predictionId, error);
     } else if (status === ReplicatePredictionStatus.CANCELED) {
-      await updateGenerationRecord(predictionId, {
+      await updateGenerationRecord(db, predictionId, {
         status: ImageGenerationStatus.CANCELED,
         errorMessage: error || "Prediction canceled",
         completedAt: completed_at ? new Date(completed_at) : new Date(),

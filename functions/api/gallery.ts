@@ -1,7 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { imageGenerations } from "../../src/db/schema";
-import { getDb } from "../lib/db";
-import type { ContextData } from "./_middleware";
+import type { ContextData } from "../types";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +13,7 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
 ) => {
   try {
     const { data } = context;
+    const db = data.db;
 
     // Check if user is authenticated
     const user = data.user;
@@ -31,7 +31,6 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
     }
 
     // Query user's successful image generations
-    const db = getDb();
     const generations = await db
       .select({
         id: imageGenerations.id,

@@ -5,8 +5,7 @@ import {
   profiles,
 } from "../../src/db/schema";
 import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
-import { getDb } from "../lib/db";
-import type { ContextData } from "./_middleware";
+import type { ContextData, DbClient } from "../types";
 
 interface Env {
   REPLICATE_API_TOKEN: string;
@@ -50,9 +49,10 @@ const REPLICATE_MODEL_VERSION =
  * Check user credits and deduct 1 credit if available
  * Returns remaining credits after deduction, or null if insufficient
  */
-async function checkAndDeductCredit(userId: string): Promise<number | null> {
-  const db = getDb();
-
+async function checkAndDeductCredit(
+  db: DbClient,
+  userId: string
+): Promise<number | null> {
   // Atomically check and deduct credit
   const result = await db
     .update(profiles)
@@ -74,10 +74,10 @@ async function checkAndDeductCredit(userId: string): Promise<number | null> {
  * Save image generation record to database using drizzle-orm
  */
 async function saveGenerationRecord(
+  db: DbClient,
   predictionId: string,
   userId: string
 ): Promise<void> {
-  const db = getDb();
   await db.insert(imageGenerations).values({
     predictionId,
     userId,
@@ -96,6 +96,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
 ) => {
   try {
     const { request, env, data } = context;
+    const db = data.db;
 
     // 1. Check if user is authenticated (required)
     const user = data.user;
@@ -113,7 +114,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     }
 
     // 2. Check and deduct credit
-    const remainingCredits = await checkAndDeductCredit(user.id);
+    const remainingCredits = await checkAndDeductCredit(db, user.id);
     if (remainingCredits === null) {
       return new Response(
         JSON.stringify({
@@ -198,7 +199,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     // Save generation record to database (synchronous - fail fast if DB write fails)
     if (result.id) {
       try {
-        await saveGenerationRecord(result.id, user.id);
+        await saveGenerationRecord(db, result.id, user.id);
       } catch (err) {
         console.error("Failed to save generation record:", err);
         return new Response(
