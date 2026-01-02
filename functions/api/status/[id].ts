@@ -42,11 +42,14 @@ export const onRequestGet: PagesFunction = async (context) => {
 
     const generation = result[0];
 
+    // Fallback to Replicate URL if R2 upload failed
+    const outputUrl = generation.outputImageUrl || generation.replicateOutputUrl || null;
+
     // Return simplified response based on DB record
     const response = {
       id: generation.predictionId,
       status: generation.status,
-      output: generation.outputImageUrl || null,
+      output: outputUrl,
       error: generation.errorMessage || null,
       created_at: generation.createdAt.toISOString(),
       completed_at: generation.completedAt?.toISOString() || null,
@@ -57,10 +60,12 @@ export const onRequestGet: PagesFunction = async (context) => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {
+    // Log technical error for debugging, return generic message to client
     console.error("Status check error:", error);
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "Failed to check generation status",
+        code: "INTERNAL_ERROR",
       }),
       {
         status: 500,

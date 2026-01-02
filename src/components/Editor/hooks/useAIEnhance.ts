@@ -149,7 +149,9 @@ export function useAIEnhance(
               }
             } catch (error) {
               clearInterval(interval);
-              reject(error);
+              // Log technical error, reject with user-friendly message
+              console.error("Status polling error:", error);
+              reject(new Error(t("editor.ai.failed")));
             }
           }, POLLING.DEFAULT);
         });
@@ -206,18 +208,20 @@ export function useAIEnhance(
       // Handle API error responses
       const axiosError = error as AxiosError<GenerateErrorResponse>;
       const errorCode = axiosError.response?.data?.code;
-      const errorMessage = axiosError.response?.data?.error;
 
       let displayMessage: string;
 
+      // Map error codes to user-friendly messages
       if (errorCode === "UNAUTHORIZED") {
         displayMessage = t("editor.ai.loginRequired");
       } else if (errorCode === "INSUFFICIENT_CREDITS") {
         displayMessage = t("editor.ai.insufficientCredits");
         setRemainingAIUsage(0);
-      } else if (errorMessage) {
-        displayMessage = errorMessage;
-      } else if (error instanceof Error) {
+      } else if (errorCode === "INTERNAL_ERROR") {
+        // Server internal error - show generic message
+        displayMessage = t("editor.ai.failed");
+      } else if (error instanceof Error && error.message) {
+        // Error message already translated (from pollForResult)
         displayMessage = error.message;
       } else {
         displayMessage = t("editor.ai.failed");
