@@ -5,7 +5,9 @@ pages_build_output_dir = "dist"
 
 # 환경 변수
 [vars]
+BASE_URL = "https://savemybias.com"
 R2_PUBLIC_URL = "https://pub-9dc0e2e630dd4076ae0da18a6f45c556.r2.dev"
+APP_ENV = "production"
 
 # KV 바인딩 설정
 [[kv_namespaces]]
@@ -18,3 +20,10 @@ preview_id = "44703de0abc4464bad57bea032a16b08"
 binding = "R2_BUCKET"
 bucket_name = "mybias"
 preview_bucket_name = "mybias"
+
+[env.preview]
+name = "mybias-web-preview"
+
+[env.preview.vars]
+BASE_URL = "https://dev.savemybias.com"
+APP_ENV = "preview"
