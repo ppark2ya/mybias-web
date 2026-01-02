@@ -136,7 +136,7 @@ export function Profile() {
                 </div>
               )}
 
-              {/* AI Usage - Placeholder for future */}
+              {/* AI Credits */}
               <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-fuchsia-50 to-purple-50 rounded-xl">
                 <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow-sm">
                   <Sparkles className="w-5 h-5 text-fuchsia-500" />
@@ -146,7 +146,7 @@ export function Profile() {
                     {t("profile.aiCredits")}
                   </p>
                   <p className="text-sm font-medium text-gray-900">
-                    {t("profile.creditsRemaining", { count: 3 })}
+                    {t("profile.creditsRemaining", { count: profile?.credits ?? 0 })}
                   </p>
                 </div>
               </div>
