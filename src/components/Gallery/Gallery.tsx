@@ -1,28 +1,24 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ArrowLeft, ImageIcon, Download, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { apiClient } from "../../lib/axios";
-
-interface GalleryImage {
-  id: string;
-  predictionId: string;
-  imageUrl: string;
-  createdAt: string;
-}
-
-interface GalleryResponse {
-  images: GalleryImage[];
-}
+import { useGalleryQuery } from "../../api/gallery";
 
 export function Gallery() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [images, setImages] = useState<GalleryImage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const {
+    data,
+    isLoading,
+    error,
+  } = useGalleryQuery({
+    enabled: isAuthenticated,
+  });
+
+  const images = data?.images ?? [];
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -30,27 +26,6 @@ export function Gallery() {
       navigate({ to: "/login" });
     }
   }, [authLoading, isAuthenticated, navigate]);
-
-  // Fetch gallery images
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const fetchGallery = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const { data } = await apiClient.get<GalleryResponse>("/gallery");
-        setImages(data.images);
-      } catch (err) {
-        console.error("Failed to load gallery:", err);
-        setError(t("gallery.loadError"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGallery();
-  }, [isAuthenticated, t]);
 
   const handleDownload = async (imageUrl: string, predictionId: string) => {
     try {
@@ -123,7 +98,9 @@ export function Gallery() {
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <p className="text-sm text-red-500">{error}</p>
+                <p className="text-sm text-red-500">
+                  {error.response?.data?.error ?? t("gallery.loadError")}
+                </p>
               </div>
             ) : images.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
