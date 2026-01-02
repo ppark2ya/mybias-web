@@ -1,0 +1,85 @@
+import { eq, desc } from "drizzle-orm";
+import { imageGenerations } from "../../src/db/schema";
+import { getDb } from "../lib/db";
+import type { ContextData } from "./_middleware";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
+  context
+) => {
+  try {
+    const { data } = context;
+
+    // Check if user is authenticated
+    const user = data.user;
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: "Authentication required",
+          code: "UNAUTHORIZED",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Query user's successful image generations
+    const db = getDb();
+    const generations = await db
+      .select({
+        id: imageGenerations.id,
+        predictionId: imageGenerations.predictionId,
+        outputImageUrl: imageGenerations.outputImageUrl,
+        replicateOutputUrl: imageGenerations.replicateOutputUrl,
+        createdAt: imageGenerations.createdAt,
+      })
+      .from(imageGenerations)
+      .where(eq(imageGenerations.userId, user.id))
+      .orderBy(desc(imageGenerations.createdAt))
+      .limit(50);
+
+    // Filter only succeeded generations with output URL
+    const images = generations
+      .filter(
+        (g) =>
+          g.outputImageUrl || g.replicateOutputUrl
+      )
+      .map((g) => ({
+        id: g.id,
+        predictionId: g.predictionId,
+        imageUrl: g.outputImageUrl || g.replicateOutputUrl,
+        createdAt: g.createdAt.toISOString(),
+      }));
+
+    return new Response(JSON.stringify({ images }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (error) {
+    console.error("Gallery error:", error);
+    return new Response(
+      JSON.stringify({
+        error: "Failed to load gallery",
+        code: "INTERNAL_ERROR",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+};
+
+export const onRequestOptions: PagesFunction = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+};

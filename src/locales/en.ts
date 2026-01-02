@@ -116,9 +116,21 @@ export default {
     "user.login": "Login",
     "user.menu": "User Menu",
     "user.profile": "Profile",
+    "user.gallery": "My Gallery",
     "user.logout": "Logout",
     "user.language": "Language",
     "user.back": "Back",
+
+    // Gallery
+    "gallery.title": "My Gallery",
+    "gallery.subtitle": "AI enhanced photos",
+    "gallery.backToHome": "Home",
+    "gallery.loading": "Loading photos...",
+    "gallery.loadError": "Failed to load photos.",
+    "gallery.empty": "No enhanced photos yet",
+    "gallery.emptyHint": "Try the AI enhancement feature",
+    "gallery.startCreating": "Start Creating",
+    "gallery.download": "Download",
 
     // Profile
     "profile.title": "My Profile",

@@ -69,9 +69,21 @@ export default {
     "user.login": "登录",
     "user.menu": "用户菜单",
     "user.profile": "个人资料",
+    "user.gallery": "我的相册",
     "user.logout": "退出登录",
     "user.language": "语言",
     "user.back": "返回",
+
+    // Gallery
+    "gallery.title": "我的相册",
+    "gallery.subtitle": "AI增强的照片",
+    "gallery.backToHome": "返回主页",
+    "gallery.loading": "加载照片中...",
+    "gallery.loadError": "加载照片失败。",
+    "gallery.empty": "还没有增强的照片",
+    "gallery.emptyHint": "试试AI增强功能",
+    "gallery.startCreating": "开始创作",
+    "gallery.download": "下载",
 
     // Profile
     "profile.title": "我的资料",

@@ -30,11 +30,19 @@ export const onRequestGet: PagesFunction = async (context) => {
       .where(eq(imageGenerations.predictionId, id))
       .limit(1);
 
+    // If no record found, return pending status (DB write may be in progress)
     if (result.length === 0) {
       return new Response(
-        JSON.stringify({ error: "Generation not found" }),
+        JSON.stringify({
+          id,
+          status: "pending",
+          output: null,
+          error: null,
+          created_at: new Date().toISOString(),
+          completed_at: null,
+        }),
         {
-          status: 404,
+          status: 200,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
