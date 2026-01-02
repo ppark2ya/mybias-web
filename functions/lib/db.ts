@@ -24,5 +24,5 @@ export type { DbClient };
  */
 export function createDbClient(databaseUrl: string): DbClient {
   const client = postgres(databaseUrl, { prepare: false, max: 1 });
-  return drizzle(client);
+  return drizzle(client, { logger: true });
 }

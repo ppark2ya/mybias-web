@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { ArrowLeft, ImageIcon, Download, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { useGalleryQuery } from "../../api/gallery";
+import { useGalleryQuery, downloadImage } from "../../api/gallery";
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -27,10 +27,9 @@ export function Gallery() {
     }
   }, [authLoading, isAuthenticated, navigate]);
 
-  const handleDownload = async (imageUrl: string, predictionId: string) => {
+  const handleDownload = async (predictionId: string) => {
     try {
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
+      const blob = await downloadImage(predictionId);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -136,9 +135,7 @@ export function Gallery() {
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <button
-                        onClick={() =>
-                          handleDownload(image.imageUrl, image.predictionId)
-                        }
+                        onClick={() => handleDownload(image.predictionId)}
                         className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
                         type="button"
                       >

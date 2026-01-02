@@ -37,7 +37,9 @@ async function validateWebhook(
 ): Promise<boolean> {
   // If no secret configured, skip validation (not recommended for production)
   if (!secret) {
-    console.warn("REPLICATE_WEBHOOK_SECRET not configured - skipping validation");
+    console.warn(
+      "REPLICATE_WEBHOOK_SECRET not configured - skipping validation"
+    );
     return true;
   }
 
@@ -111,14 +113,16 @@ async function uploadToR2(
   const ext = extMap[contentType] || "png";
 
   // Generate R2 key with date-based path for organization
+  const fileName = `${predictionId}.${ext}`;
   const date = new Date();
   const datePrefix = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-  const key = `generations/${datePrefix}/${predictionId}.${ext}`;
+  const key = `generations/${datePrefix}/${fileName}`;
 
   // Upload to R2
   await bucket.put(key, imageBuffer, {
     httpMetadata: {
       contentType,
+      contentDisposition: `attachment; filename="${fileName}"`,
     },
   });
 
@@ -157,7 +161,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { request, env } = context;
 
     // Validate webhook signature
-    const isValid = await validateWebhook(request, env.REPLICATE_WEBHOOK_SECRET);
+    const isValid = await validateWebhook(
+      request,
+      env.REPLICATE_WEBHOOK_SECRET
+    );
     if (!isValid) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
@@ -222,7 +229,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         completedAt: completed_at ? new Date(completed_at) : new Date(),
       });
 
-      console.log("Successfully processed prediction:", predictionId, "->", publicUrl);
+      console.log(
+        "Successfully processed prediction:",
+        predictionId,
+        "->",
+        publicUrl
+      );
     } else if (status === ReplicatePredictionStatus.FAILED) {
       await updateGenerationRecord(db, predictionId, {
         status: ImageGenerationStatus.FAILED,
