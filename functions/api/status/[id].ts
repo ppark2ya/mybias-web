@@ -68,15 +68,23 @@ export const onRequestGet: PagesFunction = async (context) => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {
-    // Log technical error for debugging, return generic message to client
+    // Log technical error for debugging
     console.error("Status check error:", error);
+
+    // Return pending status on DB error (connection may be initializing)
+    // Client will continue polling and eventually get the real status
+    const id = context.params.id as string;
     return new Response(
       JSON.stringify({
-        error: "Failed to check generation status",
-        code: "INTERNAL_ERROR",
+        id: id || "unknown",
+        status: "pending",
+        output: null,
+        error: null,
+        created_at: new Date().toISOString(),
+        completed_at: null,
       }),
       {
-        status: 500,
+        status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
