@@ -1,29 +1,20 @@
 /**
  * Middleware for API routes
- * - Initializes database connection
+ * - Creates database client and stores in context.data
  * - Extracts user information from Authorization header
  */
 import { createClient, type User } from "@supabase/supabase-js";
-import { initDb } from "../lib/db";
+import { createDbClient } from "../lib/db";
+import type { ContextData, BaseEnv } from "../types";
 
-interface Env {
-  SUPABASE_URL: string;
-  SUPABASE_SECRET_KEY: string;
-  DATABASE_URL: string;
-}
-
-export type { User };
-
-export interface ContextData extends Record<string, unknown> {
-  user: User | null;
-}
+export type { User, ContextData };
 
 /**
  * Extract user from Supabase JWT token in Authorization header
  */
 async function getUserFromAuth(
   request: Request,
-  env: Env
+  env: BaseEnv
 ): Promise<User | null> {
   const authHeader = request.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
@@ -54,13 +45,14 @@ async function getUserFromAuth(
   }
 }
 
-export const onRequest: PagesFunction<Env, string, ContextData> = async (
+export const onRequest: PagesFunction<BaseEnv, string, ContextData> = async (
   context
 ) => {
   const { request, env, data } = context;
 
-  // Initialize database connection (singleton)
-  initDb(env.DATABASE_URL);
+  // Create database client and store in context
+  const db = createDbClient(env.DATABASE_URL);
+  data.db = db;
 
   // Extract user from Authorization header
   const user = await getUserFromAuth(request, env);
