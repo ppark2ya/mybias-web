@@ -131,14 +131,21 @@ export function useAIEnhance(
                 if (outputUrl) {
                   resolve(outputUrl);
                 } else {
-                  reject(new Error("No output URL received"));
+                  // Log technical error for debugging
+                  console.error("No output URL in succeeded status");
+                  reject(new Error(t("editor.ai.failed")));
                 }
               } else if (statusData.status === "failed") {
                 clearInterval(interval);
-                reject(new Error(statusData.error || "Enhancement failed"));
+                // Log technical error for debugging, show user-friendly message
+                if (statusData.error) {
+                  console.error("AI enhancement failed:", statusData.error);
+                }
+                reject(new Error(t("editor.ai.failed")));
               } else if (attempts >= maxAttempts) {
                 clearInterval(interval);
-                reject(new Error("Enhancement timed out"));
+                console.error("AI enhancement timed out after", maxAttempts, "attempts");
+                reject(new Error(t("editor.ai.timeout")));
               }
             } catch (error) {
               clearInterval(interval);

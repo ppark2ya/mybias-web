@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "Almost done!",
     "editor.ai.downloadingImage": "Downloading image...",
     "editor.ai.failed": "AI enhancement failed. Please try again.",
+    "editor.ai.timeout": "AI server response is delayed. Please try again later.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI Enhancement",

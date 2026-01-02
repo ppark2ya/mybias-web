@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "もうすぐ完了！",
     "editor.ai.downloadingImage": "画像をダウンロード中...",
     "editor.ai.failed": "AI補正に失敗しました。もう一度試してください。",
+    "editor.ai.timeout": "AIサーバーの応答が遅延しています。しばらくしてから再試行してください。",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI補正",

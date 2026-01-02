@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "¡Casi listo!",
     "editor.ai.downloadingImage": "Descargando imagen...",
     "editor.ai.failed": "La mejora de IA falló. Inténtalo de nuevo.",
+    "editor.ai.timeout": "La respuesta del servidor de IA se retrasa. Por favor, inténtalo más tarde.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "Mejora con IA",

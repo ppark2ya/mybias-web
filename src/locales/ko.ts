@@ -35,6 +35,7 @@ export default {
     "editor.ai.almostDone": "거의 다 됐어요!",
     "editor.ai.downloadingImage": "이미지 다운로드 중...",
     "editor.ai.failed": "AI 보정에 실패했습니다. 다시 시도해주세요.",
+    "editor.ai.timeout": "AI 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI 보정",

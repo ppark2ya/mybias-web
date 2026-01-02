@@ -33,6 +33,7 @@ export default {
     "editor.ai.almostDone": "快完成了！",
     "editor.ai.downloadingImage": "下载图像中...",
     "editor.ai.failed": "AI增强失败。请重试。",
+    "editor.ai.timeout": "AI服务器响应延迟。请稍后再试。",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI增强",
