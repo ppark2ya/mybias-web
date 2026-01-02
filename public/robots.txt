@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mybias.pages.dev/sitemap.xml
+Sitemap: https://savemybias.com/sitemap.xml
