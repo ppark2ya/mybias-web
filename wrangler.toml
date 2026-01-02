@@ -19,7 +19,7 @@ preview_id = "44703de0abc4464bad57bea032a16b08"
 [[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "mybias"
-preview_bucket_name = "mybias"
+preview_bucket_name = "mybias-preview"
 
 [env.preview.vars]
 BASE_URL = "https://dev.savemybias.com"
