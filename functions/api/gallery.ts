@@ -63,14 +63,15 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error) {
+    // Log technical error for debugging
     console.error("Gallery error:", error);
+
+    // Return empty gallery on DB error (connection may be initializing)
+    // Better UX than showing error - user can refresh to retry
     return new Response(
-      JSON.stringify({
-        error: "Failed to load gallery",
-        code: "INTERNAL_ERROR",
-      }),
+      JSON.stringify({ images: [] }),
       {
-        status: 500,
+        status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
