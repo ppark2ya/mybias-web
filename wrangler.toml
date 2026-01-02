@@ -21,9 +21,6 @@ binding = "R2_BUCKET"
 bucket_name = "mybias"
 preview_bucket_name = "mybias"
 
-[env.preview]
-name = "mybias-web-preview"
-
 [env.preview.vars]
 BASE_URL = "https://dev.savemybias.com"
 APP_ENV = "preview"
