@@ -84,6 +84,7 @@ export default {
     "gallery.emptyHint": "试试AI增强功能",
     "gallery.startCreating": "开始创作",
     "gallery.download": "下载",
+    "gallery.downloading": "下载中...",
 
     // Profile
     "profile.title": "我的资料",

@@ -84,6 +84,7 @@ export default {
     "gallery.emptyHint": "AI補正機能を使ってみてください",
     "gallery.startCreating": "写真を補正する",
     "gallery.download": "ダウンロード",
+    "gallery.downloading": "ダウンロード中...",
 
     // Profile
     "profile.title": "マイプロフィール",
