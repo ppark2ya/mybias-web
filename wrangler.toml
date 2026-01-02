@@ -6,7 +6,7 @@ pages_build_output_dir = "dist"
 # 환경 변수
 [vars]
 BASE_URL = "https://savemybias.com"
-R2_PUBLIC_URL = "https://pub-9dc0e2e630dd4076ae0da18a6f45c556.r2.dev"
+R2_PUBLIC_URL = "https://assets.savemybias.com"
 APP_ENV = "production"
 
 # KV 바인딩 설정
