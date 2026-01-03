@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ImageIcon, Download, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useGalleryQuery, downloadImage } from "../../api/gallery";
@@ -19,6 +19,7 @@ export function Gallery() {
   });
 
   const images = data?.images ?? [];
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -28,6 +29,9 @@ export function Gallery() {
   }, [authLoading, isAuthenticated, navigate]);
 
   const handleDownload = async (predictionId: string) => {
+    if (downloadingId) return;
+
+    setDownloadingId(predictionId);
     try {
       const blob = await downloadImage(predictionId);
       const url = window.URL.createObjectURL(blob);
@@ -40,6 +44,8 @@ export function Gallery() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Failed to download image:", err);
+    } finally {
+      setDownloadingId(null);
     }
   };
 
@@ -136,11 +142,18 @@ export function Gallery() {
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                       <button
                         onClick={() => handleDownload(image.predictionId)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                        disabled={downloadingId !== null}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         type="button"
                       >
-                        <Download className="w-4 h-4" />
-                        {t("gallery.download")}
+                        {downloadingId === image.predictionId ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Download className="w-4 h-4" />
+                        )}
+                        {downloadingId === image.predictionId
+                          ? t("gallery.downloading")
+                          : t("gallery.download")}
                       </button>
                     </div>
                     {/* Date */}

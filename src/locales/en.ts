@@ -131,6 +131,7 @@ export default {
     "gallery.emptyHint": "Try the AI enhancement feature",
     "gallery.startCreating": "Start Creating",
     "gallery.download": "Download",
+    "gallery.downloading": "Downloading...",
 
     // Profile
     "profile.title": "My Profile",

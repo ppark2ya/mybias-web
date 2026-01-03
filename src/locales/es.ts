@@ -84,6 +84,7 @@ export default {
     "gallery.emptyHint": "Prueba la función de mejora con IA",
     "gallery.startCreating": "Empezar a Crear",
     "gallery.download": "Descargar",
+    "gallery.downloading": "Descargando...",
 
     // Profile
     "profile.title": "Mi Perfil",

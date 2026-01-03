@@ -134,6 +134,7 @@ export default {
     "gallery.emptyHint": "AI 보정 기능을 사용해보세요",
     "gallery.startCreating": "사진 보정하러 가기",
     "gallery.download": "다운로드",
+    "gallery.downloading": "다운로드 중...",
 
     // Profile
     "profile.title": "내 프로필",
