@@ -30,6 +30,16 @@ interface ReplicateWebhookPayload {
 /**
  * Validate webhook request from Replicate
  * Replicate signs webhooks with HMAC-SHA256
+ *
+ * Headers:
+ * - webhook-id: unique message identifier
+ * - webhook-timestamp: timestamp in seconds since epoch
+ * - webhook-signature: Base64 encoded signatures (space delimited, format: "v1,signature")
+ *
+ * Signed content: `${webhook_id}.${webhook_timestamp}.${body}`
+ * Secret format: "whsec_<base64_key>" - need to extract and decode the base64 part
+ *
+ * @see https://replicate.com/docs/topics/webhooks/verify-webhook
  */
 async function validateWebhook(
   request: Request,
@@ -43,47 +53,104 @@ async function validateWebhook(
     return true;
   }
 
-  const signature = request.headers.get("webhook-signature");
-  if (!signature) {
-    console.error("Missing webhook-signature header");
+  // Get required headers
+  const webhookId = request.headers.get("webhook-id");
+  const webhookTimestamp = request.headers.get("webhook-timestamp");
+  const webhookSignature = request.headers.get("webhook-signature");
+
+  if (!webhookId || !webhookTimestamp || !webhookSignature) {
+    console.error("Missing required webhook headers:", {
+      hasId: !!webhookId,
+      hasTimestamp: !!webhookTimestamp,
+      hasSignature: !!webhookSignature,
+    });
     return false;
   }
 
-  // Parse the signature header (format: t=timestamp,v1=signature)
-  const parts = signature.split(",");
-  const timestamp = parts.find((p) => p.startsWith("t="))?.slice(2);
-  const sig = parts.find((p) => p.startsWith("v1="))?.slice(3);
+  // Verify timestamp is within tolerance (5 minutes)
+  const timestampSeconds = parseInt(webhookTimestamp, 10);
+  const currentSeconds = Math.floor(Date.now() / 1000);
+  const tolerance = 5 * 60; // 5 minutes
 
-  if (!timestamp || !sig) {
-    console.error("Invalid webhook-signature format");
+  if (Math.abs(currentSeconds - timestampSeconds) > tolerance) {
+    console.error("Webhook timestamp outside tolerance window");
     return false;
   }
 
-  // Get request body
+  // Parse signatures (space-delimited, format: "v1,base64signature")
+  const signatures = webhookSignature.split(" ");
+  const v1Signatures: string[] = [];
+
+  for (const sig of signatures) {
+    const [version, signature] = sig.split(",");
+    if (version === "v1" && signature) {
+      v1Signatures.push(signature);
+    }
+  }
+
+  if (v1Signatures.length === 0) {
+    console.error("No v1 signatures found in webhook-signature header");
+    return false;
+  }
+
+  // Get request body (must be raw, unmodified)
   const body = await request.clone().text();
 
-  // Create signed payload
-  const signedPayload = `${timestamp}.${body}`;
+  // Create signed payload: webhook_id.webhook_timestamp.body
+  const signedPayload = `${webhookId}.${webhookTimestamp}.${body}`;
 
-  // Calculate expected signature
+  // Extract base64 key from secret (remove "whsec_" prefix)
+  const secretKey = secret.startsWith("whsec_") ? secret.slice(6) : secret;
+
+  // Decode base64 secret key
+  const keyBytes = Uint8Array.from(atob(secretKey), (c) => c.charCodeAt(0));
+
+  // Calculate expected signature using HMAC-SHA256
   const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
+  const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(secret),
+    keyBytes,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
   );
+
   const signatureBytes = await crypto.subtle.sign(
     "HMAC",
-    key,
+    cryptoKey,
     encoder.encode(signedPayload)
   );
-  const expectedSignature = Array.from(new Uint8Array(signatureBytes))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
 
-  return sig === expectedSignature;
+  // Convert to base64 for comparison
+  const expectedSignature = btoa(
+    String.fromCharCode(...new Uint8Array(signatureBytes))
+  );
+
+  // Compare with provided signatures (constant-time comparison)
+  for (const providedSig of v1Signatures) {
+    if (timingSafeEqual(expectedSignature, providedSig)) {
+      return true;
+    }
+  }
+
+  console.error("Webhook signature verification failed");
+  return false;
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+
+  return result === 0;
 }
 
 /**
