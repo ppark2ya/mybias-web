@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { X, Download, Loader2 } from "lucide-react";
+import { X, Download, Share2, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { GalleryImage } from "../../api/gallery";
 
@@ -8,6 +8,7 @@ interface ImageViewerProps {
   isDownloading: boolean;
   onClose: () => void;
   onDownload: () => void;
+  onShare: () => void;
 }
 
 export function ImageViewer({
@@ -15,6 +16,7 @@ export function ImageViewer({
   isDownloading,
   onClose,
   onDownload,
+  onShare,
 }: ImageViewerProps) {
   const { t } = useTranslation();
 
@@ -49,6 +51,14 @@ export function ImageViewer({
     >
       {/* Top bar with buttons */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-end gap-2 p-4">
+        <button
+          onClick={onShare}
+          className="flex items-center justify-center w-10 h-10 text-white transition-colors rounded-full bg-white/10 hover:bg-white/20"
+          type="button"
+          aria-label={t("share.title")}
+        >
+          <Share2 className="w-5 h-5" />
+        </button>
         <button
           onClick={onDownload}
           disabled={isDownloading}

@@ -10,6 +10,7 @@ import {
 } from "../../api/gallery";
 import { ImageViewer } from "./ImageViewer";
 import { ImageSkeleton } from "./ImageSkeleton";
+import { ShareModal } from "../ShareModal/ShareModal";
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -33,6 +34,7 @@ export function Gallery() {
   const [loadedImages, setLoadedImages] = useState<Set<string>>(
     () => new Set()
   );
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Infinite scroll observer
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -101,6 +103,14 @@ export function Gallery() {
     if (selectedImage) {
       handleDownload(selectedImage.predictionId);
     }
+  };
+
+  const handleShareFromViewer = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setIsShareModalOpen(false);
   };
 
   if (authLoading) {
@@ -234,6 +244,16 @@ export function Gallery() {
           isDownloading={downloadingId === selectedImage.predictionId}
           onClose={handleCloseViewer}
           onDownload={handleDownloadFromViewer}
+          onShare={handleShareFromViewer}
+        />
+      )}
+
+      {/* Share Modal */}
+      {selectedImage && (
+        <ShareModal
+          isOpen={isShareModalOpen}
+          onClose={handleCloseShareModal}
+          imageUrl={selectedImage.imageUrl}
         />
       )}
     </div>
