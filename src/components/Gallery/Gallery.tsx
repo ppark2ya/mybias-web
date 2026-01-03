@@ -1,12 +1,16 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useGalleryInfiniteQuery, type GalleryImage } from "../../api/gallery";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { ShareModal } from "../ShareModal/ShareModal";
-import { ImageSkeleton } from "./ImageSkeleton";
+import {
+  useGalleryInfiniteQuery,
+  downloadImage,
+  type GalleryImage,
+} from "../../api/gallery";
 import { ImageViewer } from "./ImageViewer";
+import { ImageSkeleton } from "./ImageSkeleton";
+import { ShareModal } from "../ShareModal/ShareModal";
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -67,12 +71,15 @@ export function Gallery() {
 
     setDownloadingId(predictionId);
     try {
-      const link = document.createElement("a");
-      link.href = selectedImage?.imageUrl || "";
-      link.download = `mybias-${new Date().toISOString().slice(0, 10)}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const blob = await downloadImage(predictionId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mybias-${predictionId}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Failed to download image:", err);
     } finally {
@@ -247,6 +254,7 @@ export function Gallery() {
           isOpen={isShareModalOpen}
           onClose={handleCloseShareModal}
           imageUrl={selectedImage.imageUrl}
+          onDownload={handleDownloadFromViewer}
         />
       )}
     </div>

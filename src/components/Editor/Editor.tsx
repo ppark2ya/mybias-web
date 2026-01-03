@@ -11,9 +11,9 @@ import {
   Sparkles,
   Maximize,
   Download,
-  Share2,
+  // Share2, // TODO: Share button temporarily disabled
 } from "lucide-react";
-import ShareModal from "../ShareModal";
+// import ShareModal from "../ShareModal"; // TODO: Share button temporarily disabled
 import AIPreviewModal from "../AIPreviewModal";
 import { useEditorState } from "./hooks/useEditorState";
 import { useImageHistory } from "./hooks/useImageHistory";
@@ -54,8 +54,8 @@ export function Editor({ files, onClose }: EditorProps) {
     setIsProcessing,
     processingMessage,
     setProcessingMessage,
-    isShareModalOpen,
-    setIsShareModalOpen,
+    // isShareModalOpen, // TODO: Share button temporarily disabled
+    // setIsShareModalOpen, // TODO: Share button temporarily disabled
   } = useEditorState(files);
 
   // History management
@@ -356,6 +356,7 @@ export function Editor({ files, onClose }: EditorProps) {
               variant="download"
             />
 
+{/* TODO: Share button temporarily disabled
             <ToolButton
               onClick={() => setIsShareModalOpen(true)}
               disabled={isProcessing || !currentImageState}
@@ -363,6 +364,7 @@ export function Editor({ files, onClose }: EditorProps) {
               label="SHARE"
               variant="share"
             />
+            */}
           </div>
 
           {/* Tool Settings Panel */}
@@ -380,12 +382,13 @@ export function Editor({ files, onClose }: EditorProps) {
         </div>
       </div>
 
-      {/* Share Modal */}
+{/* TODO: Share Modal temporarily disabled
       <ShareModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         imageUrl={currentImageState?.blobUrl || ""}
       />
+      */}
 
       {/* AI Preview Modal */}
       <AIPreviewModal
