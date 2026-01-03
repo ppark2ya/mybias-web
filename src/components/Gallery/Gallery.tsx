@@ -30,7 +30,9 @@ export function Gallery() {
   const images = data?.pages.flatMap((page) => page.images) ?? [];
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(
+    () => new Set()
+  );
 
   // Infinite scroll observer
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -152,9 +154,7 @@ export function Gallery() {
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <p className="text-sm text-red-500">
-                  {t("gallery.loadError")}
-                </p>
+                <p className="text-sm text-red-500">{t("gallery.loadError")}</p>
               </div>
             ) : images.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
@@ -201,7 +201,7 @@ export function Gallery() {
                       {/* Hover overlay */}
                       <div className="absolute inset-0 transition-opacity duration-200 opacity-0 bg-black/20 group-hover:opacity-100" />
                       {/* Date badge */}
-                      <div className="absolute p-2 transition-opacity opacity-0 bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent group-hover:opacity-100">
+                      <div className="absolute bottom-0 left-0 right-0 p-2 transition-opacity opacity-0 bg-gradient-to-t from-black/50 to-transparent group-hover:opacity-100">
                         <p className="text-xs text-white/80">
                           {new Date(image.createdAt).toLocaleDateString()}
                         </p>
