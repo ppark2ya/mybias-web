@@ -8,6 +8,7 @@ interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   imageUrl: string;
+  onDownload?: () => void;
 }
 
 type SharePlatform =
@@ -28,7 +29,7 @@ interface ShareOption {
 
 // ShareOptions will be defined inside component to use t() function
 
-export function ShareModal({ isOpen, onClose, imageUrl }: ShareModalProps) {
+export function ShareModal({ isOpen, onClose, imageUrl, onDownload }: ShareModalProps) {
   const { t } = useTranslation();
   const modalRef = useRef<HTMLDivElement>(null);
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
@@ -209,26 +210,33 @@ export function ShareModal({ isOpen, onClose, imageUrl }: ShareModalProps) {
 
       case "copy":
         try {
-          await navigator.clipboard.writeText(shareUrl);
+          // Copy R2 image URL to clipboard
+          await navigator.clipboard.writeText(imageUrl);
           toast.info(t("share.linkCopied"));
         } catch {
           const textArea = document.createElement("textarea");
-          textArea.value = shareUrl;
+          textArea.value = imageUrl;
           document.body.appendChild(textArea);
           textArea.select();
-          navigator.clipboard.writeText(shareUrl);
+          navigator.clipboard.writeText(imageUrl);
           document.body.removeChild(textArea);
           toast.info(t("share.linkCopied"));
         }
         break;
 
       case "download": {
-        const link = document.createElement("a");
-        link.href = imageUrl;
-        link.download = `mybias-${new Date().toISOString().slice(0, 10)}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Use provided onDownload handler if available (for Gallery download API)
+        if (onDownload) {
+          onDownload();
+        } else {
+          // Fallback: direct download for Editor
+          const link = document.createElement("a");
+          link.href = imageUrl;
+          link.download = `mybias-${new Date().toISOString().slice(0, 10)}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
         break;
       }
     }
