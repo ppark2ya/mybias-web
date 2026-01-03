@@ -132,6 +132,7 @@ export default {
     "gallery.startCreating": "Start Creating",
     "gallery.download": "Download",
     "gallery.downloading": "Downloading...",
+    "gallery.close": "Close",
 
     // Profile
     "profile.title": "My Profile",

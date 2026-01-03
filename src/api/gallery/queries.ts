@@ -1,4 +1,4 @@
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { fetchGallery } from "./api";
 import type { GalleryResponse, GalleryErrorResponse } from "./types";
@@ -12,29 +12,37 @@ export const galleryKeys = {
 };
 
 /**
- * Hook for fetching gallery images
+ * Hook for fetching gallery images with infinite scroll
  *
  * @example
  * ```tsx
- * const { data, isLoading, error } = useGalleryQuery({
+ * const {
+ *   data,
+ *   isLoading,
+ *   error,
+ *   fetchNextPage,
+ *   hasNextPage,
+ *   isFetchingNextPage,
+ * } = useGalleryInfiniteQuery({
  *   enabled: isAuthenticated,
  * });
  *
- * if (isLoading) return <Loading />;
- * if (error) return <Error message={error.message} />;
- *
- * return <GalleryGrid images={data.images} />;
+ * const images = data?.pages.flatMap(page => page.images) ?? [];
  * ```
  */
-export function useGalleryQuery(
-  options?: Omit<
-    UseQueryOptions<GalleryResponse, AxiosError<GalleryErrorResponse>>,
-    "queryKey" | "queryFn"
-  >
-) {
-  return useQuery({
+export function useGalleryInfiniteQuery(options?: { enabled?: boolean }) {
+  return useInfiniteQuery<
+    GalleryResponse,
+    AxiosError<GalleryErrorResponse>,
+    InfiniteData<GalleryResponse>,
+    readonly ["gallery", "list"],
+    string | undefined
+  >({
     queryKey: galleryKeys.list(),
-    queryFn: fetchGallery,
-    ...options,
+    queryFn: ({ pageParam }) => fetchGallery({ cursor: pageParam }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasMore ? lastPage.nextCursor ?? undefined : undefined,
+    enabled: options?.enabled,
   });
 }

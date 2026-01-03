@@ -124,6 +124,9 @@ async function uploadToR2(
       contentType,
       contentDisposition: `attachment; filename="${fileName}"`,
     },
+    customMetadata: {
+      predictionId,
+    },
   });
 
   return key;

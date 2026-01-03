@@ -1,12 +1,18 @@
 import { apiClient } from "../../lib/axios";
-import type { GalleryResponse } from "./types";
+import type { GalleryResponse, GalleryParams } from "./types";
 
 /**
- * Fetch user's gallery images
- * @returns Promise with gallery images
+ * Fetch user's gallery images with pagination
+ * @param params - Pagination parameters (cursor, limit)
+ * @returns Promise with gallery images and pagination info
  */
-export async function fetchGallery(): Promise<GalleryResponse> {
-  const { data } = await apiClient.get<GalleryResponse>("/gallery");
+export async function fetchGallery(params?: GalleryParams): Promise<GalleryResponse> {
+  const { data } = await apiClient.get<GalleryResponse>("/gallery", {
+    params: {
+      cursor: params?.cursor,
+      limit: params?.limit,
+    },
+  });
   return data;
 }
 

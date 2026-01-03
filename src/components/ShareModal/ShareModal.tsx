@@ -242,7 +242,7 @@ export function ShareModal({ isOpen, onClose, imageUrl }: ShareModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center duration-200 sm:items-center bg-black/50 backdrop-blur-sm animate-in fade-in"
+      className="fixed inset-0 z-[110] flex items-end justify-center duration-200 sm:items-center bg-black/50 backdrop-blur-sm animate-in fade-in"
       onClick={handleBackdropClick}
     >
       {/* Bottom Sheet / Modal */}
