@@ -85,6 +85,7 @@ export default {
     "gallery.startCreating": "开始创作",
     "gallery.download": "下载",
     "gallery.downloading": "下载中...",
+    "gallery.close": "关闭",
 
     // Profile
     "profile.title": "我的资料",

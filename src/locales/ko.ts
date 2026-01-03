@@ -135,6 +135,7 @@ export default {
     "gallery.startCreating": "사진 보정하러 가기",
     "gallery.download": "다운로드",
     "gallery.downloading": "다운로드 중...",
+    "gallery.close": "닫기",
 
     // Profile
     "profile.title": "내 프로필",

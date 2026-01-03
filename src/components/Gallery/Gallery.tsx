@@ -1,9 +1,15 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ImageIcon, Download, Loader2 } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { ArrowLeft, ImageIcon, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { useGalleryQuery, downloadImage } from "../../api/gallery";
+import {
+  useGalleryInfiniteQuery,
+  downloadImage,
+  type GalleryImage,
+} from "../../api/gallery";
+import { ImageViewer } from "./ImageViewer";
+import { ImageSkeleton } from "./ImageSkeleton";
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -14,12 +20,40 @@ export function Gallery() {
     data,
     isLoading,
     error,
-  } = useGalleryQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useGalleryInfiniteQuery({
     enabled: isAuthenticated,
   });
 
-  const images = data?.images ?? [];
+  const images = data?.pages.flatMap((page) => page.images) ?? [];
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+
+  // Infinite scroll observer
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return;
+
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      });
+
+      if (node) {
+        observerRef.current.observe(node);
+      }
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -49,10 +83,28 @@ export function Gallery() {
     }
   };
 
+  const handleImageLoad = (imageId: string) => {
+    setLoadedImages((prev) => new Set(prev).add(imageId));
+  };
+
+  const handleImageClick = (image: GalleryImage) => {
+    setSelectedImage(image);
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedImage(null);
+  };
+
+  const handleDownloadFromViewer = () => {
+    if (selectedImage) {
+      handleDownload(selectedImage.predictionId);
+    }
+  };
+
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400">
+        <div className="w-8 h-8 border-4 rounded-full border-white/30 border-t-white animate-spin" />
       </div>
     );
   }
@@ -62,9 +114,9 @@ export function Gallery() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 py-4 px-2 sm:py-6 sm:px-4 lg:py-8 lg:px-6">
+    <div className="min-h-screen px-2 py-4 bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 sm:py-6 sm:px-4 lg:py-8 lg:px-6">
       {/* Back Button */}
-      <div className="fixed top-4 left-4 sm:top-6 sm:left-6 z-50">
+      <div className="fixed z-50 top-4 left-4 sm:top-6 sm:left-6">
         <Link
           to="/"
           className="flex items-center gap-2 px-3 py-2 text-sm text-white transition-all duration-200 border rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 hover:scale-105 active:scale-95"
@@ -75,8 +127,8 @@ export function Gallery() {
       </div>
 
       {/* Gallery Content */}
-      <div className="max-w-4xl mx-auto pt-16 sm:pt-20">
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="max-w-4xl pt-16 mx-auto sm:pt-20">
+        <div className="overflow-hidden bg-white shadow-2xl rounded-3xl">
           {/* Header */}
           <div className="px-6 py-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -95,80 +147,95 @@ export function Gallery() {
           {/* Gallery Grid */}
           <div className="p-4 sm:p-6">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-fuchsia-500 animate-spin" />
-                <p className="mt-3 text-sm text-gray-500">
-                  {t("gallery.loading")}
-                </p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                <ImageSkeleton count={6} />
               </div>
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <p className="text-sm text-red-500">
-                  {error.response?.data?.error ?? t("gallery.loadError")}
+                  {t("gallery.loadError")}
                 </p>
               </div>
             ) : images.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <div className="flex items-center justify-center w-16 h-16 mb-4 bg-gray-100 rounded-full">
                   <ImageIcon className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-600 font-medium">
+                <p className="font-medium text-gray-600">
                   {t("gallery.empty")}
                 </p>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="mt-1 text-sm text-gray-400">
                   {t("gallery.emptyHint")}
                 </p>
                 <Link
                   to="/"
-                  className="mt-4 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-fuchsia-500 to-purple-600 rounded-lg hover:from-fuchsia-600 hover:to-purple-700 transition-all"
+                  className="px-4 py-2 mt-4 text-sm font-medium text-white transition-all rounded-lg bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700"
                 >
                   {t("gallery.startCreating")}
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-                {images.map((image) => (
+              <>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                  {images.map((image) => (
+                    <div
+                      key={image.id}
+                      className="relative overflow-hidden transition-transform duration-200 bg-gray-200 cursor-pointer group aspect-square rounded-xl hover:scale-[1.02] active:scale-[0.98]"
+                      onClick={() => handleImageClick(image)}
+                    >
+                      {/* Skeleton placeholder */}
+                      {!loadedImages.has(image.id) && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer" />
+                      )}
+                      <img
+                        src={image.imageUrl}
+                        alt={`AI Enhanced ${image.predictionId}`}
+                        className={`w-full h-full object-cover transition-all duration-500 ${
+                          loadedImages.has(image.id)
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-105"
+                        }`}
+                        loading="lazy"
+                        onLoad={() => handleImageLoad(image.id)}
+                      />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 transition-opacity duration-200 opacity-0 bg-black/20 group-hover:opacity-100" />
+                      {/* Date badge */}
+                      <div className="absolute p-2 transition-opacity opacity-0 bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent group-hover:opacity-100">
+                        <p className="text-xs text-white/80">
+                          {new Date(image.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Loading more skeletons */}
+                  {isFetchingNextPage && <ImageSkeleton count={3} />}
+                </div>
+
+                {/* Infinite scroll trigger */}
+                {hasNextPage && (
                   <div
-                    key={image.id}
-                    className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100"
+                    ref={loadMoreRef}
+                    className="flex items-center justify-center py-8"
                   >
-                    <img
-                      src={image.imageUrl}
-                      alt={`AI Enhanced ${image.predictionId}`}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                      <button
-                        onClick={() => handleDownload(image.predictionId)}
-                        disabled={downloadingId !== null}
-                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        type="button"
-                      >
-                        {downloadingId === image.predictionId ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Download className="w-4 h-4" />
-                        )}
-                        {downloadingId === image.predictionId
-                          ? t("gallery.downloading")
-                          : t("gallery.download")}
-                      </button>
-                    </div>
-                    {/* Date */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="text-xs text-white/80">
-                        {new Date(image.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
+                    <Loader2 className="w-6 h-6 text-fuchsia-500 animate-spin" />
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Image Viewer Modal */}
+      {selectedImage && (
+        <ImageViewer
+          image={selectedImage}
+          isDownloading={downloadingId === selectedImage.predictionId}
+          onClose={handleCloseViewer}
+          onDownload={handleDownloadFromViewer}
+        />
+      )}
     </div>
   );
 }

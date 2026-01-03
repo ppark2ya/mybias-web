@@ -13,11 +13,25 @@ export interface GalleryImage {
 }
 
 /**
+ * Request parameters for fetching gallery
+ */
+export interface GalleryParams {
+  /** Cursor for pagination (createdAt timestamp) */
+  cursor?: string;
+  /** Number of items to fetch (default: 12, max: 50) */
+  limit?: number;
+}
+
+/**
  * Response type for /api/gallery endpoint
  */
 export interface GalleryResponse {
   /** List of gallery images */
   images: GalleryImage[];
+  /** Cursor for next page (null if no more) */
+  nextCursor: string | null;
+  /** Whether there are more results */
+  hasMore: boolean;
 }
 
 /**

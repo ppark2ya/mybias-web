@@ -85,6 +85,7 @@ export default {
     "gallery.startCreating": "写真を補正する",
     "gallery.download": "ダウンロード",
     "gallery.downloading": "ダウンロード中...",
+    "gallery.close": "閉じる",
 
     // Profile
     "profile.title": "マイプロフィール",

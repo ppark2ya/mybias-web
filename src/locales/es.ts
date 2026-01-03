@@ -85,6 +85,7 @@ export default {
     "gallery.startCreating": "Empezar a Crear",
     "gallery.download": "Descargar",
     "gallery.downloading": "Descargando...",
+    "gallery.close": "Cerrar",
 
     // Profile
     "profile.title": "Mi Perfil",

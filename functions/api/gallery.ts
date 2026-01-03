@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, lt, and } from "drizzle-orm";
 import { imageGenerations } from "../../src/db/schema";
 import type { ContextData } from "../types";
 
@@ -8,11 +8,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
+const DEFAULT_LIMIT = 12;
+
 export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
   context
 ) => {
   try {
-    const { data } = context;
+    const { data, request } = context;
     const db = data.db;
 
     // Check if user is authenticated
@@ -30,7 +32,22 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
       );
     }
 
-    // Query user's successful image generations
+    // Parse query parameters
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get("cursor");
+    const limitParam = url.searchParams.get("limit");
+    const limit = limitParam ? Math.min(parseInt(limitParam, 10), 50) : DEFAULT_LIMIT;
+
+    // Build query conditions
+    const conditions = [eq(imageGenerations.userId, user.id)];
+
+    // Add cursor condition if provided (cursor is the createdAt timestamp)
+    if (cursor) {
+      const cursorDate = new Date(cursor);
+      conditions.push(lt(imageGenerations.createdAt, cursorDate));
+    }
+
+    // Query user's image generations with pagination
     const generations = await db
       .select({
         id: imageGenerations.id,
@@ -40,16 +57,17 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
         createdAt: imageGenerations.createdAt,
       })
       .from(imageGenerations)
-      .where(eq(imageGenerations.userId, user.id))
+      .where(and(...conditions))
       .orderBy(desc(imageGenerations.createdAt))
-      .limit(50);
+      .limit(limit + 1); // Fetch one extra to check if there are more
 
-    // Filter only succeeded generations with output URL
-    const images = generations
-      .filter(
-        (g) =>
-          g.outputImageUrl || g.replicateOutputUrl
-      )
+    // Check if there are more results
+    const hasMore = generations.length > limit;
+    const results = hasMore ? generations.slice(0, limit) : generations;
+
+    // Filter only generations with output URL
+    const images = results
+      .filter((g) => g.outputImageUrl || g.replicateOutputUrl)
       .map((g) => ({
         id: g.id,
         predictionId: g.predictionId,
@@ -57,18 +75,29 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
         createdAt: g.createdAt.toISOString(),
       }));
 
-    return new Response(JSON.stringify({ images }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+    // Get next cursor from the last item
+    const nextCursor = hasMore && results.length > 0
+      ? results[results.length - 1].createdAt.toISOString()
+      : null;
+
+    return new Response(
+      JSON.stringify({
+        images,
+        nextCursor,
+        hasMore,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
   } catch (error) {
     // Log technical error for debugging
     console.error("Gallery error:", error);
 
-    // Return empty gallery on DB error (connection may be initializing)
-    // Better UX than showing error - user can refresh to retry
+    // Return empty gallery on DB error
     return new Response(
-      JSON.stringify({ images: [] }),
+      JSON.stringify({ images: [], nextCursor: null, hasMore: false }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
