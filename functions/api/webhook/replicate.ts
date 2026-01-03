@@ -122,6 +122,7 @@ async function uploadToR2(
   await bucket.put(key, imageBuffer, {
     httpMetadata: {
       contentType,
+      contentDisposition: `attachment; filename="${fileName}"`,
     },
     customMetadata: {
       predictionId,

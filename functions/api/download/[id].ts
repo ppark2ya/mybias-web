@@ -82,8 +82,6 @@ export const onRequestGet: PagesFunction<Env, string, ContextData> = async (
     // Extract R2 key from URL (format: https://domain/generations/YYYY/MM/DD/predictionId.ext)
     const urlPath = new URL(generation.outputImageUrl).pathname;
     const r2Key = urlPath.startsWith("/") ? urlPath.slice(1) : urlPath;
-    console.log("r2Key: ", r2Key);
-    console.log("generation.outputImageUrl: ", generation.outputImageUrl);
 
     // Get object from R2
     const object = await env.R2_BUCKET.get(r2Key);
