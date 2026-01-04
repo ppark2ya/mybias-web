@@ -44,6 +44,9 @@ export default {
     "editor.ai.preview.remaining": "{{count}} uses remaining today",
     "editor.ai.preview.cancel": "Cancel",
     "editor.ai.preview.enhance": "Enhance with AI",
+    "editor.ai.preview.fidelity": "Fidelity",
+    "editor.ai.preview.fidelityLow": "Better restoration",
+    "editor.ai.preview.fidelityHigh": "Keep original features",
 
     // Editor - AI Result Modal
     "editor.ai.result.title": "Enhancement Complete",

@@ -1,63 +1,90 @@
-import { useEffect, useRef } from "react";
-import { X, Sparkles, ArrowRight, Check } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { X, Sparkles, Check, SlidersHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ImageCompareSlider } from "../ImageCompareSlider";
 
 type ModalMode = "preview" | "result";
 
 interface AIPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm?: () => void;
+  onConfirm?: (fidelity: number) => void;
   beforeImageUrl: string;
   afterImageUrl?: string;
   remainingUsage?: number;
   mode?: ModalMode;
 }
 
-export function AIPreviewModal({
-  isOpen,
+// CSS filter로 fidelity에 따른 예상 결과 시뮬레이션
+function getPreviewFilter(fidelity: number): React.CSSProperties {
+  // fidelity가 낮을수록 더 선명하고 부드럽게 (복원 품질 높음)
+  // fidelity가 높을수록 원본에 가깝게 (원본 특징 유지)
+  const sharpness = 1 + (1 - fidelity) * 0.15; // 0.85 ~ 1.15
+  const saturation = 1 + (1 - fidelity) * 0.2; // 0.8 ~ 1.2
+  const brightness = 1 + (1 - fidelity) * 0.05; // 0.95 ~ 1.05
+
+  return {
+    filter: `contrast(${sharpness}) saturate(${saturation}) brightness(${brightness})`,
+  };
+}
+
+const DEFAULT_FIDELITY = 0.5;
+
+// Inner component that resets state when key changes
+function AIPreviewModalContent({
   onClose,
   onConfirm,
   beforeImageUrl,
   afterImageUrl,
-  remainingUsage = 0,
-  mode = "preview",
-}: AIPreviewModalProps) {
+  remainingUsage,
+  isResultMode,
+}: {
+  onClose: () => void;
+  onConfirm?: (fidelity: number) => void;
+  beforeImageUrl: string;
+  afterImageUrl?: string;
+  remainingUsage: number;
+  isResultMode: boolean;
+}) {
   const { t } = useTranslation();
   const modalRef = useRef<HTMLDivElement>(null);
+  const [fidelity, setFidelity] = useState(DEFAULT_FIDELITY);
 
-  const isResultMode = mode === "result";
-
+  // Handle escape key and body scroll
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
 
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
+    document.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
       document.body.style.overflow = "";
     };
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
-  };
+  }, [onClose]);
 
-  const handleConfirm = () => {
+  const handleConfirm = useCallback(() => {
     if (onConfirm) {
       onClose();
-      onConfirm();
+      onConfirm(fidelity);
     }
-  };
+  }, [onConfirm, onClose, fidelity]);
 
-  if (!isOpen) return null;
+  const handleFidelityChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFidelity(parseFloat(e.target.value));
+  }, []);
+
+  // Create preview image URL with filter applied via canvas or use CSS filter
+  const previewImageUrl = beforeImageUrl;
+  const previewStyle = !isResultMode ? getPreviewFilter(fidelity) : undefined;
 
   return (
     <div
@@ -67,7 +94,7 @@ export function AIPreviewModal({
       <div
         ref={modalRef}
         className="
-          w-full sm:max-w-3xl
+          w-full sm:max-w-2xl
           max-h-[95vh] sm:max-h-[90vh]
           bg-white
           rounded-t-3xl sm:rounded-3xl
@@ -121,78 +148,75 @@ export function AIPreviewModal({
           </div>
         </div>
 
-        {/* Preview Area */}
+        {/* Preview Area with Slider */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <div className="flex flex-row gap-3 sm:gap-6">
-            {/* Before Image */}
-            <div className="flex-1 min-w-0">
-              <div className="mb-2 text-center">
-                <span className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold text-gray-600 bg-gray-100 rounded-full">
-                  {isResultMode
-                    ? t("editor.ai.result.before")
-                    : t("editor.ai.preview.before")}
-                </span>
-              </div>
-              <div className="overflow-hidden bg-gray-100 rounded-xl sm:rounded-2xl aspect-square">
+          {isResultMode && afterImageUrl ? (
+            /* Result Mode - Use actual before/after images */
+            <ImageCompareSlider
+              beforeImage={beforeImageUrl}
+              afterImage={afterImageUrl}
+              beforeLabel={t("editor.ai.result.before")}
+              afterLabel={t("editor.ai.result.after")}
+              className="rounded-xl sm:rounded-2xl overflow-hidden"
+            />
+          ) : (
+            /* Preview Mode - Use CSS filter simulation */
+            <div className="relative">
+              <ImageCompareSlider
+                beforeImage={beforeImageUrl}
+                afterImage={previewImageUrl}
+                beforeLabel={t("editor.ai.preview.before")}
+                afterLabel={t("editor.ai.preview.after")}
+                className="rounded-xl sm:rounded-2xl overflow-hidden"
+                key={fidelity} // Re-render when fidelity changes
+              />
+              {/* Apply filter overlay for preview */}
+              <div
+                className="absolute inset-0 pointer-events-none rounded-xl sm:rounded-2xl overflow-hidden"
+                style={{
+                  clipPath: `inset(0 0 0 50%)`, // Only apply to right side
+                }}
+              >
                 <img
-                  src={beforeImageUrl}
-                  alt="Before"
-                  className="object-cover w-full h-full"
+                  src={previewImageUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover aspect-square"
+                  style={previewStyle}
                 />
               </div>
             </div>
+          )}
 
-            {/* Arrow - hidden on mobile for more space */}
-            <div className="hidden sm:flex items-center justify-center">
-              <div className={`p-2 rounded-full ${
-                isResultMode
-                  ? "bg-gradient-to-r from-emerald-100 to-teal-100"
-                  : "bg-gradient-to-r from-violet-100 to-purple-100"
-              }`}>
-                <ArrowRight className={`w-5 h-5 ${
-                  isResultMode ? "text-emerald-600" : "text-violet-600"
-                }`} />
-              </div>
-            </div>
-
-            {/* After Image */}
-            <div className="flex-1 min-w-0">
-              <div className="mb-2 text-center">
-                <span className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold text-white rounded-full ${
-                  isResultMode
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-500"
-                    : "bg-gradient-to-r from-violet-500 to-purple-500"
-                }`}>
-                  {isResultMode
-                    ? t("editor.ai.result.after")
-                    : t("editor.ai.preview.after")}
+          {/* Fidelity Slider - Only in Preview Mode */}
+          {!isResultMode && (
+            <div className="mt-4 sm:mt-6 p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-2 mb-3">
+                <SlidersHorizontal className="w-4 h-4 text-violet-600" />
+                <span className="text-sm font-medium text-gray-700">
+                  {t("editor.ai.preview.fidelity")}
+                </span>
+                <span className="ml-auto text-sm font-semibold text-violet-600">
+                  {Math.round(fidelity * 100)}%
                 </span>
               </div>
-              <div className="relative overflow-hidden bg-gray-100 rounded-xl sm:rounded-2xl aspect-square">
-                <img
-                  src={isResultMode ? afterImageUrl : beforeImageUrl}
-                  alt="After"
-                  className="object-cover w-full h-full"
-                  style={isResultMode ? undefined : {
-                    filter: "contrast(1.08) saturate(1.15) brightness(1.03)",
-                  }}
-                />
-                {/* Enhancement overlay effect - only in preview mode */}
-                {!isResultMode && (
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-white/10" />
-                )}
-                {/* Sparkle decorations */}
-                <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-                  <Sparkles className={`w-3 h-3 sm:w-4 sm:h-4 animate-pulse ${
-                    isResultMode ? "text-emerald-400" : "text-yellow-400"
-                  }`} />
-                </div>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={fidelity}
+                onChange={handleFidelityChange}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-violet-600"
+              />
+              <div className="flex justify-between mt-2 text-xs text-gray-500">
+                <span>{t("editor.ai.preview.fidelityLow")}</span>
+                <span>{t("editor.ai.preview.fidelityHigh")}</span>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Info Message */}
-          <div className={`p-3 sm:p-4 mt-4 sm:mt-6 rounded-xl ${
+          <div className={`p-3 sm:p-4 mt-4 rounded-xl ${
             isResultMode
               ? "bg-gradient-to-r from-emerald-50 to-teal-50"
               : "bg-gradient-to-r from-violet-50 to-purple-50"
@@ -250,6 +274,34 @@ export function AIPreviewModal({
         <div className="h-safe-area-inset-bottom sm:hidden" />
       </div>
     </div>
+  );
+}
+
+// Wrapper component that controls mounting/unmounting
+export function AIPreviewModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  beforeImageUrl,
+  afterImageUrl,
+  remainingUsage = 0,
+  mode = "preview",
+}: AIPreviewModalProps) {
+  const isResultMode = mode === "result";
+
+  if (!isOpen) return null;
+
+  // Key based on isOpen ensures fresh state on each open
+  return (
+    <AIPreviewModalContent
+      key={`${isOpen}-${mode}`}
+      onClose={onClose}
+      onConfirm={onConfirm}
+      beforeImageUrl={beforeImageUrl}
+      afterImageUrl={afterImageUrl}
+      remainingUsage={remainingUsage}
+      isResultMode={isResultMode}
+    />
   );
 }
 
