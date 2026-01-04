@@ -7,6 +7,8 @@ interface ImageCompareSliderProps {
   afterLabel?: string;
   initialPosition?: number;
   className?: string;
+  beforeStyle?: React.CSSProperties;
+  afterStyle?: React.CSSProperties;
 }
 
 export function ImageCompareSlider({
@@ -16,6 +18,8 @@ export function ImageCompareSlider({
   afterLabel = "AFTER",
   initialPosition = 50,
   className = "",
+  beforeStyle,
+  afterStyle,
 }: ImageCompareSliderProps) {
   const [sliderPosition, setSliderPosition] = useState(initialPosition);
   const [isDragging, setIsDragging] = useState(false);
@@ -103,6 +107,7 @@ export function ImageCompareSlider({
           src={afterImage}
           alt="After"
           className="absolute inset-0 w-full h-full object-cover"
+          style={afterStyle}
           draggable={false}
         />
 
@@ -117,7 +122,8 @@ export function ImageCompareSlider({
             className="absolute inset-0 w-full h-full object-cover"
             style={{
               width: containerWidth ? `${containerWidth}px` : '100%',
-              maxWidth: 'none'
+              maxWidth: 'none',
+              ...beforeStyle,
             }}
             draggable={false}
           />

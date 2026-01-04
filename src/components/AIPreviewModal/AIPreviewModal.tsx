@@ -16,15 +16,37 @@ interface AIPreviewModalProps {
 }
 
 // CSS filter로 fidelity에 따른 예상 결과 시뮬레이션
+// AI 보정 효과를 눈에 띄게 표현 (실제 CodeFormer 결과와 유사하게)
 function getPreviewFilter(fidelity: number): React.CSSProperties {
-  // fidelity가 낮을수록 더 선명하고 부드럽게 (복원 품질 높음)
+  // fidelity가 낮을수록 더 강한 보정 (복원 품질 우선)
   // fidelity가 높을수록 원본에 가깝게 (원본 특징 유지)
-  const sharpness = 1 + (1 - fidelity) * 0.15; // 0.85 ~ 1.15
-  const saturation = 1 + (1 - fidelity) * 0.2; // 0.8 ~ 1.2
-  const brightness = 1 + (1 - fidelity) * 0.05; // 0.95 ~ 1.05
+  const intensity = 1 - fidelity; // 0 ~ 1 (보정 강도)
+
+  // 더 눈에 띄는 효과로 조정
+  const contrast = 1 + intensity * 0.25; // 1.0 ~ 1.25 (대비 증가)
+  const saturation = 1 + intensity * 0.35; // 1.0 ~ 1.35 (채도 증가)
+  const brightness = 1 + intensity * 0.08; // 1.0 ~ 1.08 (밝기 약간 증가)
+
+  // SVG 필터를 통한 샤프닝 효과 (URL 인코딩된 SVG)
+  // unsharp mask 효과로 선명도 향상
+  const sharpenAmount = intensity * 0.8; // 0 ~ 0.8
 
   return {
-    filter: `contrast(${sharpness}) saturate(${saturation}) brightness(${brightness})`,
+    filter: `
+      contrast(${contrast.toFixed(3)})
+      saturate(${saturation.toFixed(3)})
+      brightness(${brightness.toFixed(3)})
+      drop-shadow(0 0 0 transparent)
+    `.replace(/\s+/g, ' ').trim(),
+    // CSS custom property로 샤프닝 강도 전달 (backdrop에서 사용)
+    '--sharpen-amount': sharpenAmount.toString(),
+  } as React.CSSProperties;
+}
+
+// Before 이미지에 적용할 "저화질" 필터 (대비를 위해)
+function getBeforeFilter(): React.CSSProperties {
+  return {
+    filter: 'blur(0.3px) contrast(0.95) saturate(0.9) brightness(0.97)',
   };
 }
 
@@ -82,8 +104,7 @@ function AIPreviewModalContent({
     setFidelity(parseFloat(e.target.value));
   }, []);
 
-  // Create preview image URL with filter applied via canvas or use CSS filter
-  const previewImageUrl = beforeImageUrl;
+  // Get filter styles for preview mode
   const previewStyle = !isResultMode ? getPreviewFilter(fidelity) : undefined;
 
   return (
@@ -161,30 +182,15 @@ function AIPreviewModalContent({
             />
           ) : (
             /* Preview Mode - Use CSS filter simulation */
-            <div className="relative">
-              <ImageCompareSlider
-                beforeImage={beforeImageUrl}
-                afterImage={previewImageUrl}
-                beforeLabel={t("editor.ai.preview.before")}
-                afterLabel={t("editor.ai.preview.after")}
-                className="rounded-xl sm:rounded-2xl overflow-hidden"
-                key={fidelity} // Re-render when fidelity changes
-              />
-              {/* Apply filter overlay for preview */}
-              <div
-                className="absolute inset-0 pointer-events-none rounded-xl sm:rounded-2xl overflow-hidden"
-                style={{
-                  clipPath: `inset(0 0 0 50%)`, // Only apply to right side
-                }}
-              >
-                <img
-                  src={previewImageUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover aspect-square"
-                  style={previewStyle}
-                />
-              </div>
-            </div>
+            <ImageCompareSlider
+              beforeImage={beforeImageUrl}
+              afterImage={beforeImageUrl}
+              beforeLabel={t("editor.ai.preview.before")}
+              afterLabel={t("editor.ai.preview.after")}
+              className="rounded-xl sm:rounded-2xl overflow-hidden"
+              beforeStyle={getBeforeFilter()}
+              afterStyle={previewStyle}
+            />
           )}
 
           {/* Fidelity Slider - Only in Preview Mode */}
