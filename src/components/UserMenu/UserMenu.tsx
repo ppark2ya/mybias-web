@@ -5,6 +5,7 @@ import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check, ImageIcon 
 import { FlagIcon } from "../LanguageSwitcher/FlagIcon";
 import { LANGUAGES } from "../../constants/locales";
 import { useAuth } from "../../hooks/useAuth";
+import { trackLogout, trackLanguageChange } from "../../utils/analytics";
 
 export function UserMenu() {
   const { t, i18n } = useTranslation();
@@ -51,6 +52,7 @@ export function UserMenu() {
 
   const handleLanguageChange = (langCode: string) => {
     i18n.changeLanguage(langCode);
+    trackLanguageChange(langCode);
     setShowLanguages(false);
     setIsOpen(false);
   };
@@ -64,6 +66,7 @@ export function UserMenu() {
 
   const handleSignOut = async () => {
     setIsOpen(false);
+    trackLogout();
     await signOut();
   };
 

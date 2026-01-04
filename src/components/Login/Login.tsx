@@ -5,6 +5,7 @@ import { SocialButton } from "./SocialButton";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { trackLoginStart } from "../../utils/analytics";
 
 export function Login() {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export function Login() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
+    trackLoginStart("google");
     const { error } = await signInWithGoogle();
     if (error) {
       toast.error(error.message);
@@ -36,6 +38,7 @@ export function Login() {
     }
 
     setIsLoading(true);
+    trackLoginStart("email");
     const { error } = await signInWithEmail(email);
     setIsLoading(false);
 

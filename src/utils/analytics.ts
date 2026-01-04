@@ -69,6 +69,10 @@ export const EventCategory = {
   FILE: "file",
   AI: "ai",
   NAVIGATION: "navigation",
+  AUTH: "auth",
+  USER: "user",
+  GALLERY: "gallery",
+  SHARE: "share",
 } as const;
 
 /**
@@ -93,6 +97,25 @@ export const EventAction = {
   // Navigation events
   EDITOR_OPEN: "editor_open",
   EDITOR_CLOSE: "editor_close",
+
+  // Auth events
+  LOGIN_START: "login_start",
+  LOGIN_SUCCESS: "login_success",
+  LOGOUT: "logout",
+
+  // User events
+  LANGUAGE_CHANGE: "language_change",
+  CHARGE_CLICK: "charge_click",
+
+  // Gallery events
+  IMAGE_VIEW: "image_view",
+  IMAGE_VIEW_CLOSE: "image_view_close",
+  GALLERY_LOAD_MORE: "gallery_load_more",
+
+  // Share events
+  SHARE_MODAL_OPEN: "share_modal_open",
+  SHARE_MODAL_CLOSE: "share_modal_close",
+  SHARE_CLICK: "share_click",
 } as const;
 
 type EventCategoryType = (typeof EventCategory)[keyof typeof EventCategory];
@@ -247,5 +270,120 @@ export function trackAIEnhanceFail(errorMessage: string) {
     category: EventCategory.AI,
     action: EventAction.AI_ENHANCE_FAIL,
     label: errorMessage,
+  });
+}
+
+/**
+ * Track login start event
+ */
+export function trackLoginStart(method: "google" | "email") {
+  trackEvent({
+    category: EventCategory.AUTH,
+    action: EventAction.LOGIN_START,
+    label: method,
+  });
+}
+
+/**
+ * Track login success event
+ */
+export function trackLoginSuccess(method: "google" | "email") {
+  trackEvent({
+    category: EventCategory.AUTH,
+    action: EventAction.LOGIN_SUCCESS,
+    label: method,
+  });
+}
+
+/**
+ * Track logout event
+ */
+export function trackLogout() {
+  trackEvent({
+    category: EventCategory.AUTH,
+    action: EventAction.LOGOUT,
+  });
+}
+
+/**
+ * Track language change event
+ */
+export function trackLanguageChange(language: string) {
+  trackEvent({
+    category: EventCategory.USER,
+    action: EventAction.LANGUAGE_CHANGE,
+    label: language,
+  });
+}
+
+/**
+ * Track charge button click event
+ */
+export function trackChargeClick() {
+  trackEvent({
+    category: EventCategory.USER,
+    action: EventAction.CHARGE_CLICK,
+  });
+}
+
+/**
+ * Track image view event
+ */
+export function trackImageView() {
+  trackEvent({
+    category: EventCategory.GALLERY,
+    action: EventAction.IMAGE_VIEW,
+  });
+}
+
+/**
+ * Track image view close event
+ */
+export function trackImageViewClose() {
+  trackEvent({
+    category: EventCategory.GALLERY,
+    action: EventAction.IMAGE_VIEW_CLOSE,
+  });
+}
+
+/**
+ * Track gallery load more event
+ */
+export function trackGalleryLoadMore(page: number) {
+  trackEvent({
+    category: EventCategory.GALLERY,
+    action: EventAction.GALLERY_LOAD_MORE,
+    value: page,
+  });
+}
+
+/**
+ * Track share modal open event
+ */
+export function trackShareModalOpen() {
+  trackEvent({
+    category: EventCategory.SHARE,
+    action: EventAction.SHARE_MODAL_OPEN,
+  });
+}
+
+/**
+ * Track share modal close event
+ */
+export function trackShareModalClose() {
+  trackEvent({
+    category: EventCategory.SHARE,
+    action: EventAction.SHARE_MODAL_CLOSE,
+  });
+}
+
+/**
+ * Track share click event
+ */
+export function trackShareClick(platform: string) {
+  trackEvent({
+    category: EventCategory.SHARE,
+    action: EventAction.SHARE_CLICK,
+    label: platform,
   });
 }

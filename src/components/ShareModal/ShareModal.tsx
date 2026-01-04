@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Copy, Download, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { trackEvent, EventCategory } from "../../utils/analytics";
+import { trackShareClick } from "../../utils/analytics";
 import { toast } from "sonner";
 
 interface ShareModalProps {
@@ -119,11 +119,7 @@ export function ShareModal({ isOpen, onClose, imageUrl, onDownload }: ShareModal
   };
 
   const handleShare = async (platform: SharePlatform) => {
-    trackEvent({
-      category: EventCategory.NAVIGATION,
-      action: "share_click" as "editor_open",
-      label: platform,
-    });
+    trackShareClick(platform);
 
     switch (platform) {
       case "twitter":
