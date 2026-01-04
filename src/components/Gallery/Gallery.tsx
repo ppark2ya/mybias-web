@@ -11,6 +11,13 @@ import {
 import { ImageViewer } from "./ImageViewer";
 import { ImageSkeleton } from "./ImageSkeleton";
 import { ShareModal } from "../ShareModal/ShareModal";
+import {
+  trackImageView,
+  trackImageViewClose,
+  trackGalleryLoadMore,
+  trackShareModalOpen,
+  trackShareModalClose,
+} from "../../utils/analytics";
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -48,6 +55,8 @@ export function Gallery() {
 
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasNextPage) {
+          const currentPage = data?.pages.length ?? 0;
+          trackGalleryLoadMore(currentPage + 1);
           fetchNextPage();
         }
       });
@@ -56,7 +65,7 @@ export function Gallery() {
         observerRef.current.observe(node);
       }
     },
-    [isFetchingNextPage, hasNextPage, fetchNextPage]
+    [isFetchingNextPage, hasNextPage, fetchNextPage, data?.pages.length]
   );
 
   // Redirect to login if not authenticated
@@ -92,10 +101,12 @@ export function Gallery() {
   };
 
   const handleImageClick = (image: GalleryImage) => {
+    trackImageView();
     setSelectedImage(image);
   };
 
   const handleCloseViewer = () => {
+    trackImageViewClose();
     setSelectedImage(null);
   };
 
@@ -106,10 +117,12 @@ export function Gallery() {
   };
 
   const handleShareFromViewer = () => {
+    trackShareModalOpen();
     setIsShareModalOpen(true);
   };
 
   const handleCloseShareModal = () => {
+    trackShareModalClose();
     setIsShareModalOpen(false);
   };
 

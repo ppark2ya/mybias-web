@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { supabase } from "../../lib/supabase";
 import { useTranslation } from "react-i18next";
+import { trackLoginSuccess } from "../../utils/analytics";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -44,6 +45,8 @@ function AuthCallback() {
       }
 
       if (session) {
+        const provider = session.user?.app_metadata?.provider;
+        trackLoginSuccess(provider === "google" ? "google" : "email");
         navigate({ to: "/" });
         return true;
       }
@@ -60,6 +63,8 @@ function AuthCallback() {
       if (!isMounted) return;
 
       if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
+        const provider = session.user?.app_metadata?.provider;
+        trackLoginSuccess(provider === "google" ? "google" : "email");
         navigate({ to: "/" });
       }
     });

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect } from "react";
+import { trackLogout, trackChargeClick } from "../../utils/analytics";
 
 export function Profile() {
   const { t } = useTranslation();
@@ -38,11 +39,13 @@ export function Profile() {
   }, [isLoading, isAuthenticated, navigate]);
 
   const handleSignOut = async () => {
+    trackLogout();
     await signOut();
     navigate({ to: "/" });
   };
 
   const handleCharge = () => {
+    trackChargeClick();
     // TODO: Implement charge/payment flow
     console.log("Charge button clicked");
   };
