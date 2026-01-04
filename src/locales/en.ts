@@ -90,9 +90,9 @@ export default {
     "seo.features.ai.title": "AI Specialized for Face Restoration",
     "seo.features.ai.description":
       "Unlike generic landscape upscalers, we use deep learning models specialized in facial feature restoration, vividly bringing out eyes, eyelashes, and lip textures.",
-    "seo.features.privacy.title": "Complete Privacy Protection",
+    "seo.features.privacy.title": "Safe Photo Storage",
     "seo.features.privacy.description":
-      "Uploaded images are only used for conversion and are automatically and permanently deleted from the server after a set period (e.g., 1 hour). Use with peace of mind.",
+      "AI-converted images are safely stored in 'My Gallery' where you can view and download them anytime. No worries about losing your precious memories.",
     "seo.features.mobile.title": "Mobile Optimized",
     "seo.features.mobile.description":
       "No app installation required. Enjoy the same high-performance AI features on mobile browsers like iPhone and Galaxy as you would on PC.",
@@ -101,7 +101,7 @@ export default {
     "seo.faq.title": "Frequently Asked Questions",
     "seo.faq.q1": "Is this service free?",
     "seo.faq.a1":
-      "Yes, basic AI conversion features are provided for free. However, there may be daily limits on the number of conversions to prevent server overload. You can earn additional conversions by watching ads.",
+      "You receive 5 free credits when you sign up. After using all your free credits, you can purchase additional credits to continue using the service.",
     "seo.faq.q2": "What kind of photos work best?",
     "seo.faq.a2":
       "Photos with faces facing forward and not too small yield the best results. Severely pixelated images (mosaic-level) or full-body shots where faces are very small may have reduced restoration effects.",
@@ -110,7 +110,7 @@ export default {
       "This is a heavy process that uses high-performance GPUs to redraw each pixel. During peak hours, wait times may be slightly longer. Thank you for your patience.",
     "seo.faq.q4": "Are my photos stored on the server?",
     "seo.faq.a4":
-      "No. MyBias values your privacy. Processed images are temporarily stored so you can download them, then automatically deleted within a short time.",
+      "When you sign up and use AI conversion, the result images are stored on the server and can be viewed and downloaded anytime from 'My Gallery'. AI conversion is only available to registered users.",
 
     // User
     "user.login": "Login",
