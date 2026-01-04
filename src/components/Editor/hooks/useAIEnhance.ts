@@ -52,7 +52,7 @@ export function useAIEnhance(
     setRemainingAIUsage(profile.credits);
   }
 
-  const handleAIEnhance = async () => {
+  const handleAIEnhance = async (fidelity: number = 0.5) => {
     if (!currentImageState || isProcessing) return;
 
     // Check authentication
@@ -89,7 +89,7 @@ export function useAIEnhance(
       });
       setProcessingMessage(t("editor.ai.requestingServer"));
 
-      const generateResponse = await generateImage(createGenerateRequest(base64));
+      const generateResponse = await generateImage(createGenerateRequest(base64, { fidelity }));
       const predictionId = generateResponse.id;
 
       // Update remaining credits from server response

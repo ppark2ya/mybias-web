@@ -46,6 +46,9 @@ export default {
     "editor.ai.preview.remaining": "오늘 {{count}}회 남음",
     "editor.ai.preview.cancel": "취소",
     "editor.ai.preview.enhance": "AI 보정 시작",
+    "editor.ai.preview.fidelity": "원본 유지도",
+    "editor.ai.preview.fidelityLow": "복원 품질 우선",
+    "editor.ai.preview.fidelityHigh": "원본 특징 유지",
 
     // Editor - AI Result Modal
     "editor.ai.result.title": "보정 완료",
