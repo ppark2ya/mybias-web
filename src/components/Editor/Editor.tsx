@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "@tanstack/react-router";
 import { downloadImage } from "../../utils/imageEditor";
+import { useAuth } from "../../hooks/useAuth";
 import { trackToolSelect, trackFileDownload } from "../../utils/analytics";
 import {
   Undo2,
@@ -34,6 +36,8 @@ interface EditorProps {
 
 export function Editor({ files, onClose }: EditorProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [isAIPreviewModalOpen, setIsAIPreviewModalOpen] = useState(false);
   const [isAIResultModalOpen, setIsAIResultModalOpen] = useState(false);
   const [aiResultImages, setAIResultImages] = useState<{
@@ -153,7 +157,15 @@ export function Editor({ files, onClose }: EditorProps) {
   };
 
   const openAIPreviewModal = () => {
-    if (!currentImageState || isProcessing || remainingAIUsage === 0) return;
+    if (!currentImageState || isProcessing) return;
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate({ to: "/login" });
+      return;
+    }
+
+    if (remainingAIUsage === 0) return;
     setIsAIPreviewModalOpen(true);
   };
 
@@ -341,10 +353,10 @@ export function Editor({ files, onClose }: EditorProps) {
 
             <ToolButton
               onClick={openAIPreviewModal}
-              disabled={isProcessing || !currentImageState || remainingAIUsage === 0}
+              disabled={isProcessing || !currentImageState || (isAuthenticated && remainingAIUsage === 0)}
               icon={<Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
               label="AI"
-              badge={remainingAIUsage}
+              badge={isAuthenticated ? remainingAIUsage : undefined}
               variant="ai"
             />
 
