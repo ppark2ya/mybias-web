@@ -56,6 +56,26 @@ export default {
     "editor.ai.result.info": "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
     "editor.ai.result.confirm": "Done",
 
+    // Editor - Magic Eraser
+    "editor.eraser.title": "Magic Eraser",
+    "editor.eraser.subtitle": "Draw over the area you want to remove",
+    "editor.eraser.info": "Draw over unwanted objects to remove them. AI will fill in the background naturally.",
+    "editor.eraser.remaining": "{{count}} uses remaining",
+    "editor.eraser.cancel": "Cancel",
+    "editor.eraser.erase": "Erase",
+    "editor.eraser.loginRequired": "Please log in to use Magic Eraser.",
+    "editor.eraser.insufficientCredits": "Insufficient credits. Please top up and try again.",
+    "editor.eraser.preparingImage": "Preparing image...",
+    "editor.eraser.requestingServer": "Requesting AI server...",
+    "editor.eraser.processingAI": "AI is processing...",
+    "editor.eraser.analyzingArea": "Analyzing selected area...",
+    "editor.eraser.removingObject": "Removing object...",
+    "editor.eraser.fillingBackground": "Filling background...",
+    "editor.eraser.almostDone": "Almost done!",
+    "editor.eraser.downloadingImage": "Downloading image...",
+    "editor.eraser.failed": "Magic eraser failed. Please try again.",
+    "editor.eraser.timeout": "AI server response is delayed. Please try again later.",
+
     // Share Modal
     "share.title": "Share",
     "share.kakaotalk": "KakaoTalk",

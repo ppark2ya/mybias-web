@@ -58,6 +58,26 @@ export default {
     "editor.ai.result.info": "AI가 얼굴 디테일을 복원하고 피부 톤을 개선하며 전체적인 화질을 선명하게 만들었습니다. 되돌리기 버튼으로 원본으로 복원할 수 있습니다.",
     "editor.ai.result.confirm": "확인",
 
+    // Editor - Magic Eraser
+    "editor.eraser.title": "AI 지우개",
+    "editor.eraser.subtitle": "지우고 싶은 영역을 그려주세요",
+    "editor.eraser.info": "원하지 않는 물체 위에 그리면 AI가 자연스럽게 배경을 채워줍니다.",
+    "editor.eraser.remaining": "{{count}}회 남음",
+    "editor.eraser.cancel": "취소",
+    "editor.eraser.erase": "지우기",
+    "editor.eraser.loginRequired": "AI 지우개 기능을 사용하려면 로그인이 필요합니다.",
+    "editor.eraser.insufficientCredits": "크레딧이 부족합니다. 충전 후 다시 시도해주세요.",
+    "editor.eraser.preparingImage": "이미지 준비 중...",
+    "editor.eraser.requestingServer": "AI 서버에 요청 중...",
+    "editor.eraser.processingAI": "AI가 처리 중...",
+    "editor.eraser.analyzingArea": "선택 영역을 분석하고 있어요...",
+    "editor.eraser.removingObject": "물체를 지우고 있어요...",
+    "editor.eraser.fillingBackground": "배경을 채우고 있어요...",
+    "editor.eraser.almostDone": "거의 다 됐어요!",
+    "editor.eraser.downloadingImage": "이미지 다운로드 중...",
+    "editor.eraser.failed": "AI 지우개에 실패했습니다. 다시 시도해주세요.",
+    "editor.eraser.timeout": "AI 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.",
+
     // Share Modal
     "share.title": "공유하기",
     "share.kakaotalk": "카카오톡",
