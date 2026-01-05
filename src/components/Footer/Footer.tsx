@@ -42,6 +42,12 @@ export function Footer() {
               >
                 {t("footer.privacy")}
               </Link>
+              <Link
+                to="/refund-policy"
+                className="text-sm text-gray-400 transition-colors hover:text-white"
+              >
+                {t("footer.refund")}
+              </Link>
             </nav>
             <a
               href={BUY_ME_A_COFFEE_URL}

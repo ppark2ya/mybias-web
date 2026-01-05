@@ -128,6 +128,7 @@ export default {
     "footer.rights": "All rights reserved.",
     "footer.terms": "利用規約",
     "footer.privacy": "プライバシーポリシー",
+    "footer.refund": "返金ポリシー",
 
     // Legal Pages Common
     "legal.backToHome": "ホームに戻る",

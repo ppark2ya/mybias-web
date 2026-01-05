@@ -198,6 +198,7 @@ export default {
     "footer.rights": "All rights reserved.",
     "footer.terms": "Terms of Service",
     "footer.privacy": "Privacy Policy",
+    "footer.refund": "Refund Policy",
 
     // Legal Pages Common
     "legal.backToHome": "Back to Home",
