@@ -46,8 +46,22 @@ export function Profile() {
 
   const handleCharge = () => {
     trackChargeClick();
-    // TODO: Implement charge/payment flow
-    console.log("Charge button clicked");
+
+    // Lemon Squeezy checkout URL with user metadata
+    const checkoutUrl = new URL(
+      "https://savemybias.lemonsqueezy.com/checkout/buy/a92ae8c9-945a-4bff-bcc3-cb7600e9e51d"
+    );
+
+    // Pass user email and ID as checkout data
+    if (userEmail) {
+      checkoutUrl.searchParams.set("checkout[email]", userEmail);
+    }
+    if (user?.id) {
+      checkoutUrl.searchParams.set("checkout[custom][user_id]", user.id);
+    }
+
+    // Open checkout in new tab
+    window.open(checkoutUrl.toString(), "_blank");
   };
 
   if (isLoading) {
