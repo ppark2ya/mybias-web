@@ -1,5 +1,8 @@
-import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from "react";
-import { ReactSketchCanvas, type ReactSketchCanvasRef } from "react-sketch-canvas";
+import { useRef, useState, useEffect, useMemo } from "react";
+import {
+  ReactSketchCanvas,
+  type ReactSketchCanvasRef,
+} from "react-sketch-canvas";
 
 export interface MaskCanvasRef {
   /** Export mask as base64 PNG (black background, white strokes) */
@@ -25,19 +28,29 @@ interface MaskCanvasProps {
   brushSize?: number;
   /** Callback when strokes change */
   onStrokesChange?: (hasStrokes: boolean) => void;
+  /** Ref to access canvas methods */
+  ref?: React.Ref<MaskCanvasRef>;
 }
 
-export const MaskCanvas = forwardRef<MaskCanvasRef, MaskCanvasProps>(
-  ({ imageUrl, imageWidth, imageHeight, brushSize = 30, onStrokesChange }, ref) => {
-    const canvasRef = useRef<ReactSketchCanvasRef>(null);
-    const [strokeCount, setStrokeCount] = useState(0);
+export const MaskCanvas = ({
+  ref,
+  imageUrl,
+  imageWidth,
+  imageHeight,
+  brushSize = 30,
+  onStrokesChange,
+}: MaskCanvasProps) => {
+  const canvasRef = useRef<ReactSketchCanvasRef>(null);
+  const [strokeCount, setStrokeCount] = useState(0);
 
-    // Notify parent when strokes change
-    useEffect(() => {
-      onStrokesChange?.(strokeCount > 0);
-    }, [strokeCount, onStrokesChange]);
+  // Notify parent when strokes change
+  useEffect(() => {
+    onStrokesChange?.(strokeCount > 0);
+  }, [strokeCount, onStrokesChange]);
 
-    useImperativeHandle(ref, () => ({
+  // Expose methods via ref
+  const refValue = useMemo(
+    () => ({
       exportMask: async () => {
         if (!canvasRef.current) {
           throw new Error("Canvas not initialized");
@@ -68,8 +81,12 @@ export const MaskCanvas = forwardRef<MaskCanvasRef, MaskCanvasProps>(
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(exportedSvg, "image/svg+xml");
         const svgElement = svgDoc.querySelector("svg");
-        const displayWidth = svgElement ? parseFloat(svgElement.getAttribute("width") || "0") : 0;
-        const displayHeight = svgElement ? parseFloat(svgElement.getAttribute("height") || "0") : 0;
+        const displayWidth = svgElement
+          ? parseFloat(svgElement.getAttribute("width") || "0")
+          : 0;
+        const displayHeight = svgElement
+          ? parseFloat(svgElement.getAttribute("height") || "0")
+          : 0;
 
         // Calculate scale factors
         const scaleX = displayWidth > 0 ? imageWidth / displayWidth : 1;
@@ -83,7 +100,8 @@ export const MaskCanvas = forwardRef<MaskCanvasRef, MaskCanvasProps>(
         for (const pathData of paths) {
           if (pathData.paths.length === 0) continue;
 
-          ctx.lineWidth = (pathData.strokeWidth || brushSize) * Math.max(scaleX, scaleY);
+          ctx.lineWidth =
+            (pathData.strokeWidth || brushSize) * Math.max(scaleX, scaleY);
           ctx.beginPath();
 
           const firstPoint = pathData.paths[0];
@@ -117,42 +135,54 @@ export const MaskCanvas = forwardRef<MaskCanvasRef, MaskCanvasProps>(
       },
 
       hasStrokes: () => strokeCount > 0,
-    }));
+    }),
+    [canvasRef, strokeCount, imageWidth, imageHeight, brushSize]
+  );
 
-    const handleStroke = () => {
-      setStrokeCount((prev) => prev + 1);
-    };
+  // Assign methods to ref
+  useEffect(() => {
+    if (!ref) return;
 
-    return (
-      <div className="relative w-full h-full">
-        {/* Background image */}
-        <img
-          src={imageUrl}
-          alt="Background"
-          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-          draggable={false}
+    if ("current" in ref) {
+      ref.current = refValue;
+    } else if (typeof ref === "function") {
+      ref(refValue);
+    }
+  }, [ref, refValue]);
+
+  const handleStroke = () => {
+    setStrokeCount((prev) => prev + 1);
+  };
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Background image */}
+      <img
+        src={imageUrl}
+        alt="Background"
+        className="absolute inset-0 object-contain w-full h-full pointer-events-none"
+        draggable={false}
+      />
+
+      {/* Drawing canvas overlay */}
+      <div className="absolute inset-0">
+        <ReactSketchCanvas
+          ref={canvasRef}
+          strokeWidth={brushSize}
+          strokeColor="rgba(255, 100, 100, 0.6)"
+          canvasColor="transparent"
+          style={{
+            width: "100%",
+            height: "100%",
+            border: "none",
+            borderRadius: "0",
+          }}
+          onStroke={handleStroke}
         />
-
-        {/* Drawing canvas overlay */}
-        <div className="absolute inset-0">
-          <ReactSketchCanvas
-            ref={canvasRef}
-            strokeWidth={brushSize}
-            strokeColor="rgba(255, 100, 100, 0.6)"
-            canvasColor="transparent"
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              borderRadius: "0",
-            }}
-            onStroke={handleStroke}
-          />
-        </div>
       </div>
-    );
-  }
-);
+    </div>
+  );
+};
 
 MaskCanvas.displayName = "MaskCanvas";
 

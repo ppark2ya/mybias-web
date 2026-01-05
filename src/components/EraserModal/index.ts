@@ -1,2 +1,1 @@
-export { EraserModal } from "./EraserModal";
-export default EraserModal;
+export { EraserModal, default } from "./EraserModal";

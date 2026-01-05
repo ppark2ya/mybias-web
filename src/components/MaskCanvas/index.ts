@@ -1,2 +1,1 @@
-export { MaskCanvas, type MaskCanvasRef } from "./MaskCanvas";
-export default MaskCanvas;
+export { MaskCanvas, type MaskCanvasRef, default } from "./MaskCanvas";
