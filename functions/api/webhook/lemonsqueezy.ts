@@ -59,7 +59,13 @@ interface LemonSqueezyWebhookPayload {
       total_usd: number;
       tax_name: string;
       tax_rate: string;
-      status: "pending" | "failed" | "paid" | "refunded" | "partial_refund" | "fraudulent";
+      status:
+        | "pending"
+        | "failed"
+        | "paid"
+        | "refunded"
+        | "partial_refund"
+        | "fraudulent";
       status_formatted: string;
       refunded: boolean;
       refunded_at: string | null;
@@ -125,48 +131,43 @@ async function validateWebhook(
 
   // Calculate expected signature using HMAC-SHA256
   const encoder = new TextEncoder();
+
+  // 비밀키 import (verify 용도)
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
     encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["verify"]
   );
 
-  const signatureBytes = await crypto.subtle.sign(
+  // Hex String(헤더) -> Uint8Array(바이트) 변환
+  // verify 함수는 바이트 배열을 원하므로 변환이 필요합니다.
+  const signatureBytes = hexToBytes(signature);
+
+  // 6. 네이티브 검증 실행 (Timing Safe 처리됨)
+  const isValid = await crypto.subtle.verify(
     "HMAC",
     cryptoKey,
+    signatureBytes,
     encoder.encode(body)
   );
 
-  // Convert to hex for comparison
-  const expectedSignature = Array.from(new Uint8Array(signatureBytes))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  // Compare signatures (constant-time)
-  if (!timingSafeEqual(expectedSignature, signature)) {
-    console.error("Webhook signature verification failed");
+  if (!isValid) {
+    console.error("❌ Webhook signature verification failed");
     return false;
   }
 
   return true;
 }
 
-/**
- * Constant-time string comparison to prevent timing attacks
- */
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
+// 헬퍼 함수: Hex 문자열을 바이트 배열로 변환
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
   }
-
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-
-  return result === 0;
+  return bytes;
 }
 
 /**
@@ -247,10 +248,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       // Only process paid orders
       if (attributes.status !== "paid") {
         console.log("Order not paid, skipping:", attributes.status);
-        return new Response(JSON.stringify({ received: true, processed: false }), {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ received: true, processed: false }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
       }
 
       // Get user ID from custom data or find by email
@@ -258,7 +262,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
       if (!userId) {
         // Try to find user by email
-        userId = await findUserByEmail(db, attributes.user_email) ?? undefined;
+        userId =
+          (await findUserByEmail(db, attributes.user_email)) ?? undefined;
       }
 
       if (!userId) {
@@ -300,7 +305,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       let userId = payload.meta.custom_data?.user_id;
 
       if (!userId) {
-        userId = await findUserByEmail(db, attributes.user_email) ?? undefined;
+        userId =
+          (await findUserByEmail(db, attributes.user_email)) ?? undefined;
       }
 
       if (userId) {
