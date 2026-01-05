@@ -93,6 +93,9 @@ export const EventAction = {
   AI_ENHANCE_START: "ai_enhance_start",
   AI_ENHANCE_SUCCESS: "ai_enhance_success",
   AI_ENHANCE_FAIL: "ai_enhance_fail",
+  MAGIC_ERASER_START: "magic_eraser_start",
+  MAGIC_ERASER_SUCCESS: "magic_eraser_success",
+  MAGIC_ERASER_FAIL: "magic_eraser_fail",
 
   // Navigation events
   EDITOR_OPEN: "editor_open",
@@ -269,6 +272,39 @@ export function trackAIEnhanceFail(errorMessage: string) {
   trackEvent({
     category: EventCategory.AI,
     action: EventAction.AI_ENHANCE_FAIL,
+    label: errorMessage,
+  });
+}
+
+/**
+ * Track Magic Eraser start event
+ */
+export function trackMagicEraserStart() {
+  trackEvent({
+    category: EventCategory.AI,
+    action: EventAction.MAGIC_ERASER_START,
+  });
+}
+
+/**
+ * Track Magic Eraser success event
+ */
+export function trackMagicEraserSuccess(durationMs: number) {
+  trackEvent({
+    category: EventCategory.AI,
+    action: EventAction.MAGIC_ERASER_SUCCESS,
+    value: Math.round(durationMs / 1000),
+    duration_seconds: Math.round(durationMs / 1000),
+  });
+}
+
+/**
+ * Track Magic Eraser fail event
+ */
+export function trackMagicEraserFail(errorMessage: string) {
+  trackEvent({
+    category: EventCategory.AI,
+    action: EventAction.MAGIC_ERASER_FAIL,
     label: errorMessage,
   });
 }

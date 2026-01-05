@@ -13,16 +13,19 @@ import {
   Sparkles,
   Maximize,
   Download,
+  Eraser,
   // Share2, // TODO: Share button temporarily disabled
 } from "lucide-react";
 // import ShareModal from "../ShareModal"; // TODO: Share button temporarily disabled
 import AIPreviewModal from "../AIPreviewModal";
+import EraserModal from "../EraserModal";
 import { useEditorState } from "./hooks/useEditorState";
 import { useImageHistory } from "./hooks/useImageHistory";
 import { useCropTool } from "./hooks/useCropTool";
 import { useBlurTool } from "./hooks/useBlurTool";
 import { useResizeTool } from "./hooks/useResizeTool";
 import { useAIEnhance } from "./hooks/useAIEnhance";
+import { useMagicEraser } from "./hooks/useMagicEraser";
 import { IconButton } from "./components/IconButton";
 import { ToolButton } from "./components/ToolButton";
 import { CropOverlay } from "./components/CropOverlay";
@@ -44,6 +47,12 @@ export function Editor({ files, onClose }: EditorProps) {
     beforeImageUrl: string;
     afterImageUrl: string;
   } | null>(null);
+  const [isEraserModalOpen, setIsEraserModalOpen] = useState(false);
+  const [eraserResultImages, setEraserResultImages] = useState<{
+    beforeImageUrl: string;
+    afterImageUrl: string;
+  } | null>(null);
+  const [isEraserResultModalOpen, setIsEraserResultModalOpen] = useState(false);
 
   // Editor state
   const {
@@ -137,6 +146,23 @@ export function Editor({ files, onClose }: EditorProps) {
     }
   );
 
+  // Magic Eraser
+  const { remainingCredits: eraserCredits, handleMagicErase } = useMagicEraser(
+    currentImageState,
+    selectedIndex,
+    setImageStates,
+    historyIndex,
+    historyHook.setHistory,
+    historyHook.setHistoryIndex,
+    setProcessingMessage,
+    isProcessing,
+    setIsProcessing,
+    (result) => {
+      setEraserResultImages(result);
+      setIsEraserResultModalOpen(true);
+    }
+  );
+
   const handleActiveTool = (tool: typeof activeTool) => {
     // Reset blur preview when switching away from blur tool
     if (activeTool === "BLUR" && tool !== "BLUR") {
@@ -167,6 +193,19 @@ export function Editor({ files, onClose }: EditorProps) {
 
     if (remainingAIUsage === 0) return;
     setIsAIPreviewModalOpen(true);
+  };
+
+  const openEraserModal = () => {
+    if (!currentImageState || isProcessing) return;
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate({ to: "/login" });
+      return;
+    }
+
+    if (eraserCredits === 0) return;
+    setIsEraserModalOpen(true);
   };
 
   return (
@@ -361,6 +400,15 @@ export function Editor({ files, onClose }: EditorProps) {
             />
 
             <ToolButton
+              onClick={openEraserModal}
+              disabled={isProcessing || !currentImageState || (isAuthenticated && eraserCredits === 0)}
+              icon={<Eraser className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+              label="ERASER"
+              badge={isAuthenticated ? eraserCredits : undefined}
+              variant="eraser"
+            />
+
+            <ToolButton
               onClick={handleDownload}
               disabled={isProcessing || !currentImageState}
               icon={<Download className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
@@ -418,6 +466,27 @@ export function Editor({ files, onClose }: EditorProps) {
         onClose={() => setIsAIResultModalOpen(false)}
         beforeImageUrl={aiResultImages?.beforeImageUrl || ""}
         afterImageUrl={aiResultImages?.afterImageUrl || ""}
+        mode="result"
+      />
+
+      {/* Eraser Modal */}
+      <EraserModal
+        isOpen={isEraserModalOpen}
+        onClose={() => setIsEraserModalOpen(false)}
+        onConfirm={handleMagicErase}
+        imageUrl={currentImageState?.blobUrl || ""}
+        imageWidth={currentImageState?.width || 0}
+        imageHeight={currentImageState?.height || 0}
+        remainingUsage={eraserCredits}
+        isProcessing={isProcessing}
+      />
+
+      {/* Eraser Result Modal */}
+      <AIPreviewModal
+        isOpen={isEraserResultModalOpen}
+        onClose={() => setIsEraserResultModalOpen(false)}
+        beforeImageUrl={eraserResultImages?.beforeImageUrl || ""}
+        afterImageUrl={eraserResultImages?.afterImageUrl || ""}
         mode="result"
       />
     </div>
