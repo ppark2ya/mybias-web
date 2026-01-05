@@ -181,6 +181,7 @@ export default {
     "footer.rights": "All rights reserved.",
     "footer.terms": "이용약관",
     "footer.privacy": "개인정보처리방침",
+    "footer.refund": "환불 정책",
 
     // Legal Pages Common
     "legal.backToHome": "홈으로",

@@ -128,6 +128,7 @@ export default {
     "footer.rights": "Todos los derechos reservados.",
     "footer.terms": "Términos de Servicio",
     "footer.privacy": "Política de Privacidad",
+    "footer.refund": "Política de Reembolso",
 
     // Legal Pages Common
     "legal.backToHome": "Volver al Inicio",

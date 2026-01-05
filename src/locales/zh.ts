@@ -128,6 +128,7 @@ export default {
     "footer.rights": "All rights reserved.",
     "footer.terms": "服务条款",
     "footer.privacy": "隐私政策",
+    "footer.refund": "退款政策",
 
     // Legal Pages Common
     "legal.backToHome": "返回主页",
