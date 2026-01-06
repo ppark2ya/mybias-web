@@ -49,6 +49,28 @@ export const onRequest: PagesFunction<BaseEnv, string, ContextData> = async (
   context
 ) => {
   const { request, env, data } = context;
+  const url = new URL(request.url);
+
+  // 접속한 주소가 'pages.dev'를 포함하고 있다면
+  if (url.hostname === "mybias-web.pages.dev") {
+    const newUrl = "https://savemybias.com" + url.pathname + url.search;
+    return Response.redirect(newUrl, 301);
+  }
+
+  // 2. [개발 환경] 검색 엔진 수집 차단 (SEO 보호)
+  // dev 도메인이거나, 브랜치별 프리뷰 주소(*.pages.dev)인 경우
+  if (
+    url.hostname === "dev.savemybias.com" ||
+    url.hostname.endsWith(".pages.dev")
+  ) {
+    // 일단 페이지를 보여줍니다.
+    const response = await context.next();
+
+    // 하지만 응답 헤더에 'noindex' 딱지를 붙여서 내보냅니다.
+    // 구글 봇: "아, 이 페이지는 검색 결과에 올리면 안 되는구나" 하고 감.
+    response.headers.set("X-Robots-Tag", "noindex");
+    return response;
+  }
 
   // Create database client and store in context
   const db = createDbClient(env.DATABASE_URL);
