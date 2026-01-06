@@ -1,7 +1,7 @@
 export default {
   translation: {
     // Home page
-    "home.title": "My Bias Gallery",
+    "home.title": "SaveMyBias Gallery",
     "home.subtitle": "Capture your precious memories beautifully",
 
     // Uploader
@@ -22,8 +22,10 @@ export default {
 
     // Editor - AI Enhancement
     "editor.ai.loginRequired": "Please log in to use AI enhancement.",
-    "editor.ai.insufficientCredits": "Insufficient credits. Please top up and try again.",
-    "editor.ai.limitReached": "You've used all AI enhancements for today. Please try again tomorrow!",
+    "editor.ai.insufficientCredits":
+      "Insufficient credits. Please top up and try again.",
+    "editor.ai.limitReached":
+      "You've used all AI enhancements for today. Please try again tomorrow!",
     "editor.ai.preparingImage": "Preparing image...",
     "editor.ai.requestingServer": "Requesting AI server...",
     "editor.ai.analyzingFaces": "AI is analyzing faces...",
@@ -33,14 +35,16 @@ export default {
     "editor.ai.almostDone": "Almost done!",
     "editor.ai.downloadingImage": "Downloading image...",
     "editor.ai.failed": "AI enhancement failed. Please try again.",
-    "editor.ai.timeout": "AI server response is delayed. Please try again later.",
+    "editor.ai.timeout":
+      "AI server response is delayed. Please try again later.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI Enhancement",
     "editor.ai.preview.subtitle": "Preview the expected result",
     "editor.ai.preview.before": "BEFORE",
     "editor.ai.preview.after": "AFTER (Preview)",
-    "editor.ai.preview.info": "The actual AI result may differ from this preview. AI enhancement restores facial details, improves skin tone, and sharpens overall image quality.",
+    "editor.ai.preview.info":
+      "The actual AI result may differ from this preview. AI enhancement restores facial details, improves skin tone, and sharpens overall image quality.",
     "editor.ai.preview.remaining": "{{count}} uses remaining today",
     "editor.ai.preview.cancel": "Cancel",
     "editor.ai.preview.enhance": "Enhance with AI",
@@ -53,18 +57,21 @@ export default {
     "editor.ai.result.subtitle": "Compare the before and after",
     "editor.ai.result.before": "BEFORE",
     "editor.ai.result.after": "AFTER",
-    "editor.ai.result.info": "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
+    "editor.ai.result.info":
+      "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
     "editor.ai.result.confirm": "Done",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "Magic Eraser",
     "editor.eraser.subtitle": "Draw over the area you want to remove",
-    "editor.eraser.info": "Draw over unwanted objects to remove them. AI will fill in the background naturally.",
+    "editor.eraser.info":
+      "Draw over unwanted objects to remove them. AI will fill in the background naturally.",
     "editor.eraser.remaining": "{{count}} uses remaining",
     "editor.eraser.cancel": "Cancel",
     "editor.eraser.erase": "Erase",
     "editor.eraser.loginRequired": "Please log in to use Magic Eraser.",
-    "editor.eraser.insufficientCredits": "Insufficient credits. Please top up and try again.",
+    "editor.eraser.insufficientCredits":
+      "Insufficient credits. Please top up and try again.",
     "editor.eraser.preparingImage": "Preparing image...",
     "editor.eraser.requestingServer": "Requesting AI server...",
     "editor.eraser.processingAI": "AI is processing...",
@@ -74,14 +81,15 @@ export default {
     "editor.eraser.almostDone": "Almost done!",
     "editor.eraser.downloadingImage": "Downloading image...",
     "editor.eraser.failed": "Magic eraser failed. Please try again.",
-    "editor.eraser.timeout": "AI server response is delayed. Please try again later.",
+    "editor.eraser.timeout":
+      "AI server response is delayed. Please try again later.",
 
     // Share Modal
     "share.title": "Share",
     "share.kakaotalk": "KakaoTalk",
     "share.copyLink": "Copy Link",
     "share.saveImage": "Save Image",
-    "share.message": "Photo created in My Bias Gallery!",
+    "share.message": "Photo created in SaveMyBias Gallery!",
     "share.linkCopiedKakao": "Link copied. Please paste in KakaoTalk!",
     "share.shareFromKakaoApp": "Please share directly from KakaoTalk app.",
     "share.linkCopied": "Link copied!",
@@ -92,7 +100,7 @@ export default {
     "seo.intro.title":
       "AI Photo Restoration & Quality Enhancement Tool (MyBias)",
     "seo.intro.description1":
-      "MyBias is an online AI photo restoration tool that enhances blurry, low-resolution photos into crisp, high-quality images. Using advanced photo restoration and quality enhancement technology, we help you recover precious memories from low-quality concert photos, event shots, or old photographs.",
+      "MyBias is an online AI photo restoration tool that enhances blurry, low-resolution photos into crisp, high-quality images. Using advanced photo restoration and quality enhancement technology, we help you recover precious memories from low-quality Low-resolution photos, event shots, or old photographs.",
     "seo.intro.description2":
       "Our AI engine specializes in photo restoration and quality enhancement. Built on CodeFormer and Real-ESRGAN algorithms, it analyzes degraded facial features and restores lost details naturally, bringing your photos back to life with improved clarity and sharpness.",
 
@@ -173,7 +181,7 @@ export default {
 
     // Login
     "login.title": "Welcome Back",
-    "login.subtitle": "Continue to My Bias Gallery",
+    "login.subtitle": "Continue to SaveMyBias Gallery",
     "login.continueWithGoogle": "Continue with Google",
     "login.continueWithEmail": "Continue with Email",
     "login.or": "or",
@@ -187,7 +195,8 @@ export default {
     "login.invalidEmail": "Please enter a valid email",
     "login.emailSent": "Login link sent to your email!",
     "login.checkEmail": "Check your email",
-    "login.emailSentDescription": "We sent a login link to {{email}}. Please check your inbox and click the link.",
+    "login.emailSentDescription":
+      "We sent a login link to {{email}}. Please check your inbox and click the link.",
     "login.tryAnotherMethod": "Try another method",
     "login.termsText": "By continuing, you agree to our",
     "login.termsLink": "Terms of Service",

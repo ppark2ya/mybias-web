@@ -21,9 +21,12 @@ export default {
     "editor.pleaseWait": "Vui lòng chờ",
 
     // Editor - AI Enhancement
-    "editor.ai.loginRequired": "Vui lòng đăng nhập để sử dụng tính năng cải thiện AI.",
-    "editor.ai.insufficientCredits": "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
-    "editor.ai.limitReached": "Bạn đã sử dụng hết lượt cải thiện AI hôm nay. Vui lòng thử lại vào ngày mai!",
+    "editor.ai.loginRequired":
+      "Vui lòng đăng nhập để sử dụng tính năng cải thiện AI.",
+    "editor.ai.insufficientCredits":
+      "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
+    "editor.ai.limitReached":
+      "Bạn đã sử dụng hết lượt cải thiện AI hôm nay. Vui lòng thử lại vào ngày mai!",
     "editor.ai.preparingImage": "Đang chuẩn bị hình ảnh...",
     "editor.ai.requestingServer": "Đang yêu cầu máy chủ AI...",
     "editor.ai.analyzingFaces": "AI đang phân tích khuôn mặt...",
@@ -40,7 +43,8 @@ export default {
     "editor.ai.preview.subtitle": "Xem trước kết quả dự kiến",
     "editor.ai.preview.before": "TRƯỚC",
     "editor.ai.preview.after": "SAU (Xem trước)",
-    "editor.ai.preview.info": "Kết quả AI thực tế có thể khác với bản xem trước này. Cải thiện AI khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể.",
+    "editor.ai.preview.info":
+      "Kết quả AI thực tế có thể khác với bản xem trước này. Cải thiện AI khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể.",
     "editor.ai.preview.remaining": "Còn {{count}} lượt hôm nay",
     "editor.ai.preview.cancel": "Hủy",
     "editor.ai.preview.enhance": "Cải thiện với AI",
@@ -53,18 +57,21 @@ export default {
     "editor.ai.result.subtitle": "So sánh trước và sau",
     "editor.ai.result.before": "TRƯỚC",
     "editor.ai.result.after": "SAU",
-    "editor.ai.result.info": "AI đã khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể. Sử dụng hoàn tác nếu bạn muốn hoàn nguyên.",
+    "editor.ai.result.info":
+      "AI đã khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể. Sử dụng hoàn tác nếu bạn muốn hoàn nguyên.",
     "editor.ai.result.confirm": "Xong",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "Tẩy Thần Kỳ",
     "editor.eraser.subtitle": "Vẽ lên vùng bạn muốn xóa",
-    "editor.eraser.info": "Vẽ lên các đối tượng không mong muốn để xóa chúng. AI sẽ điền nền một cách tự nhiên.",
+    "editor.eraser.info":
+      "Vẽ lên các đối tượng không mong muốn để xóa chúng. AI sẽ điền nền một cách tự nhiên.",
     "editor.eraser.remaining": "Còn {{count}} lượt",
     "editor.eraser.cancel": "Hủy",
     "editor.eraser.erase": "Xóa",
     "editor.eraser.loginRequired": "Vui lòng đăng nhập để sử dụng Tẩy Thần Kỳ.",
-    "editor.eraser.insufficientCredits": "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
+    "editor.eraser.insufficientCredits":
+      "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
     "editor.eraser.preparingImage": "Đang chuẩn bị hình ảnh...",
     "editor.eraser.requestingServer": "Đang yêu cầu máy chủ AI...",
     "editor.eraser.processingAI": "AI đang xử lý...",
@@ -74,16 +81,19 @@ export default {
     "editor.eraser.almostDone": "Sắp xong rồi!",
     "editor.eraser.downloadingImage": "Đang tải xuống hình ảnh...",
     "editor.eraser.failed": "Tẩy thần kỳ thất bại. Vui lòng thử lại.",
-    "editor.eraser.timeout": "Phản hồi máy chủ AI bị chậm. Vui lòng thử lại sau.",
+    "editor.eraser.timeout":
+      "Phản hồi máy chủ AI bị chậm. Vui lòng thử lại sau.",
 
     // Share Modal
     "share.title": "Chia Sẻ",
     "share.kakaotalk": "KakaoTalk",
     "share.copyLink": "Sao Chép Liên Kết",
     "share.saveImage": "Lưu Hình Ảnh",
-    "share.message": "Ảnh được tạo tại My Bias Gallery!",
-    "share.linkCopiedKakao": "Đã sao chép liên kết. Vui lòng dán vào KakaoTalk!",
-    "share.shareFromKakaoApp": "Vui lòng chia sẻ trực tiếp từ ứng dụng KakaoTalk.",
+    "share.message": "Ảnh được tạo tại SaveMyBias Gallery!",
+    "share.linkCopiedKakao":
+      "Đã sao chép liên kết. Vui lòng dán vào KakaoTalk!",
+    "share.shareFromKakaoApp":
+      "Vui lòng chia sẻ trực tiếp từ ứng dụng KakaoTalk.",
     "share.linkCopied": "Đã sao chép liên kết!",
     "share.copyFailed": "Sao chép liên kết thất bại.",
     "share.viewOnWeb": "Xem trên Web",
@@ -92,7 +102,7 @@ export default {
     "seo.intro.title":
       "Công Cụ Khôi Phục Ảnh & Nâng Cao Chất Lượng Bằng AI (MyBias)",
     "seo.intro.description1":
-      "MyBias là công cụ khôi phục ảnh AI trực tuyến giúp nâng cao ảnh mờ, độ phân giải thấp thành hình ảnh sắc nét, chất lượng cao. Sử dụng công nghệ khôi phục ảnh và nâng cao chất lượng tiên tiến, chúng tôi giúp bạn phục hồi những kỷ niệm quý giá từ ảnh concert chất lượng thấp, ảnh sự kiện hoặc ảnh cũ.",
+      "MyBias là công cụ khôi phục ảnh AI trực tuyến giúp nâng cao ảnh mờ, độ phân giải thấp thành hình ảnh sắc nét, chất lượng cao. Sử dụng công nghệ khôi phục ảnh và nâng cao chất lượng tiên tiến, chúng tôi giúp bạn phục hồi những kỷ niệm quý giá từ ảnh Low-resolution photos chất lượng thấp, ảnh sự kiện hoặc ảnh cũ.",
     "seo.intro.description2":
       "Engine AI của chúng tôi chuyên về khôi phục ảnh và nâng cao chất lượng. Được xây dựng trên thuật toán CodeFormer và Real-ESRGAN, nó phân tích các đặc điểm khuôn mặt bị hư hỏng và khôi phục chi tiết bị mất một cách tự nhiên, mang lại sự sống cho ảnh của bạn với độ rõ nét và sắc nét được cải thiện.",
 
@@ -173,7 +183,7 @@ export default {
 
     // Login
     "login.title": "Chào Mừng Trở Lại",
-    "login.subtitle": "Tiếp tục đến My Bias Gallery",
+    "login.subtitle": "Tiếp tục đến SaveMyBias Gallery",
     "login.continueWithGoogle": "Tiếp tục với Google",
     "login.continueWithEmail": "Tiếp tục với Email",
     "login.or": "hoặc",
@@ -187,7 +197,8 @@ export default {
     "login.invalidEmail": "Vui lòng nhập email hợp lệ",
     "login.emailSent": "Đã gửi liên kết đăng nhập đến email của bạn!",
     "login.checkEmail": "Kiểm tra email của bạn",
-    "login.emailSentDescription": "Chúng tôi đã gửi liên kết đăng nhập đến {{email}}. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết.",
+    "login.emailSentDescription":
+      "Chúng tôi đã gửi liên kết đăng nhập đến {{email}}. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết.",
     "login.tryAnotherMethod": "Thử phương thức khác",
     "login.termsText": "Bằng cách tiếp tục, bạn đồng ý với",
     "login.termsLink": "Điều Khoản Dịch Vụ",
