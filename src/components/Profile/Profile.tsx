@@ -13,6 +13,9 @@ import { useAuth } from "../../hooks/useAuth";
 import { useEffect } from "react";
 import { trackLogout, trackChargeClick } from "../../utils/analytics";
 
+// Show charge button only in dev mode (test mode)
+const isDevMode = import.meta.env.VITE_APP_STAGE === "dev";
+
 export function Profile() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -46,8 +49,22 @@ export function Profile() {
 
   const handleCharge = () => {
     trackChargeClick();
-    // TODO: Implement charge/payment flow
-    console.log("Charge button clicked");
+
+    // Lemon Squeezy checkout URL with user metadata
+    const checkoutUrl = new URL(
+      "https://savemybias.lemonsqueezy.com/checkout/buy/a92ae8c9-945a-4bff-bcc3-cb7600e9e51d"
+    );
+
+    // Pass user email and ID as checkout data
+    if (userEmail) {
+      checkoutUrl.searchParams.set("checkout[email]", userEmail);
+    }
+    if (user?.id) {
+      checkoutUrl.searchParams.set("checkout[custom][user_id]", user.id);
+    }
+
+    // Open checkout in new tab
+    window.open(checkoutUrl.toString(), "_blank");
   };
 
   if (isLoading) {
@@ -157,15 +174,17 @@ export function Profile() {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              {/* Charge Button */}
-              <button
-                onClick={handleCharge}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold text-white rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700 transition-all shadow-lg shadow-fuchsia-500/25"
-                type="button"
-              >
-                <CreditCard className="w-5 h-5" />
-                {t("profile.charge")}
-              </button>
+              {/* Charge Button - Only visible in dev mode */}
+              {isDevMode && (
+                <button
+                  onClick={handleCharge}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold text-white rounded-xl bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700 transition-all shadow-lg shadow-fuchsia-500/25"
+                  type="button"
+                >
+                  <CreditCard className="w-5 h-5" />
+                  {t("profile.charge")}
+                </button>
+              )}
 
               {/* Logout Button */}
               <button
