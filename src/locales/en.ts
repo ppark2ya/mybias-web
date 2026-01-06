@@ -90,35 +90,40 @@ export default {
 
     // SEO Content - Intro
     "seo.intro.title":
-      "The Best AI HD Upscaler for K-Pop Idol Photos (MyBias)",
+      "AI Photo Restoration & Quality Enhancement Tool (MyBias)",
     "seo.intro.description1":
-      "MyBias is a free online tool that uses cutting-edge artificial intelligence (AI) technology to restore blurry, noisy idol photos into crisp, high-resolution (HD, 4K) images. Have you ever been frustrated seeing your bias's face looking pixelated in concert photos, fan meeting shots, or low-quality broadcast screenshots?",
+      "MyBias is an online AI photo restoration tool that enhances blurry, low-resolution photos into crisp, high-quality images. Using advanced photo restoration and quality enhancement technology, we help you recover precious memories from low-quality concert photos, event shots, or old photographs.",
     "seo.intro.description2":
-      "Our proprietary AI engine doesn't just enlarge images. Built on CodeFormer and Real-ESRGAN algorithms, it analyzes blurry facial features and infers lost details to naturally restore them as if the original was high-quality. Experience the best quality perfect for sharing on Twitter and Instagram right now.",
+      "Our AI engine specializes in photo restoration and quality enhancement. Built on CodeFormer and Real-ESRGAN algorithms, it analyzes degraded facial features and restores lost details naturally, bringing your photos back to life with improved clarity and sharpness.",
 
     // SEO Content - How-to
-    "seo.howto.title": "HD Conversion in 3 Simple Steps",
+    "seo.howto.title": "Photo Restoration in 3 Simple Steps",
     "seo.howto.step1.title": "Upload Image",
     "seo.howto.step1.description":
-      "Click the 'Choose File' button to upload low-quality idol photos from your gallery. We support most image formats including JPG, PNG, and WEBP. (Max 5MB)",
-    "seo.howto.step2.title": "AI Model Processing",
+      "Click the 'Choose File' button to upload photos you want to restore from your gallery. We support most image formats including JPG, PNG, and WEBP. (Max 5MB)",
+    "seo.howto.step2.title": "AI Restoration Processing",
     "seo.howto.step2.description":
-      "Once uploaded, our AI model runs on cloud GPU servers. Face Restoration and Resolution Upscaling work simultaneously, and this process may take about 10 to 30 seconds depending on the complexity of the photo.",
+      "Once uploaded, our AI model runs on cloud GPU servers. Photo Restoration and Quality Enhancement work simultaneously, and this process may take about 10 to 30 seconds depending on the complexity of the photo.",
     "seo.howto.step3.title": "Compare & Download",
     "seo.howto.step3.description":
-      "Once the conversion is complete, compare the original and result using the slider. If you like it, hit the download button to save it or share directly to social media.",
+      "Once the restoration is complete, compare the original and result using the slider. If you like it, hit the download button to save it or share directly to social media.",
 
     // SEO Content - Features
     "seo.features.title": "Why Choose MyBias?",
-    "seo.features.ai.title": "AI Specialized for Face Restoration",
+    "seo.features.ai.title": "AI Specialized for Photo Restoration",
     "seo.features.ai.description":
-      "Unlike generic landscape upscalers, we use deep learning models specialized in facial feature restoration, vividly bringing out eyes, eyelashes, and lip textures.",
+      "Unlike generic upscalers, we use deep learning models specialized in facial feature restoration and quality enhancement, vividly bringing out eyes, eyelashes, and lip textures.",
     "seo.features.privacy.title": "Safe Photo Storage",
     "seo.features.privacy.description":
-      "AI-converted images are safely stored in 'My Gallery' where you can view and download them anytime. No worries about losing your precious memories.",
+      "Restored images are safely stored in 'My Gallery' where you can view and download them anytime. No worries about losing your precious memories.",
     "seo.features.mobile.title": "Mobile Optimized",
     "seo.features.mobile.description":
-      "No app installation required. Enjoy the same high-performance AI features on mobile browsers like iPhone and Galaxy as you would on PC.",
+      "No app installation required. Enjoy the same high-performance AI photo restoration features on mobile browsers like iPhone and Galaxy as you would on PC.",
+
+    // SEO Content - Safe Use Policy
+    "seo.safeuse.title": "Safe Use Policy",
+    "seo.safeuse.description":
+      "We strictly prohibit deepfakes, nude/explicit content generation, and illegal image synthesis. Our technology is designed exclusively for legitimate photo restoration and quality enhancement.",
 
     // SEO Content - FAQ
     "seo.faq.title": "Frequently Asked Questions",
@@ -206,28 +211,31 @@ export default {
     // Terms of Service
     "terms.title": "Terms of Service",
     "terms.lastUpdated": "Last Updated",
-    "terms.updateDate": "December 22, 2024",
+    "terms.updateDate": "January 6, 2025",
     "terms.section1.title": "1. Service Overview",
     "terms.section1.content":
-      "MyBias (hereinafter 'Service') is a free online tool that uses artificial intelligence (AI) technology to enhance the quality of images uploaded by users. By using this Service, you agree to be bound by these Terms of Service.",
-    "terms.section2.title": "2. Terms of Use",
+      "MyBias (hereinafter 'Service') is an online tool that uses artificial intelligence (AI) technology specifically designed for photo restoration and quality enhancement. Our service helps users restore blurry or low-resolution photos to higher quality by improving facial details, enhancing skin tones, and sharpening overall image quality. By using this Service, you agree to be bound by these Terms of Service.",
+    "terms.section2.title": "2. Safe Use Policy",
     "terms.section2.content":
-      "Users may only upload images for which they hold copyright or have authorization to use. Uploading images that infringe on others' copyrights, portrait rights, or other rights is prohibited. Uploading illegal or harmful content (pornography, violent images, hate speech, etc.) is strictly prohibited.",
-    "terms.section3.title": "3. Intellectual Property Rights",
+      "We strictly prohibit the creation of deepfakes, nude/explicit content generation, illegal image synthesis, and any form of non-consensual image manipulation. Our AI technology is designed exclusively for legitimate photo restoration and quality enhancement purposes. We actively monitor and technically block attempts to misuse our service. Violations will result in immediate account termination and may be reported to relevant authorities.",
+    "terms.section3.title": "3. Terms of Use",
     "terms.section3.content":
-      "All rights to original images uploaded by users remain with the respective users. The Service uses uploaded images only for processing purposes and automatically deletes them from servers within a set period after processing. The Service's logos, designs, AI models, and technology are assets of MyBias, and unauthorized copying and use are prohibited.",
-    "terms.section4.title": "4. Disclaimer",
+      "Users may only upload images for which they hold copyright or have authorization to use. Uploading images that infringe on others' copyrights, portrait rights, or other rights is prohibited. Uploading illegal or harmful content (pornography, violent images, hate speech, etc.) is strictly prohibited.",
+    "terms.section4.title": "4. Intellectual Property Rights",
     "terms.section4.content":
-      "The Service is provided 'as is' without any warranties of fitness for a particular purpose, accuracy, or completeness. The quality of AI-processed results may vary depending on the condition of the original image. MyBias shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use of the Service.",
-    "terms.section5.title": "5. Service Modification and Termination",
+      "All rights to original images uploaded by users remain with the respective users. The Service uses uploaded images only for processing purposes and automatically deletes them from servers within a set period after processing. The Service's logos, designs, AI models, and technology are assets of MyBias, and unauthorized copying and use are prohibited.",
+    "terms.section5.title": "5. Disclaimer",
     "terms.section5.content":
-      "MyBias reserves the right to modify, suspend, or terminate all or part of the Service without prior notice. MyBias shall not be liable for damages resulting from service interruption.",
-    "terms.section6.title": "6. Changes to Terms",
+      "The Service is provided 'as is' without any warranties of fitness for a particular purpose, accuracy, or completeness. The quality of AI-processed results may vary depending on the condition of the original image. MyBias shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use of the Service.",
+    "terms.section6.title": "6. Service Modification and Termination",
     "terms.section6.content":
-      "These Terms of Service may be changed as needed. Important changes will be announced through notices within the Service. If you do not agree with the changed terms, you must discontinue use of the Service.",
-    "terms.section7.title": "7. Contact",
+      "MyBias reserves the right to modify, suspend, or terminate all or part of the Service without prior notice. MyBias shall not be liable for damages resulting from service interruption.",
+    "terms.section7.title": "7. Changes to Terms",
     "terms.section7.content":
-      "If you have any questions about these Terms of Service, please contact us at mybias.official@gmail.com.",
+      "These Terms of Service may be changed as needed. Important changes will be announced through notices within the Service. If you do not agree with the changed terms, you must discontinue use of the Service.",
+    "terms.section8.title": "8. Contact",
+    "terms.section8.content":
+      "If you have any questions about these Terms of Service, please contact us at support@savemybias.com.",
 
     // Privacy Policy
     "privacy.title": "Privacy Policy",
@@ -253,6 +261,6 @@ export default {
       "This Service is not intended for children under 14 years of age. If we become aware that personal information from a child under 14 has been collected, we will immediately delete that information.",
     "privacy.section7.title": "7. Contact",
     "privacy.section7.content":
-      "If you have any questions about our privacy practices, please contact us at mybias.official@gmail.com.",
+      "If you have any questions about our privacy practices, please contact us at support@savemybias.com.",
   },
 };

@@ -7,6 +7,8 @@ export const LanguageCode = {
   ES: "es",
   JA: "ja",
   ZH: "zh",
+  TH: "th",
+  VI: "vi",
 } as const;
 
 /**
@@ -31,6 +33,8 @@ export const LANGUAGES: readonly Language[] = [
   { code: LanguageCode.ES, name: "Español" },
   { code: LanguageCode.JA, name: "日本語" },
   { code: LanguageCode.ZH, name: "中文" },
+  { code: LanguageCode.TH, name: "ไทย" },
+  { code: LanguageCode.VI, name: "Tiếng Việt" },
 ] as const;
 
 /**

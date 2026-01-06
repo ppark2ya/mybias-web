@@ -109,6 +109,16 @@ function TermsPage() {
                 {t("terms.section7.content")}
               </p>
             </section>
+
+            {/* Section 8 */}
+            <section>
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                {t("terms.section8.title")}
+              </h2>
+              <p className="text-gray-600 leading-relaxed">
+                {t("terms.section8.content")}
+              </p>
+            </section>
           </div>
         </article>
       </main>

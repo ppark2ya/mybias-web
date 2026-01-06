@@ -94,6 +94,27 @@ export function FlagIcon({ code, ...props }: FlagIconProps) {
         />
       </svg>
     ),
+    [LanguageCode.TH]: (
+      // Thai Flag
+      <svg viewBox="0 0 24 24" fill="none" {...props}>
+        <rect width="24" height="24" rx="2" fill="#FFFFFF" />
+        <rect y="0" width="24" height="4" fill="#A51931" />
+        <rect y="4" width="24" height="4" fill="#F4F5F8" />
+        <rect y="8" width="24" height="8" fill="#2D2A4A" />
+        <rect y="16" width="24" height="4" fill="#F4F5F8" />
+        <rect y="20" width="24" height="4" fill="#A51931" />
+      </svg>
+    ),
+    [LanguageCode.VI]: (
+      // Vietnamese Flag
+      <svg viewBox="0 0 24 24" fill="none" {...props}>
+        <rect width="24" height="24" rx="2" fill="#DA251D" />
+        <path
+          d="M12 5 L13.5 9.5 L18 9.5 L14.5 12.5 L15.8 17 L12 14 L8.2 17 L9.5 12.5 L6 9.5 L10.5 9.5 Z"
+          fill="#FFFF00"
+        />
+      </svg>
+    ),
   };
 
   return flags[code];
