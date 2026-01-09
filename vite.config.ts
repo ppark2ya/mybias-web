@@ -37,4 +37,7 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    exclude: ["e2e/**", "node_modules/**", "dist/**", ".idea/**", ".git/**", ".cache/**"],
+  },
 });
