@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check, ImageIcon } from "lucide-react";
+import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check, ImageIcon, CreditCard } from "lucide-react";
 import { FlagIcon } from "../LanguageSwitcher/FlagIcon";
 import { LANGUAGES } from "../../constants/locales";
 import { useAuth } from "../../hooks/useAuth";
@@ -179,6 +179,14 @@ export function UserMenu() {
                     <span>{t("user.profile")}</span>
                   </Link>
                   <Link
+                    to="/pricing"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>{t("user.pricing", "Pricing")}</span>
+                  </Link>
+                  <Link
                     to="/gallery"
                     onClick={() => setIsOpen(false)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
@@ -189,14 +197,24 @@ export function UserMenu() {
                 </>
               ) : (
                 /* Not Logged In - Login Button */
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>{t("user.login")}</span>
-                </Link>
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>{t("user.login")}</span>
+                  </Link>
+                  <Link
+                    to="/pricing"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    <span>{t("user.pricing", "Pricing")}</span>
+                  </Link>
+                </>
               )}
 
               {/* Language Switcher */}
