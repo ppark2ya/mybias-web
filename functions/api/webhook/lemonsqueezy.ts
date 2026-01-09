@@ -96,9 +96,34 @@ interface LemonSqueezyWebhookPayload {
 }
 
 /**
- * Credits to add per order (can be customized based on product)
+ * Plan definitions matching the Pricing page
  */
-const CREDITS_PER_ORDER = 50;
+const PLAN_CREDITS: Record<string, number> = {
+  "tiny": 20,
+  "basic": 60,
+  "pro": 150,
+  "ultra": 450,
+  "master": 1000,
+};
+
+/**
+ * Get credits amount based on variant name
+ */
+function getCreditsForVariant(variantName: string): number {
+  // Normalize variant name to lowercase to match keys
+  const normalizedName = variantName.toLowerCase();
+  
+  // Check if any plan name is contained in the variant name
+  for (const [plan, credits] of Object.entries(PLAN_CREDITS)) {
+    if (normalizedName.includes(plan)) {
+      return credits;
+    }
+  }
+  
+  // Default fallback (log warning in calling function if this happens)
+  console.warn(`Unknown variant name: ${variantName}, default to 0 credits`);
+  return 0;
+}
 
 /**
  * Validate webhook request from Lemon Squeezy
@@ -277,12 +302,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         );
       }
 
+      // Determine credits based on variant
+      const creditsToAdd = getCreditsForVariant(
+        attributes.first_order_item.variant_name
+      );
+
+      if (creditsToAdd === 0) {
+        console.error(
+          `Could not determine credits for variant: ${attributes.first_order_item.variant_name}`
+        );
+      }
+
       // Add credits to user
-      const success = await addCreditsToUser(db, userId, CREDITS_PER_ORDER);
+      const success = await addCreditsToUser(db, userId, creditsToAdd);
 
       if (success) {
         console.log(
-          `Added ${CREDITS_PER_ORDER} credits to user ${userId} for order ${payload.data.id}`
+          `Added ${creditsToAdd} credits to user ${userId} for order ${payload.data.id} (${attributes.first_order_item.variant_name})`
         );
       } else {
         console.error(`Failed to add credits for user ${userId}`);
@@ -310,17 +346,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
 
       if (userId) {
+        // Determine credits to deduct
+        const creditsToDeduct = getCreditsForVariant(
+          attributes.first_order_item.variant_name
+        );
+
         // Deduct credits (don't go negative)
         await db
           .update(profiles)
           .set({
-            credits: sql`GREATEST(0, ${profiles.credits} - ${CREDITS_PER_ORDER})`,
+            credits: sql`GREATEST(0, ${profiles.credits} - ${creditsToDeduct})`,
             updatedAt: new Date(),
           })
           .where(eq(profiles.id, userId));
 
         console.log(
-          `Deducted ${CREDITS_PER_ORDER} credits from user ${userId} due to refund`
+          `Deducted ${creditsToDeduct} credits from user ${userId} due to refund (${attributes.first_order_item.variant_name})`
         );
       }
 
