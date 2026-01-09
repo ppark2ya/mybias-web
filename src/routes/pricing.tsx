@@ -16,6 +16,19 @@ import {
   Eraser,
 } from "lucide-react";
 import Footer from "../components/Footer";
+import { useAuth } from "../hooks/useAuth";
+
+// Lemon Squeezy Store URL
+const LEMONSQUEEZY_STORE = "https://savemybias.lemonsqueezy.com";
+
+// Variant IDs for each plan (to be configured in Lemon Squeezy)
+const PLAN_VARIANT_IDS: Record<string, string> = {
+  tiny: "a92ae8c9-945a-4bff-bcc3-cb7600e9e51d", // TODO: Replace with actual variant ID
+  basic: "a92ae8c9-945a-4bff-bcc3-cb7600e9e51d", // TODO: Replace with actual variant ID
+  pro: "a92ae8c9-945a-4bff-bcc3-cb7600e9e51d", // TODO: Replace with actual variant ID
+  ultra: "a92ae8c9-945a-4bff-bcc3-cb7600e9e51d", // TODO: Replace with actual variant ID
+  master: "a92ae8c9-945a-4bff-bcc3-cb7600e9e51d", // TODO: Replace with actual variant ID
+};
 
 export const Route = createFileRoute("/pricing")({
   component: Pricing,
@@ -110,9 +123,11 @@ const plans: PricingPlan[] = [
 function PricingCard({
   plan,
   isCompact = false,
+  onBuy,
 }: {
   plan: PricingPlan;
   isCompact?: boolean;
+  onBuy: (planId: string) => void;
 }) {
   const isPro = plan.popular;
 
@@ -189,6 +204,7 @@ function PricingCard({
       </ul>
 
       <button
+        onClick={() => onBuy(plan.id)}
         className={`
           w-full py-3 px-4 rounded-xl font-semibold transition-all duration-200
           ${
@@ -206,12 +222,37 @@ function PricingCard({
 
 export function Pricing() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [showAllPlans, setShowAllPlans] = useState(false);
 
   const mainPlans = plans.filter((p) => p.tier === "main");
   const hiddenPlans = plans.filter((p) => p.tier === "hidden");
   const tinyPlan = hiddenPlans.find((p) => p.id === "tiny");
   const masterPlan = hiddenPlans.find((p) => p.id === "master");
+
+  const handleBuyCredits = (planId: string) => {
+    const variantId = PLAN_VARIANT_IDS[planId];
+    if (!variantId) {
+      console.error("Unknown plan:", planId);
+      return;
+    }
+
+    // Build Lemon Squeezy checkout URL
+    const checkoutUrl = new URL(
+      `${LEMONSQUEEZY_STORE}/checkout/buy/${variantId}`
+    );
+
+    // Pass user email and ID as checkout data
+    if (user?.email) {
+      checkoutUrl.searchParams.set("checkout[email]", user.email);
+    }
+    if (user?.id) {
+      checkoutUrl.searchParams.set("checkout[custom][user_id]", user.id);
+    }
+
+    // Open checkout in new tab
+    window.open(checkoutUrl.toString(), "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 py-4 px-2 sm:py-6 sm:px-4 lg:py-8 lg:px-6">
@@ -242,7 +283,7 @@ export function Pricing() {
         {/* Main 3 plans */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-center">
           {mainPlans.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
+            <PricingCard key={plan.id} plan={plan} onBuy={handleBuyCredits} />
           ))}
         </div>
 
@@ -272,8 +313,8 @@ export function Pricing() {
         {/* Hidden plans (Tiny & Master) */}
         {showAllPlans && tinyPlan && masterPlan && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-top-4 duration-300">
-            <PricingCard plan={tinyPlan} isCompact />
-            <PricingCard plan={masterPlan} isCompact />
+            <PricingCard plan={tinyPlan} isCompact onBuy={handleBuyCredits} />
+            <PricingCard plan={masterPlan} isCompact onBuy={handleBuyCredits} />
           </div>
         )}
 
