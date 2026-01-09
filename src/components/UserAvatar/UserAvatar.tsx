@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { User, LogIn, UserCircle } from "lucide-react";
+import { User, LogIn, UserCircle, CreditCard } from "lucide-react";
 
 export function UserAvatar() {
   const { t } = useTranslation();
@@ -37,21 +37,7 @@ export function UserAvatar() {
     };
   }, [isOpen]);
 
-  // If not logged in, show login button
-  if (!isLoggedIn) {
-    return (
-      <Link
-        to="/login"
-        className="flex items-center gap-2 px-2 py-1 text-sm text-white transition-all duration-200 border rounded-lg sm:px-4 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 sm:rounded-xl sm:text-base hover:scale-105 active:scale-95"
-        aria-label={t("user.login")}
-      >
-        <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
-        <span className="hidden sm:inline">{t("user.login")}</span>
-      </Link>
-    );
-  }
-
-  // If logged in, show avatar with dropdown
+  // Show avatar with dropdown menu
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -63,7 +49,9 @@ export function UserAvatar() {
         <div className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-white/20 rounded-full">
           <User className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <span className="hidden sm:inline">{userName}</span>
+        <span className="hidden sm:inline">
+          {isLoggedIn ? userName : t("user.menu", "Menu")}
+        </span>
       </button>
 
       {isOpen && (
@@ -78,12 +66,9 @@ export function UserAvatar() {
           animate-in fade-in slide-in-from-top-2 duration-200
         "
         >
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              // TODO: Navigate to profile page when implemented
-            }}
+          <Link
+            to="/pricing"
+            onClick={() => setIsOpen(false)}
             className="
               w-full flex items-center gap-3 px-4 py-3
               text-left text-sm text-gray-700
@@ -91,26 +76,58 @@ export function UserAvatar() {
               hover:bg-gray-50
             "
           >
-            <UserCircle className="w-4 h-4" />
-            <span>{t("user.profile")}</span>
-          </button>
+            <CreditCard className="w-4 h-4" />
+            <span>{t("user.pricing", "Pricing")}</span>
+          </Link>
 
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              // TODO: Implement logout logic
-            }}
-            className="
-              w-full flex items-center gap-3 px-4 py-3
-              text-left text-sm text-red-600
-              transition-colors duration-150
-              hover:bg-red-50
-            "
-          >
-            <LogIn className="w-4 h-4" />
-            <span>{t("user.logout")}</span>
-          </button>
+          {isLoggedIn ? (
+            <>
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="
+                  w-full flex items-center gap-3 px-4 py-3
+                  text-left text-sm text-gray-700
+                  transition-colors duration-150
+                  hover:bg-gray-50
+                "
+              >
+                <UserCircle className="w-4 h-4" />
+                <span>{t("user.profile")}</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  // TODO: Implement logout logic
+                }}
+                className="
+                  w-full flex items-center gap-3 px-4 py-3
+                  text-left text-sm text-red-600
+                  transition-colors duration-150
+                  hover:bg-red-50
+                "
+              >
+                <LogIn className="w-4 h-4" />
+                <span>{t("user.logout")}</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setIsOpen(false)}
+              className="
+                w-full flex items-center gap-3 px-4 py-3
+                text-left text-sm text-gray-700
+                transition-colors duration-150
+                hover:bg-gray-50
+              "
+            >
+              <LogIn className="w-4 h-4" />
+              <span>{t("user.login")}</span>
+            </Link>
+          )}
         </div>
       )}
     </div>
