@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { Coins } from "lucide-react";
 import Uploader from "../components/Uploader";
 import Editor from "../components/Editor";
 import UserMenu from "../components/UserMenu";
@@ -28,7 +29,15 @@ export function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 py-4 px-2 sm:py-6 sm:px-4 lg:py-8 lg:px-6">
       {/* User Menu - Fixed position on top right */}
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 flex items-center gap-2">
+        <Link
+          to="/pricing"
+          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white transition-all duration-200 border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 hover:scale-105 active:scale-95"
+          aria-label={t("user.pricing", "Pricing")}
+        >
+          <Coins className="w-4 h-4 text-yellow-300" />
+          <span className="hidden sm:inline">{t("nav.credits", "Credits")}</span>
+        </Link>
         <UserMenu />
       </div>
 
