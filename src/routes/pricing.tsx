@@ -11,6 +11,9 @@ import {
   Crown,
   ChevronDown,
   ChevronUp,
+  ImageUp,
+  WandSparkles,
+  Eraser,
 } from "lucide-react";
 import Footer from "../components/Footer";
 
@@ -273,6 +276,80 @@ export function Pricing() {
             <PricingCard plan={masterPlan} isCompact />
           </div>
         )}
+
+        {/* Credit Usage Guide */}
+        <div className="mt-16 max-w-3xl mx-auto">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+            <h2 className="text-xl sm:text-2xl font-bold text-white text-center mb-2">
+              {t("pricing.usageGuide.title", "Credit Usage Guide")}
+            </h2>
+            <p className="text-white/70 text-sm text-center mb-6">
+              {t(
+                "pricing.usageGuide.subtitle",
+                "Different AI models use different amounts of credits"
+              )}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Standard Upscale */}
+              <div className="bg-white/10 rounded-xl p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-yellow-400/20 rounded-lg">
+                    <ImageUp className="w-5 h-5 text-yellow-300" />
+                  </div>
+                  <span className="text-lg font-bold text-white">1 Credit</span>
+                </div>
+                <h3 className="font-semibold text-white mb-1">
+                  {t("pricing.usageGuide.standard.title", "Standard Upscale")}
+                </h3>
+                <p className="text-xs text-white/70">
+                  {t(
+                    "pricing.usageGuide.standard.description",
+                    "Fast & cost-effective. Perfect for general photos."
+                  )}
+                </p>
+              </div>
+
+              {/* Pro Restoration */}
+              <div className="bg-white/10 rounded-xl p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-purple-400/20 rounded-lg">
+                    <WandSparkles className="w-5 h-5 text-purple-300" />
+                  </div>
+                  <span className="text-lg font-bold text-white">4 Credits</span>
+                </div>
+                <h3 className="font-semibold text-white mb-1">
+                  {t("pricing.usageGuide.pro.title", "Pro Restoration")}
+                </h3>
+                <p className="text-xs text-white/70">
+                  {t(
+                    "pricing.usageGuide.pro.description",
+                    "AI redraws faces. Revive your blurry fancam shots."
+                  )}
+                </p>
+              </div>
+
+              {/* Magic Eraser */}
+              <div className="bg-white/10 rounded-xl p-4 hover:bg-white/15 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-pink-400/20 rounded-lg">
+                    <Eraser className="w-5 h-5 text-pink-300" />
+                  </div>
+                  <span className="text-lg font-bold text-white">2 Credits</span>
+                </div>
+                <h3 className="font-semibold text-white mb-1">
+                  {t("pricing.usageGuide.eraser.title", "Magic Eraser")}
+                </h3>
+                <p className="text-xs text-white/70">
+                  {t(
+                    "pricing.usageGuide.eraser.description",
+                    "Remove people & distractions from your photos."
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Guarantee */}
         <div className="mt-12 text-center space-y-2">
