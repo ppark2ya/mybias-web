@@ -21,4 +21,20 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-i18next"],
+          "tanstack-vendor": ["@tanstack/react-query", "@tanstack/react-router"],
+          "ui-vendor": ["lucide-react", "sonner", "class-variance-authority", "clsx", "tailwind-merge"],
+          "db-vendor": ["@supabase/supabase-js", "drizzle-orm", "postgres"],
+          "ai-vendor": ["replicate"],
+          "canvas-vendor": ["react-sketch-canvas"],
+          "analytics-vendor": ["react-ga4", "react-microsoft-clarity"],
+          "utils-vendor": ["axios", "i18next", "i18next-browser-languagedetector"],
+        },
+      },
+    },
+  },
 });
