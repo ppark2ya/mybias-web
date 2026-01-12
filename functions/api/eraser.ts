@@ -166,9 +166,9 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           mask,
           width,
           height,
-          prompt: "", // Empty prompt for context-aware filling
+          prompt: "background, texture, empty space, wall, floor", // Force background generation
           negative_prompt:
-            "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, mosaic, pixelated",
+            "person, human, face, man, woman, child, body, people, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, mosaic, pixelated",
           num_inference_steps: 30,
           scheduler: "DPMSolverMultistep",
         },
