@@ -150,7 +150,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       ? `${env.BASE_URL}/api/webhook/replicate`
       : null;
 
-    // Create prediction with LaMa model
+    // Create prediction with Bria Eraser model
     const response = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
       headers: {
@@ -158,7 +158,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        version: ReplicateModels.LAMA,
+        version: ReplicateModels.BRIA_ERASER,
         input: {
           image,
           mask,
