@@ -117,7 +117,11 @@ export const MaskCanvas = ({
         const scaleX = imageWidth / renderedWidth;
         const scaleY = imageHeight / renderedHeight;
 
-        // Draw white strokes (areas to erase)
+        // Mask enhancement settings
+        const MASK_DILATION_PX = 10; // Expand mask by this many pixels
+        const MASK_BLUR_PX = 8; // Apply gaussian blur for smooth edges
+
+        // Draw white strokes (areas to erase) with dilation
         ctx.strokeStyle = "#FFFFFF";
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -125,8 +129,10 @@ export const MaskCanvas = ({
         for (const pathData of paths) {
           if (pathData.paths.length === 0) continue;
 
-          ctx.lineWidth =
+          // Add dilation to line width for expanded mask coverage
+          const baseLineWidth =
             (pathData.strokeWidth || brushSize) * Math.max(scaleX, scaleY);
+          ctx.lineWidth = baseLineWidth + MASK_DILATION_PX * 2;
           ctx.beginPath();
 
           const firstPoint = pathData.paths[0];
@@ -145,8 +151,22 @@ export const MaskCanvas = ({
           ctx.stroke();
         }
 
+        // Apply gaussian blur for smooth mask edges
+        const blurredCanvas = document.createElement("canvas");
+        blurredCanvas.width = imageWidth;
+        blurredCanvas.height = imageHeight;
+        const blurCtx = blurredCanvas.getContext("2d");
+
+        if (!blurCtx) {
+          throw new Error("Failed to get blur canvas context");
+        }
+
+        // Apply blur filter and draw the mask
+        blurCtx.filter = `blur(${MASK_BLUR_PX}px)`;
+        blurCtx.drawImage(canvas, 0, 0);
+
         // Export as base64 PNG
-        return canvas.toDataURL("image/png");
+        return blurredCanvas.toDataURL("image/png");
       },
 
       clearCanvas: () => {
