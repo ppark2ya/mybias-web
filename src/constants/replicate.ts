@@ -23,10 +23,10 @@ export type ReplicatePredictionStatusType =
 export const ReplicateModels = {
   // CodeFormer - Face Restoration model (sczhou/codeformer)
   CODEFORMER: "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
-  // Bria Eraser - Professional object removal model (bria/eraser)
-  // High-quality inpainting without prompt, fills removed areas with natural background
-  // No smudging, trained on licensed data for commercial use
-  BRIA_ERASER: "204e6eb4d3d835a30bf64cdd90c650cebd441248fd13f70205c70e43d75b9bf8",
+  // Image Object Removal - LaMa with Fast Fourier Convolutions (dpakkk/image-object-removal)
+  // High-quality object removal without prompt, fills with natural background
+  // Very cost-effective: ~4,545 runs per $1
+  IMAGE_OBJECT_REMOVAL: "40e67426e1bf78199d78b36580389fbbdcb4c9cdc2bc2b489e99d713f167b3c5",
 } as const;
 
 export type ReplicateModelType = (typeof ReplicateModels)[keyof typeof ReplicateModels];
