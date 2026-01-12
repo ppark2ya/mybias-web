@@ -64,29 +64,42 @@ async function compositeImages(
       // 1. Draw original (base)
       ctx.drawImage(imgOriginal, 0, 0, width, height);
 
-      // 2. Draw inpainted result, masked by the mask
-      // We use 'destination-out' to erase the masked hole from the original? No.
-      // We want to overlay Inpainted ONLY where Mask is White.
-      // Mask: White = Erase (so Overlay here). Black = Keep (so Transparent here).
+      // 2. Prepare the mask as specific alpha
+      const maskCanvas = document.createElement("canvas");
+      maskCanvas.width = width;
+      maskCanvas.height = height;
+      const maskCtx = maskCanvas.getContext("2d");
+      if (!maskCtx) return;
 
-      // Create a temp canvas for the masked inpainted content
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = width;
-      tempCanvas.height = height;
-      const tempCtx = tempCanvas.getContext("2d");
-      if (!tempCtx) return;
+      maskCtx.drawImage(imgMask, 0, 0, width, height);
+      const maskData = maskCtx.getImageData(0, 0, width, height);
 
-      // Draw the mask first
-      tempCtx.drawImage(imgMask, 0, 0, width, height);
+      // Convert White/Black mask to Alpha channel
+      // We want to keep Inpainted where Mask is White (Alpha=255).
+      // We want to discard Inpainted where Mask is Black (Alpha=0).
+      // Since mask is grayscale (white on black), we can use the Red channel as Alpha.
+      for (let i = 0; i < maskData.data.length; i += 4) {
+        // R channel: 0 (black/keep) -> 255 (white/erase)
+        const alpha = maskData.data[i];
+        maskData.data[i + 3] = alpha;
+      }
+      maskCtx.putImageData(maskData, 0, 0);
 
-      // Change composite mode to keep only where mask is opaque (White)
-      // Wait, standard mask is White=Erase.
-      // Source-In: Keeps source (inpainted) where dest (mask) is opaque.
-      tempCtx.globalCompositeOperation = "source-in";
-      tempCtx.drawImage(imgInpainted, 0, 0, width, height);
+      // 3. Composite Inpainted using the alpha-converted mask
+      const patchCanvas = document.createElement("canvas");
+      patchCanvas.width = width;
+      patchCanvas.height = height;
+      const patchCtx = patchCanvas.getContext("2d");
+      if (!patchCtx) return;
 
-      // Now draw this masked inpainted content onto the main canvas
-      ctx.drawImage(tempCanvas, 0, 0);
+      // Draw alpha mask
+      patchCtx.drawImage(maskCanvas, 0, 0);
+      // Source-in to keep inpainted only where mask is opaque
+      patchCtx.globalCompositeOperation = "source-in";
+      patchCtx.drawImage(imgInpainted, 0, 0, width, height);
+
+      // 4. Draw patch over original
+      ctx.drawImage(patchCanvas, 0, 0);
 
       canvas.toBlob((blob) => {
         if (blob) {
