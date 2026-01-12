@@ -158,10 +158,15 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        version: ReplicateModels.IMAGE_OBJECT_REMOVAL,
+        version: ReplicateModels.STABLE_DIFFUSION_INPAINTING,
         input: {
           image,
           mask,
+          prompt: "", // Empty prompt for context-aware filling
+          negative_prompt:
+            "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, mosaic, pixelated",
+          num_inference_steps: 30,
+          scheduler: "DPMSolverMultistep",
         },
         ...(webhookUrl && {
           webhook: webhookUrl,

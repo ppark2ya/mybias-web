@@ -27,6 +27,9 @@ export const ReplicateModels = {
   // High-quality object removal without prompt, fills with natural background
   // Very cost-effective: ~4,545 runs per $1
   IMAGE_OBJECT_REMOVAL: "40e67426e1bf78199d78b36580389fbbdcb4c9cdc2bc2b489e99d713f167b3c5",
+  // Stable Diffusion Inpainting v2.0
+  // Higher quality generative inpainting, better for natural blending
+  STABLE_DIFFUSION_INPAINTING: "95b7223104132402a9ae91cc677285bc5eb997834bd2349fa486f53910fd68b3",
 } as const;
 
 export type ReplicateModelType = (typeof ReplicateModels)[keyof typeof ReplicateModels];
