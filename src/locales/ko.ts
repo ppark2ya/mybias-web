@@ -202,6 +202,12 @@ export default {
     "auth.error": "로그인 오류",
     "auth.tryAgain": "다시 시도하기",
 
+    // 404
+    "404.title": "페이지를 찾을 수 없습니다",
+    "404.subtitle":
+      "요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.",
+    "404.backToHome": "홈으로 돌아가기",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "이용약관",

@@ -208,6 +208,12 @@ export default {
     "auth.error": "Sign In Error",
     "auth.tryAgain": "Try Again",
 
+    // 404
+    "404.title": "Page Not Found",
+    "404.subtitle":
+      "The page you are looking for does not exist or has been moved.",
+    "404.backToHome": "Back to Home",
+
     // Footer
     "footer.rights": "All rights reserved.",
     "footer.terms": "Terms of Service",
