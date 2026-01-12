@@ -16,6 +16,8 @@ interface Env {
 interface EraserRequest {
   image: string; // Base64 encoded original image
   mask: string; // Base64 encoded mask image (white = erase, black = keep)
+  width?: number;
+  height?: number;
 }
 
 interface ReplicatePredictionResponse {
@@ -122,7 +124,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       );
     }
 
-    const { image, mask }: EraserRequest = await request.json();
+    const { image, mask, width, height }: EraserRequest = await request.json();
 
     if (!image || !mask) {
       return new Response(
@@ -162,6 +164,8 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
         input: {
           image,
           mask,
+          width,
+          height,
           prompt: "", // Empty prompt for context-aware filling
           negative_prompt:
             "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, mosaic, pixelated",

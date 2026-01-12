@@ -8,6 +8,10 @@ export interface EraserRequest {
   image: string;
   /** Base64 encoded mask image (white = erase, black = keep) */
   mask: string;
+  /** Target width for generation */
+  width?: number;
+  /** Target height for generation */
+  height?: number;
 }
 
 /**

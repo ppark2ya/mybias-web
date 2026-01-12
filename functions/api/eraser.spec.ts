@@ -3,7 +3,7 @@ import { onRequestPost } from './eraser';
 // Mock ReplicateModels since it's used in the code
 vi.mock('../../src/constants/replicate', () => ({
   ReplicateModels: {
-    LAMA: 'lama-model-version',
+    STABLE_DIFFUSION_INPAINTING: 'stable-diffusion-version',
   },
 }));
 
@@ -125,7 +125,7 @@ describe('POST /api/eraser', () => {
       'https://api.replicate.com/v1/predictions',
       expect.objectContaining({
         method: 'POST',
-        body: expect.stringContaining('lama-model-version'),
+        body: expect.stringContaining('stable-diffusion-version'),
       })
     );
     
