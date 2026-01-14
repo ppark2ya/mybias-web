@@ -11,6 +11,7 @@ import {
   X,
   Crop,
   Sparkles,
+  Crown,
   Maximize,
   Download,
   Eraser,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 // import ShareModal from "../ShareModal"; // TODO: Share button temporarily disabled
 import AIPreviewModal from "../AIPreviewModal";
+import ProRestoreModal from "../ProRestoreModal";
 import EraserModal from "../EraserModal";
 import { useEditorState } from "./hooks/useEditorState";
 import { useImageHistory } from "./hooks/useImageHistory";
@@ -25,6 +27,7 @@ import { useCropTool } from "./hooks/useCropTool";
 import { useBlurTool } from "./hooks/useBlurTool";
 import { useResizeTool } from "./hooks/useResizeTool";
 import { useAIEnhance } from "./hooks/useAIEnhance";
+import { useProRestore } from "./hooks/useProRestore";
 import { useMagicEraser } from "./hooks/useMagicEraser";
 import { IconButton } from "./components/IconButton";
 import { ToolButton } from "./components/ToolButton";
@@ -53,6 +56,12 @@ export function Editor({ files, onClose }: EditorProps) {
     afterImageUrl: string;
   } | null>(null);
   const [isEraserResultModalOpen, setIsEraserResultModalOpen] = useState(false);
+  const [isProRestoreModalOpen, setIsProRestoreModalOpen] = useState(false);
+  const [proRestoreResultImages, setProRestoreResultImages] = useState<{
+    beforeImageUrl: string;
+    afterImageUrl: string;
+  } | null>(null);
+  const [isProRestoreResultModalOpen, setIsProRestoreResultModalOpen] = useState(false);
 
   // Editor state
   const {
@@ -146,6 +155,23 @@ export function Editor({ files, onClose }: EditorProps) {
     }
   );
 
+  // Pro Restore
+  const { remainingCredits: proRestoreCredits, handleProRestore } = useProRestore(
+    currentImageState,
+    selectedIndex,
+    setImageStates,
+    historyIndex,
+    historyHook.setHistory,
+    historyHook.setHistoryIndex,
+    setProcessingMessage,
+    isProcessing,
+    setIsProcessing,
+    (result) => {
+      setProRestoreResultImages(result);
+      setIsProRestoreResultModalOpen(true);
+    }
+  );
+
   // Magic Eraser
   const { remainingCredits: eraserCredits, handleMagicErase } = useMagicEraser(
     currentImageState,
@@ -206,6 +232,19 @@ export function Editor({ files, onClose }: EditorProps) {
 
     if (eraserCredits === 0) return;
     setIsEraserModalOpen(true);
+  };
+
+  const openProRestoreModal = () => {
+    if (!currentImageState || isProcessing) return;
+
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate({ to: "/login" });
+      return;
+    }
+
+    if (proRestoreCredits < 3) return; // Pro Restore costs 3 credits
+    setIsProRestoreModalOpen(true);
   };
 
   return (
@@ -394,9 +433,16 @@ export function Editor({ files, onClose }: EditorProps) {
               onClick={openAIPreviewModal}
               disabled={isProcessing || !currentImageState || (isAuthenticated && remainingAIUsage === 0)}
               icon={<Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
-              label="AI"
-              badge={isAuthenticated ? remainingAIUsage : undefined}
+              label="UPSCALE"
               variant="ai"
+            />
+
+            <ToolButton
+              onClick={openProRestoreModal}
+              disabled={isProcessing || !currentImageState || (isAuthenticated && proRestoreCredits < 3)}
+              icon={<Crown className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+              label="PRO"
+              variant="pro"
             />
 
             <ToolButton
@@ -404,7 +450,6 @@ export function Editor({ files, onClose }: EditorProps) {
               disabled={isProcessing || !currentImageState || (isAuthenticated && eraserCredits === 0)}
               icon={<Eraser className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
               label="ERASER"
-              badge={isAuthenticated ? eraserCredits : undefined}
               variant="eraser"
             />
 
@@ -487,6 +532,25 @@ export function Editor({ files, onClose }: EditorProps) {
         onClose={() => setIsEraserResultModalOpen(false)}
         beforeImageUrl={eraserResultImages?.beforeImageUrl || ""}
         afterImageUrl={eraserResultImages?.afterImageUrl || ""}
+        mode="result"
+      />
+
+      {/* Pro Restore Preview Modal */}
+      <ProRestoreModal
+        isOpen={isProRestoreModalOpen}
+        onClose={() => setIsProRestoreModalOpen(false)}
+        onConfirm={handleProRestore}
+        beforeImageUrl={currentImageState?.blobUrl || ""}
+        remainingUsage={proRestoreCredits}
+        mode="preview"
+      />
+
+      {/* Pro Restore Result Modal */}
+      <ProRestoreModal
+        isOpen={isProRestoreResultModalOpen}
+        onClose={() => setIsProRestoreResultModalOpen(false)}
+        beforeImageUrl={proRestoreResultImages?.beforeImageUrl || ""}
+        afterImageUrl={proRestoreResultImages?.afterImageUrl || ""}
         mode="result"
       />
     </div>

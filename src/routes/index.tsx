@@ -7,6 +7,7 @@ import Editor from "../components/Editor";
 import UserMenu from "../components/UserMenu";
 import SeoContent from "../components/SeoContent";
 import Footer from "../components/Footer";
+import { useAuth } from "../hooks/useAuth";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/")({
 
 export function Home() {
   const { t } = useTranslation();
+  const { isAuthenticated, profile } = useAuth();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const handleUpload = (files: File[]) => {
@@ -36,7 +38,11 @@ export function Home() {
           aria-label={t("user.pricing", "Pricing")}
         >
           <Coins className="w-4 h-4 text-yellow-300" />
-          <span className="hidden sm:inline">{t("nav.credits", "Credits")}</span>
+          {isAuthenticated && profile?.credits !== undefined ? (
+            <span className="font-bold">{profile.credits}</span>
+          ) : (
+            <span className="hidden sm:inline">{t("nav.credits", "Credits")}</span>
+          )}
         </Link>
         <UserMenu />
       </div>
