@@ -185,6 +185,8 @@ export default {
     // User
     "user.login": "Login",
     "user.menu": "User Menu",
+    "user.pricing": "Pricing",
+    "user.aiProducts": "AI Products",
     "user.profile": "Profile",
     "user.gallery": "My Gallery",
     "user.creditHistory": "Credit History",

@@ -180,6 +180,8 @@ export default {
     // User
     "user.login": "로그인",
     "user.menu": "사용자 메뉴",
+    "user.pricing": "요금제",
+    "user.aiProducts": "AI 상품 소개",
     "user.profile": "프로필",
     "user.gallery": "내 사진함",
     "user.creditHistory": "크레딧 내역",
