@@ -3,9 +3,11 @@ import {
   imageGenerations,
   ImageGenerationStatus,
   profiles,
+  CreditTransactionType,
 } from "../../src/db/schema";
 import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
-import type { ContextData, DbClient } from "../types";
+import type { ContextData, DbClient } from "../types.d.ts";
+import { recordCreditTransaction } from "../lib/credit";
 
 interface Env {
   REPLICATE_API_TOKEN: string;
@@ -200,6 +202,15 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     if (result.id) {
       try {
         await saveGenerationRecord(db, result.id, user.id);
+        // Record credit transaction for history
+        await recordCreditTransaction(
+          db,
+          user.id,
+          -1,
+          CreditTransactionType.USAGE,
+          result.id,
+          "Image enhancement"
+        );
       } catch (err) {
         console.error("Failed to save generation record:", err);
         return new Response(

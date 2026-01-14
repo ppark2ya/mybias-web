@@ -148,9 +148,22 @@ export default {
     "user.menu": "사용자 메뉴",
     "user.profile": "프로필",
     "user.gallery": "내 사진함",
+    "user.creditHistory": "크레딧 내역",
     "user.logout": "로그아웃",
     "user.language": "언어",
     "user.back": "뒤로",
+
+    // Credit History
+    "creditHistory.title": "크레딧 내역",
+    "creditHistory.subtitle": "크레딧 사용 및 충전 내역",
+    "creditHistory.backToHome": "홈으로",
+    "creditHistory.empty": "크레딧 내역이 없습니다",
+    "creditHistory.emptyHint": "크레딧을 사용하면 내역이 표시됩니다",
+    "creditHistory.buyCredits": "크레딧 구매하기",
+    "creditHistory.loadError": "내역을 불러오는데 실패했습니다",
+    "creditHistory.type.usage": "사용",
+    "creditHistory.type.purchase": "충전",
+    "creditHistory.type.refund": "환불",
 
     // Gallery
     "gallery.title": "내 사진함",

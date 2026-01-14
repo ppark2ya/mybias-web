@@ -153,9 +153,22 @@ export default {
     "user.menu": "User Menu",
     "user.profile": "Profile",
     "user.gallery": "My Gallery",
+    "user.creditHistory": "Credit History",
     "user.logout": "Logout",
     "user.language": "Language",
     "user.back": "Back",
+
+    // Credit History
+    "creditHistory.title": "Credit History",
+    "creditHistory.subtitle": "View your credit usage",
+    "creditHistory.backToHome": "Home",
+    "creditHistory.empty": "No credit history",
+    "creditHistory.emptyHint": "Start using credits to see your history",
+    "creditHistory.buyCredits": "Buy Credits",
+    "creditHistory.loadError": "Failed to load history",
+    "creditHistory.type.usage": "Usage",
+    "creditHistory.type.purchase": "Purchase",
+    "creditHistory.type.refund": "Refund",
 
     // Gallery
     "gallery.title": "My Gallery",

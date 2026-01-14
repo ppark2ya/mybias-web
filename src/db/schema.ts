@@ -5,6 +5,7 @@ import {
   timestamp,
   integer,
   pgEnum,
+  index,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -97,6 +98,49 @@ export const imageGenerations = pgTable("image_generations", {
     .notNull(),
 });
 
+/**
+ * Credit transaction type enum
+ */
+export const creditTransactionTypeEnum = pgEnum("credit_transaction_type", [
+  "usage", // 이미지 생성 등으로 사용
+  "purchase", // 크레딧 구매
+  "refund", // 환불
+]);
+
+/**
+ * Credit transaction type constants for type-safe usage
+ */
+export const CreditTransactionType = {
+  USAGE: "usage",
+  PURCHASE: "purchase",
+  REFUND: "refund",
+} as const;
+
+export type CreditTransactionTypeValue =
+  (typeof CreditTransactionType)[keyof typeof CreditTransactionType];
+
+/**
+ * Credit transactions table - tracks all credit changes
+ * Records both credit usage (negative) and credit purchases (positive)
+ */
+export const creditTransactions = pgTable(
+  "credit_transactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    amount: integer("amount").notNull(), // +충전, -사용
+    type: creditTransactionTypeEnum("type").notNull(),
+    referenceId: text("reference_id"), // predictionId (usage) or orderId (purchase)
+    description: text("description"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("credit_transactions_user_id_idx").on(table.userId)]
+);
+
 // Type exports for use in application
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
@@ -106,3 +150,6 @@ export type NewUserSettings = typeof userSettings.$inferInsert;
 
 export type ImageGeneration = typeof imageGenerations.$inferSelect;
 export type NewImageGeneration = typeof imageGenerations.$inferInsert;
+
+export type CreditTransaction = typeof creditTransactions.$inferSelect;
+export type NewCreditTransaction = typeof creditTransactions.$inferInsert;
