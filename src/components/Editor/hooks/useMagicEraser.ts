@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import {
@@ -9,6 +10,7 @@ import {
   getOutputUrl,
 } from "../../../api";
 import type { EraserErrorResponse } from "../../../api/eraser/types";
+import { creditHistoryKeys } from "../../../api/credit-history";
 import { POLLING } from "../../../constants/times";
 import {
   getImageDimensions,
@@ -137,6 +139,7 @@ export function useMagicEraser(
   onEraseComplete?: (result: MagicEraserResult) => void
 ) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { profile, isAuthenticated, refreshProfile } = useAuth();
 
   // Get remaining credits from profile (server-side)
@@ -288,8 +291,9 @@ export function useMagicEraser(
       const durationMs = Date.now() - startTime;
       trackMagicEraserSuccess(durationMs);
 
-      // Refresh profile to sync credits
+      // Refresh profile and credit history to sync credits
       refreshProfile();
+      queryClient.invalidateQueries({ queryKey: creditHistoryKeys.all });
 
       setProcessingMessage(t("editor.eraser.downloadingImage"));
 
