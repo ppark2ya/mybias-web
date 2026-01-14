@@ -2,43 +2,61 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://savemybias.com/</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://savemybias.com/ai-products</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://savemybias.com/pricing</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://savemybias.com/gallery</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://savemybias.com/login</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://savemybias.com/profile</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://savemybias.com/gallery</loc>
-    <lastmod>2026-01-02</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://savemybias.com/credit-history</loc>
+    <lastmod>2026-01-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://savemybias.com/terms</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://savemybias.com/privacy</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://savemybias.com/refund-policy</loc>
-    <lastmod>2026-01-02</lastmod>
+    <lastmod>2026-01-14</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
