@@ -44,8 +44,8 @@ interface ReplicatePredictionResponse {
   };
 }
 
-/** Pro Restore costs 3 credits */
-const PRO_RESTORE_CREDIT_COST = 3;
+/** Pro Restore costs 4 credits */
+const PRO_RESTORE_CREDIT_COST = 4;
 
 /** Default prompts optimized for K-pop idol photo restoration */
 const DEFAULT_PROMPTS = {
@@ -133,7 +133,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     if (remainingCredits === null) {
       return new Response(
         JSON.stringify({
-          error: "크레딧이 부족합니다. Pro 복원은 3 크레딧이 필요합니다.",
+          error: "크레딧이 부족합니다. Pro 복원은 4 크레딧이 필요합니다.",
           code: "INSUFFICIENT_CREDITS",
         }),
         {

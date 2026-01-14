@@ -29,8 +29,8 @@ export interface ProRestoreResult {
   afterImageUrl: string;
 }
 
-/** Pro Restore costs 3 credits per use */
-export const PRO_RESTORE_CREDIT_COST = 3;
+/** Pro Restore costs 4 credits per use */
+export const PRO_RESTORE_CREDIT_COST = 4;
 
 export function useProRestore(
   currentImageState: ImageState | undefined,
