@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { User, LogIn, UserCircle, CreditCard } from "lucide-react";
+import { User, LogIn, UserCircle, CreditCard, Sparkles } from "lucide-react";
 
 export function UserAvatar() {
   const { t } = useTranslation();
@@ -78,6 +78,20 @@ export function UserAvatar() {
           >
             <CreditCard className="w-4 h-4" />
             <span>{t("user.pricing", "Pricing")}</span>
+          </Link>
+
+          <Link
+            to="/ai-products"
+            onClick={() => setIsOpen(false)}
+            className="
+              w-full flex items-center gap-3 px-4 py-3
+              text-left text-sm text-gray-700
+              transition-colors duration-150
+              hover:bg-gray-50
+            "
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{t("user.aiProducts", "AI 상품 소개")}</span>
           </Link>
 
           {isLoggedIn ? (
