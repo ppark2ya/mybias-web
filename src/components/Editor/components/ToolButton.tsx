@@ -7,7 +7,7 @@ interface ToolButtonProps {
   icon: ReactNode;
   label: string;
   badge?: number;
-  variant?: "default" | "ai" | "eraser" | "download" | "share";
+  variant?: "default" | "ai" | "pro" | "eraser" | "download" | "share";
   className?: string;
 }
 
@@ -34,6 +34,7 @@ export function ToolButton({
       ? "bg-gradient-to-r from-fuchsia-500 to-purple-500 text-white shadow-md"
       : "bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100",
     ai: "bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600",
+    pro: "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600",
     eraser:
       "bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600",
     download:

@@ -4,6 +4,7 @@ export * from "./generate";
 export * from "./status";
 export * from "./eraser";
 export * from "./credit-history";
+export * from "./pro-restore";
 
 // Re-export axios client from lib
 export { apiClient } from "../lib/axios";
