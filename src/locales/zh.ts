@@ -70,9 +70,22 @@ export default {
     "user.menu": "用户菜单",
     "user.profile": "个人资料",
     "user.gallery": "我的相册",
+    "user.creditHistory": "积分记录",
     "user.logout": "退出登录",
     "user.language": "语言",
     "user.back": "返回",
+
+    // Credit History
+    "creditHistory.title": "积分记录",
+    "creditHistory.subtitle": "查看积分使用记录",
+    "creditHistory.backToHome": "首页",
+    "creditHistory.empty": "暂无积分记录",
+    "creditHistory.emptyHint": "使用积分后将显示记录",
+    "creditHistory.buyCredits": "购买积分",
+    "creditHistory.loadError": "加载记录失败",
+    "creditHistory.type.usage": "使用",
+    "creditHistory.type.purchase": "购买",
+    "creditHistory.type.refund": "退款",
 
     // Gallery
     "gallery.title": "我的相册",

@@ -155,9 +155,22 @@ export default {
     "user.menu": "Menu Người Dùng",
     "user.profile": "Hồ Sơ",
     "user.gallery": "Bộ Sưu Tập Của Tôi",
+    "user.creditHistory": "Lịch Sử Điểm",
     "user.logout": "Đăng Xuất",
     "user.language": "Ngôn Ngữ",
     "user.back": "Quay Lại",
+
+    // Credit History
+    "creditHistory.title": "Lịch Sử Điểm",
+    "creditHistory.subtitle": "Xem lịch sử sử dụng điểm",
+    "creditHistory.backToHome": "Trang Chủ",
+    "creditHistory.empty": "Không có lịch sử điểm",
+    "creditHistory.emptyHint": "Bắt đầu sử dụng điểm để xem lịch sử",
+    "creditHistory.buyCredits": "Mua Điểm",
+    "creditHistory.loadError": "Tải lịch sử thất bại",
+    "creditHistory.type.usage": "Sử dụng",
+    "creditHistory.type.purchase": "Mua",
+    "creditHistory.type.refund": "Hoàn tiền",
 
     // Gallery
     "gallery.title": "Bộ Sưu Tập Của Tôi",

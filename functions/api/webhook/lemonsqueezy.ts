@@ -1,7 +1,8 @@
 import { eq, sql } from "drizzle-orm";
-import { profiles } from "../../../src/db/schema";
+import { profiles, CreditTransactionType } from "../../../src/db/schema";
 import { createDbClient } from "../../lib/db";
-import type { DbClient } from "../../types";
+import type { DbClient } from "../../types.d.ts";
+import { recordCreditTransaction } from "../../lib/credit";
 
 interface Env {
   DATABASE_URL: string;
@@ -320,6 +321,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         console.log(
           `Added ${creditsToAdd} credits to user ${userId} for order ${payload.data.id} (${attributes.first_order_item.variant_name})`
         );
+        // Record credit transaction for history
+        await recordCreditTransaction(
+          db,
+          userId,
+          creditsToAdd,
+          CreditTransactionType.PURCHASE,
+          payload.data.id,
+          attributes.first_order_item.variant_name
+        );
       } else {
         console.error(`Failed to add credits for user ${userId}`);
       }
@@ -359,6 +369,16 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             updatedAt: new Date(),
           })
           .where(eq(profiles.id, userId));
+
+        // Record credit transaction for history
+        await recordCreditTransaction(
+          db,
+          userId,
+          -creditsToDeduct,
+          CreditTransactionType.REFUND,
+          payload.data.id,
+          `Refund: ${attributes.first_order_item.variant_name}`
+        );
 
         console.log(
           `Deducted ${creditsToDeduct} credits from user ${userId} due to refund (${attributes.first_order_item.variant_name})`

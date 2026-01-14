@@ -151,9 +151,22 @@ export default {
     "user.menu": "เมนูผู้ใช้",
     "user.profile": "โปรไฟล์",
     "user.gallery": "แกลเลอรี่ของฉัน",
+    "user.creditHistory": "ประวัติเครดิต",
     "user.logout": "ออกจากระบบ",
     "user.language": "ภาษา",
     "user.back": "กลับ",
+
+    // Credit History
+    "creditHistory.title": "ประวัติเครดิต",
+    "creditHistory.subtitle": "ดูประวัติการใช้เครดิต",
+    "creditHistory.backToHome": "หน้าหลัก",
+    "creditHistory.empty": "ไม่มีประวัติเครดิต",
+    "creditHistory.emptyHint": "เริ่มใช้เครดิตเพื่อดูประวัติของคุณ",
+    "creditHistory.buyCredits": "ซื้อเครดิต",
+    "creditHistory.loadError": "โหลดประวัติไม่สำเร็จ",
+    "creditHistory.type.usage": "ใช้งาน",
+    "creditHistory.type.purchase": "ซื้อ",
+    "creditHistory.type.refund": "คืนเงิน",
 
     // Gallery
     "gallery.title": "แกลเลอรี่ของฉัน",
