@@ -274,3 +274,18 @@ export async function blendImages(
 
   return canvasToBlobUrl(canvas)
 }
+
+/**
+ * Convert a blob URL to a base64 string
+ */
+export async function blobUrlToBase64(blobUrl: string): Promise<string> {
+  const response = await fetch(blobUrl)
+  const blob = await response.blob()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+

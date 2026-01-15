@@ -59,7 +59,7 @@ function AiLookbook() {
 
   const { isAuthenticated } = useAuth(); // Assume useAuth is available
   
-}
+
   
   const handleDownload = async () => {
     if (resultImage && userImage && clothingImage) {
