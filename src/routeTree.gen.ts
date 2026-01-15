@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as CreditHistoryRouteImport } from './routes/credit-history'
 import { Route as AiProductsRouteImport } from './routes/ai-products'
+import { Route as AiLookbookRouteImport } from './routes/ai-lookbook'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 
@@ -66,6 +67,11 @@ const AiProductsRoute = AiProductsRouteImport.update({
   path: '/ai-products',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiLookbookRoute = AiLookbookRouteImport.update({
+  id: '/ai-lookbook',
+  path: '/ai-lookbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -79,6 +85,7 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-lookbook': typeof AiLookbookRoute
   '/ai-products': typeof AiProductsRoute
   '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-lookbook': typeof AiLookbookRoute
   '/ai-products': typeof AiProductsRoute
   '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-lookbook': typeof AiLookbookRoute
   '/ai-products': typeof AiProductsRoute
   '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-lookbook'
     | '/ai-products'
     | '/credit-history'
     | '/gallery'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-lookbook'
     | '/ai-products'
     | '/credit-history'
     | '/gallery'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-lookbook'
     | '/ai-products'
     | '/credit-history'
     | '/gallery'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiLookbookRoute: typeof AiLookbookRoute
   AiProductsRoute: typeof AiProductsRoute
   CreditHistoryRoute: typeof CreditHistoryRoute
   GalleryRoute: typeof GalleryRoute
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-lookbook': {
+      id: '/ai-lookbook'
+      path: '/ai-lookbook'
+      fullPath: '/ai-lookbook'
+      preLoaderRoute: typeof AiLookbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -257,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiLookbookRoute: AiLookbookRoute,
   AiProductsRoute: AiProductsRoute,
   CreditHistoryRoute: CreditHistoryRoute,
   GalleryRoute: GalleryRoute,

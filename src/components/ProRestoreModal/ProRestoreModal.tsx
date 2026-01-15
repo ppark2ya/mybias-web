@@ -9,7 +9,7 @@ type ModalMode = "preview" | "result";
 interface ProRestoreModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm?: (denoisingStrength: number) => void;
+  onConfirm?: (fidelity: number) => void;
   beforeImageUrl: string;
   afterImageUrl?: string;
   remainingUsage?: number;
@@ -17,9 +17,10 @@ interface ProRestoreModalProps {
 }
 
 // CSS filter simulation for Pro Restore preview
-function getPreviewFilter(denoisingStrength: number): React.CSSProperties {
-  // Higher denoising = stronger restoration effect
-  const intensity = denoisingStrength;
+function getPreviewFilter(fidelity: number): React.CSSProperties {
+  // Lower fidelity = stronger restoration (more AI processing)
+  // Higher fidelity = keep more original features
+  const intensity = 1 - fidelity; // Invert: low fidelity = high intensity
 
   const contrast = 1.08 + intensity * 0.15; // 1.08 ~ 1.23
   const saturation = 1.15 + intensity * 0.25; // 1.15 ~ 1.40
@@ -42,7 +43,7 @@ function getBeforeFilter(): React.CSSProperties {
   };
 }
 
-const DEFAULT_DENOISING = 0.3;
+const DEFAULT_FIDELITY = 0.5;
 
 function ProRestoreModalContent({
   onClose,
@@ -53,7 +54,7 @@ function ProRestoreModalContent({
   isResultMode,
 }: {
   onClose: () => void;
-  onConfirm?: (denoisingStrength: number) => void;
+  onConfirm?: (fidelity: number) => void;
   beforeImageUrl: string;
   afterImageUrl?: string;
   remainingUsage: number;
@@ -61,7 +62,7 @@ function ProRestoreModalContent({
 }) {
   const { t } = useTranslation();
   const modalRef = useRef<HTMLDivElement>(null);
-  const [denoisingStrength, setDenoisingStrength] = useState(DEFAULT_DENOISING);
+  const [fidelity, setFidelity] = useState(DEFAULT_FIDELITY);
 
   // Handle escape key and body scroll
   useEffect(() => {
@@ -90,19 +91,19 @@ function ProRestoreModalContent({
   const handleConfirm = useCallback(() => {
     if (onConfirm) {
       onClose();
-      onConfirm(denoisingStrength);
+      onConfirm(fidelity);
     }
-  }, [onConfirm, onClose, denoisingStrength]);
+  }, [onConfirm, onClose, fidelity]);
 
-  const handleDenoisingChange = useCallback(
+  const handleFidelityChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setDenoisingStrength(parseFloat(e.target.value));
+      setFidelity(parseFloat(e.target.value));
     },
     []
   );
 
   const hasEnoughCredits = remainingUsage >= PRO_RESTORE_CREDIT_COST;
-  const previewStyle = !isResultMode ? getPreviewFilter(denoisingStrength) : undefined;
+  const previewStyle = !isResultMode ? getPreviewFilter(fidelity) : undefined;
 
   return (
     <div
@@ -195,30 +196,30 @@ function ProRestoreModalContent({
             />
           )}
 
-          {/* Denoising Strength Slider - Only in Preview Mode */}
+          {/* Fidelity Slider - Only in Preview Mode */}
           {!isResultMode && (
             <div className="mt-4 sm:mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200/50">
               <div className="flex items-center gap-2 mb-3">
                 <SlidersHorizontal className="w-4 h-4 text-amber-600" />
                 <span className="text-sm font-medium text-gray-700">
-                  {t("editor.proRestore.preview.denoising")}
+                  {t("editor.proRestore.preview.fidelity")}
                 </span>
                 <span className="ml-auto text-sm font-semibold text-amber-600">
-                  {Math.round(denoisingStrength * 100)}%
+                  {Math.round(fidelity * 100)}%
                 </span>
               </div>
               <input
                 type="range"
                 min="0.1"
-                max="0.5"
-                step="0.05"
-                value={denoisingStrength}
-                onChange={handleDenoisingChange}
+                max="1.0"
+                step="0.1"
+                value={fidelity}
+                onChange={handleFidelityChange}
                 className="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
               />
               <div className="flex justify-between mt-2 text-xs text-gray-500">
-                <span>{t("editor.proRestore.preview.denoisingLow")}</span>
-                <span>{t("editor.proRestore.preview.denoisingHigh")}</span>
+                <span>{t("editor.proRestore.preview.fidelityLow")}</span>
+                <span>{t("editor.proRestore.preview.fidelityHigh")}</span>
               </div>
             </div>
           )}

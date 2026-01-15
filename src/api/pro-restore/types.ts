@@ -2,56 +2,49 @@ import type { PredictionStatus } from "../generate/types";
 
 /**
  * Request type for /api/pro-restore endpoint
- * Uses SUPIR model for high-quality restoration with prompt engineering
+ * Uses Real-ESRGAN + CodeFormer blending for natural high-quality restoration
  */
 export interface ProRestoreRequest {
   /** Base64 encoded image */
   image: string;
   /** Upscale factor (default: 2) */
   upscale?: number;
-  /** Positive prompt for guiding restoration */
-  prompt?: string;
-  /** Negative prompt to avoid unwanted artifacts */
-  negativePrompt?: string;
-  /** Denoising strength (0-1, default: 0.3) */
-  denoisingStrength?: number;
+  /** CodeFormer fidelity (0.5-0.6 recommended for face restoration) */
+  fidelity?: number;
+  /** Blend ratio for CodeFormer (0.7 = 70% CodeFormer, 30% Real-ESRGAN) */
+  blendRatio?: number;
+}
+
+/**
+ * Individual prediction info
+ */
+export interface PredictionInfo {
+  id: string;
+  status: PredictionStatus;
+}
+
+/**
+ * Dual predictions for blending
+ */
+export interface DualPredictions {
+  /** Real-ESRGAN prediction (skin texture, pores) */
+  realEsrgan: PredictionInfo;
+  /** CodeFormer prediction (facial features) */
+  codeformer: PredictionInfo;
 }
 
 /**
  * Response type for /api/pro-restore endpoint
  */
 export interface ProRestoreResponse {
-  /** Prediction ID from Replicate */
+  /** Primary prediction ID (CodeFormer) for compatibility */
   id: string;
-  /** Model identifier */
-  model: string;
-  /** Model version */
-  version: string;
   /** Current prediction status */
   status: PredictionStatus;
-  /** Input parameters */
-  input: Record<string, unknown>;
-  /** Output URL(s) when succeeded */
-  output?: string | string[] | null;
-  /** Error message if failed */
-  error?: string | null;
-  /** Processing logs */
-  logs?: string;
-  /** Performance metrics */
-  metrics?: {
-    predict_time?: number;
-  };
-  /** Creation timestamp */
-  created_at: string;
-  /** Processing start timestamp */
-  started_at?: string;
-  /** Completion timestamp */
-  completed_at?: string;
-  /** Related URLs */
-  urls: {
-    get: string;
-    cancel: string;
-  };
+  /** Dual prediction IDs for blending */
+  predictions: DualPredictions;
+  /** Blend ratio for client-side blending (0.7 = 70% CodeFormer) */
+  blendRatio: number;
   /** Remaining credits after this request (costs 3 credits) */
   remainingCredits?: number;
 }

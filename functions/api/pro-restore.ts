@@ -18,9 +18,8 @@ interface Env {
 interface ProRestoreRequest {
   image: string; // Base64 encoded image
   upscale?: number; // Default: 2
-  prompt?: string; // Positive prompt
-  negativePrompt?: string; // Negative prompt
-  denoisingStrength?: number; // Default: 0.3
+  fidelity?: number; // CodeFormer fidelity (0.5-0.6 recommended)
+  blendRatio?: number; // Blend ratio for CodeFormer (0.7 = 70% CodeFormer, 30% Real-ESRGAN)
 }
 
 interface ReplicatePredictionResponse {
@@ -44,16 +43,8 @@ interface ReplicatePredictionResponse {
   };
 }
 
-/** Pro Restore costs 4 credits */
-const PRO_RESTORE_CREDIT_COST = 4;
-
-/** Default prompts optimized for realistic skin texture preservation */
-const DEFAULT_PROMPTS = {
-  positive:
-    "highly detailed skin texture, pores, realistic skin, sharp focus, high quality photo",
-  negative:
-    "smooth skin, plastic skin, waxy skin, blurry, artifacts, noise, distorted",
-};
+/** Pro Restore costs 3 credits (runs 2 models but user pays for 1.5 each) */
+const PRO_RESTORE_CREDIT_COST = 3;
 
 /**
  * Check user credits and deduct specified amount if available
@@ -96,6 +87,39 @@ async function saveGenerationRecord(
   });
 }
 
+/**
+ * Create a Replicate prediction
+ */
+async function createPrediction(
+  apiToken: string,
+  version: string,
+  input: Record<string, unknown>,
+  webhookUrl: string | null
+): Promise<ReplicatePredictionResponse> {
+  const response = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      version,
+      input,
+      ...(webhookUrl && {
+        webhook: webhookUrl,
+        webhook_events_filter: ["completed"],
+      }),
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Replicate API error: ${errorText}`);
+  }
+
+  return response.json();
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -124,7 +148,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       );
     }
 
-    // 2. Check and deduct credits (Pro Restore costs 3 credits)
+    // 2. Check and deduct credits
     const remainingCredits = await checkAndDeductCredits(
       db,
       user.id,
@@ -133,7 +157,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     if (remainingCredits === null) {
       return new Response(
         JSON.stringify({
-          error: "크레딧이 부족합니다. Pro 복원은 4 크레딧이 필요합니다.",
+          error: `크레딧이 부족합니다. Pro 복원은 ${PRO_RESTORE_CREDIT_COST} 크레딧이 필요합니다.`,
           code: "INSUFFICIENT_CREDITS",
         }),
         {
@@ -146,9 +170,8 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     const {
       image,
       upscale = 2,
-      prompt = DEFAULT_PROMPTS.positive,
-      negativePrompt = DEFAULT_PROMPTS.negative,
-      denoisingStrength = 0.3,
+      fidelity = 0.5, // CodeFormer fidelity (0.5 recommended for face restoration)
+      blendRatio = 0.7, // 70% CodeFormer, 30% Real-ESRGAN
     }: ProRestoreRequest = await request.json();
 
     if (!image) {
@@ -174,78 +197,83 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       ? `${env.BASE_URL}/api/webhook/replicate`
       : null;
 
-    // Create prediction with Clarity Upscaler (SDXL-based with prompt support)
-    const response = await fetch("https://api.replicate.com/v1/predictions", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${apiToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        version: ReplicateModels.CLARITY_UPSCALER,
-        input: {
-          image,
-          prompt,
-          negative_prompt: negativePrompt,
-          scale_factor: upscale,
-          resemblance: 0.6, // Balance with creativity to preserve face structure
-          creativity: 0.4, // Allow texture detail generation (0.35-0.45 range)
-          dynamic: 6, // Balance between sharpness and smoothness
-          sd_model: "juggernaut_reborn.safetensors [338b85bc4f]", // Best for realistic photos
-          scheduler: "DPM++ 3M SDE Karras",
-          num_inference_steps: 18,
-          output_format: "png",
-        },
-        ...(webhookUrl && {
-          webhook: webhookUrl,
-          webhook_events_filter: ["completed"],
-        }),
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Replicate API error:", errorText);
-      return new Response(
-        JSON.stringify({ error: "Failed to create prediction" }),
+    // Create both predictions in parallel
+    // 1. Real-ESRGAN: Good for skin texture, pores (but blurry faces)
+    // 2. CodeFormer: Good for facial features (but waxy skin)
+    const [realEsrganResult, codeformerResult] = await Promise.all([
+      // Real-ESRGAN prediction
+      createPrediction(
+        apiToken,
+        ReplicateModels.REAL_ESRGAN,
         {
-          status: response.status,
+          image,
+          scale: upscale,
+          face_enhance: false, // Don't use built-in face enhance, we'll blend with CodeFormer
+        },
+        webhookUrl
+      ),
+      // CodeFormer prediction
+      createPrediction(
+        apiToken,
+        ReplicateModels.CODEFORMER,
+        {
+          image,
+          upscale,
+          codeformer_fidelity: fidelity,
+          background_enhance: true,
+          face_upsample: true,
+        },
+        webhookUrl
+      ),
+    ]);
+
+    // Save generation records to database
+    try {
+      // Save both prediction records
+      await Promise.all([
+        saveGenerationRecord(db, realEsrganResult.id, user.id),
+        saveGenerationRecord(db, codeformerResult.id, user.id),
+      ]);
+
+      // Record credit transaction for history (using CodeFormer ID as reference)
+      await recordCreditTransaction(
+        db,
+        user.id,
+        -PRO_RESTORE_CREDIT_COST,
+        CreditTransactionType.USAGE,
+        codeformerResult.id,
+        "Pro restoration (blending)"
+      );
+    } catch (err) {
+      console.error("Failed to save generation records:", err);
+      return new Response(
+        JSON.stringify({ error: "Failed to save generation records" }),
+        {
+          status: 500,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
 
-    const result: ReplicatePredictionResponse = await response.json();
-
-    // Save generation record to database (synchronous - fail fast if DB write fails)
-    if (result.id) {
-      try {
-        await saveGenerationRecord(db, result.id, user.id);
-        // Record credit transaction for history
-        await recordCreditTransaction(
-          db,
-          user.id,
-          -PRO_RESTORE_CREDIT_COST,
-          CreditTransactionType.USAGE,
-          result.id,
-          "Pro restoration"
-        );
-      } catch (err) {
-        console.error("Failed to save generation record:", err);
-        return new Response(
-          JSON.stringify({ error: "Failed to save generation record" }),
-          {
-            status: 500,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
-        );
-      }
-    }
-
-    // Return with prediction id and remaining credits
+    // Return both prediction IDs for client-side polling and blending
     return new Response(
       JSON.stringify({
-        ...result,
+        // Primary ID for compatibility (use CodeFormer as primary)
+        id: codeformerResult.id,
+        status: "pending",
+        // Dual prediction IDs for blending
+        predictions: {
+          realEsrgan: {
+            id: realEsrganResult.id,
+            status: realEsrganResult.status,
+          },
+          codeformer: {
+            id: codeformerResult.id,
+            status: codeformerResult.status,
+          },
+        },
+        // Blend ratio for client-side blending
+        blendRatio,
         remainingCredits,
       }),
       {

@@ -2,18 +2,13 @@ import { apiClient } from "../../lib/axios";
 import type { ProRestoreRequest, ProRestoreResponse } from "./types";
 
 /**
- * Default prompts optimized for K-pop idol photo restoration
- */
-export const PRO_RESTORE_PROMPTS = {
-  positive: "high quality, natural skin tone, studio lighting, detailed pores, k-pop idol, sharp focus, professional photo",
-  negative: "red skin, blue skin, strong color cast, blurry, waxy skin, cartoon, illustration, distorted, artifacts, noise",
-};
-
-/**
  * Start Pro AI image restoration
- * Uses SUPIR model with prompt engineering for superior results
+ * Uses Real-ESRGAN + CodeFormer blending for natural high-quality results
+ * - Real-ESRGAN: Preserves skin texture and pores
+ * - CodeFormer: Restores sharp facial features (eyes, nose, lips)
+ * - Blending: Combines both for natural look without "AI waxy skin"
  * @param request - Restoration request parameters
- * @returns Promise with prediction response
+ * @returns Promise with dual prediction response for client-side blending
  */
 export async function proRestoreImage(
   request: ProRestoreRequest
@@ -27,9 +22,8 @@ export async function proRestoreImage(
  */
 export const DEFAULT_PRO_RESTORE_PARAMS: Partial<ProRestoreRequest> = {
   upscale: 2,
-  prompt: PRO_RESTORE_PROMPTS.positive,
-  negativePrompt: PRO_RESTORE_PROMPTS.negative,
-  denoisingStrength: 0.3,
+  fidelity: 0.5, // CodeFormer fidelity (0.5 = good balance of restoration vs preservation)
+  blendRatio: 0.7, // 70% CodeFormer, 30% Real-ESRGAN (golden ratio for natural look)
 };
 
 /**
