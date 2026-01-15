@@ -47,10 +47,12 @@ interface ReplicatePredictionResponse {
 /** Pro Restore costs 4 credits */
 const PRO_RESTORE_CREDIT_COST = 4;
 
-/** Default prompts optimized for photo restoration (minimal to preserve original) */
+/** Default prompts optimized for realistic skin texture preservation */
 const DEFAULT_PROMPTS = {
-  positive: "high quality photo, sharp focus, natural",
-  negative: "blurry, artifacts, noise, distorted",
+  positive:
+    "highly detailed skin texture, pores, realistic skin, sharp focus, high quality photo",
+  negative:
+    "smooth skin, plastic skin, waxy skin, blurry, artifacts, noise, distorted",
 };
 
 /**
@@ -186,9 +188,9 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           prompt,
           negative_prompt: negativePrompt,
           scale_factor: upscale,
-          resemblance: 0.95, // High value to preserve original face
-          creativity: 0.05, // Minimal AI creativity to prevent face changes
-          dynamic: 3, // Lower value for less aggressive processing
+          resemblance: 0.6, // Balance with creativity to preserve face structure
+          creativity: 0.4, // Allow texture detail generation (0.35-0.45 range)
+          dynamic: 6, // Balance between sharpness and smoothness
           sd_model: "juggernaut_reborn.safetensors [338b85bc4f]", // Best for realistic photos
           scheduler: "DPM++ 3M SDE Karras",
           num_inference_steps: 18,

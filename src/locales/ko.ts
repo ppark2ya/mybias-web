@@ -59,6 +59,7 @@ export default {
     "editor.ai.result.confirm": "확인",
 
     // Editor - Pro Restore
+    "editor.proRestore.resizingImage": "이미지 크기 조정 중...",
     "editor.proRestore.preparingImage": "이미지 준비 중...",
     "editor.proRestore.requestingServer": "AI 서버에 요청 중...",
     "editor.proRestore.analyzingImage": "이미지 구조를 분석하고 있어요...",

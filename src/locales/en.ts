@@ -62,6 +62,7 @@ export default {
     "editor.ai.result.confirm": "Done",
 
     // Editor - Pro Restore
+    "editor.proRestore.resizingImage": "Resizing image...",
     "editor.proRestore.preparingImage": "Preparing image...",
     "editor.proRestore.requestingServer": "Requesting AI server...",
     "editor.proRestore.analyzingImage": "Analyzing image structure...",

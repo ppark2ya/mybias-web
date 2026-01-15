@@ -15,6 +15,8 @@ import { POLLING } from "../../../constants/times";
 import {
   getImageDimensions,
   urlToBlobUrl,
+  resizeImage,
+  loadImage,
 } from "../../../utils/imageEditor";
 import {
   trackAIEnhanceStart,
@@ -31,6 +33,9 @@ export interface ProRestoreResult {
 
 /** Pro Restore costs 4 credits per use */
 export const PRO_RESTORE_CREDIT_COST = 4;
+
+/** Maximum image dimension before downscaling (to prevent OOM errors) */
+const MAX_INPUT_DIMENSION = 1500;
 
 export function useProRestore(
   currentImageState: ImageState | undefined,
@@ -86,7 +91,25 @@ export function useProRestore(
 
     try {
       const startTime = Date.now();
-      const response = await fetch(currentImageState.blobUrl);
+
+      // Check if image needs downscaling to prevent OOM errors
+      let imageSrcForApi = currentImageState.blobUrl;
+      const img = await loadImage(currentImageState.blobUrl);
+      const maxDim = Math.max(img.width, img.height);
+
+      if (maxDim > MAX_INPUT_DIMENSION) {
+        setProcessingMessage(t("editor.proRestore.resizingImage"));
+        const scale = MAX_INPUT_DIMENSION / maxDim;
+        const newWidth = Math.round(img.width * scale);
+        const newHeight = Math.round(img.height * scale);
+        imageSrcForApi = await resizeImage(currentImageState.blobUrl, {
+          width: newWidth,
+          height: newHeight,
+        });
+      }
+
+      setProcessingMessage(t("editor.proRestore.preparingImage"));
+      const response = await fetch(imageSrcForApi);
       const blob = await response.blob();
       const base64 = await new Promise<string>((resolve) => {
         const reader = new FileReader();
