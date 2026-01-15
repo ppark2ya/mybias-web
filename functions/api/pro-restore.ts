@@ -191,7 +191,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           resemblance: 1 - denoisingStrength, // Higher resemblance = less denoising
           creativity: denoisingStrength, // Higher creativity = more enhancement
           dynamic: 6, // Balance between sharpness and smoothness
-          sd_model: "juggernaut_reborn.safetensors", // Best for realistic photos
+          sd_model: "juggernaut_reborn.safetensors [338b85bc4f]", // Best for realistic photos
           scheduler: "DPM++ 3M SDE Karras",
           num_inference_steps: 18,
           output_format: "png",
