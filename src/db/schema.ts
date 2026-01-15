@@ -89,6 +89,9 @@ export const imageGenerations = pgTable("image_generations", {
   outputImageUrl: text("output_image_url"), // R2 stored image URL
   replicateOutputUrl: text("replicate_output_url"), // Original Replicate output URL
   errorMessage: text("error_message"),
+  stage: integer("stage"), // 1 = IDM-VTON, 2 = Face Swap
+  parentId: text("parent_id"), // Links stage 2 to stage 1
+  originalImageUrl: text("original_image_url"), // R2 URL to original image (for face swap)
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

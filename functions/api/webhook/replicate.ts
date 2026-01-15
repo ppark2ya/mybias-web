@@ -14,6 +14,8 @@ import type { DbClient } from "../../types";
 interface Env {
   DATABASE_URL: string;
   REPLICATE_WEBHOOK_SECRET?: string;
+  REPLICATE_API_TOKEN: string;
+  BASE_URL: string;
   R2_BUCKET: R2Bucket;
   R2_PUBLIC_URL: string;
 }
@@ -225,6 +227,66 @@ async function updateGenerationRecord(
     .where(eq(imageGenerations.predictionId, predictionId));
 }
 
+// Face swap model
+const FACE_SWAP_MODEL = "codeplugtech/face-swap";
+const FACE_SWAP_VERSION = "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b34";
+
+/**
+ * Trigger Stage 2: Face Swap
+ */
+async function triggerFaceSwap(
+  env: Env,
+  db: DbClient,
+  parentPredictionId: string,
+  originalImageUrl: string,
+  stage1ResultUrl: string,
+  userId: string
+): Promise<void> {
+  const webhookUrl = env.BASE_URL
+    ? `${env.BASE_URL}/api/webhook/replicate`
+    : null;
+
+  // Call face swap API
+  const response = await fetch("https://api.replicate.com/v1/predictions", {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${env.REPLICATE_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      version: FACE_SWAP_VERSION,
+      input: {
+        swap_image: originalImageUrl,  // Source face (original user photo)
+        target_image: stage1ResultUrl,  // Target image (IDM-VTON result)
+      },
+      ...(webhookUrl && {
+        webhook: webhookUrl,
+        webhook_events_filter: ["completed"],
+      }),
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Face swap API error:", errorText);
+    throw new Error(`Failed to start face swap: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  // Save Stage 2 record
+  if (result.id) {
+    await db.insert(imageGenerations).values({
+      predictionId: result.id,
+      userId,
+      status: ImageGenerationStatus.PENDING,
+      stage: 2,
+      parentId: parentPredictionId,
+    });
+    console.log(`Stage 2 face swap started: ${result.id} (parent: ${parentPredictionId})`);
+  }
+}
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
     const { request, env } = context;
@@ -304,6 +366,32 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         "->",
         publicUrl
       );
+
+      // Check if this is Stage 1 of a multi-stage lookbook generation
+      const [generationRecord] = await db
+        .select()
+        .from(imageGenerations)
+        .where(eq(imageGenerations.predictionId, predictionId))
+        .limit(1);
+
+      if (generationRecord?.stage === 1 && generationRecord.originalImageUrl) {
+        console.log("Stage 1 complete, triggering Stage 2 face swap...");
+        
+        // Trigger Stage 2: Face Swap
+        try {
+          await triggerFaceSwap(
+            env,
+            db,
+            predictionId,
+            generationRecord.originalImageUrl,
+            publicUrl,
+            generationRecord.userId || ""
+          );
+        } catch (faceSwapError) {
+          console.error("Failed to trigger face swap:", faceSwapError);
+          // Don't fail the webhook - Stage 1 result is still valid
+        }
+      }
     } else if (status === ReplicatePredictionStatus.FAILED) {
       await updateGenerationRecord(db, predictionId, {
         status: ImageGenerationStatus.FAILED,

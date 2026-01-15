@@ -11,6 +11,8 @@ import type { ContextData, DbClient } from "../types.d.ts";
 interface Env {
   REPLICATE_API_TOKEN: string;
   BASE_URL: string;
+  R2_BUCKET: R2Bucket;
+  R2_PUBLIC_URL: string;
 }
 
 interface LookbookRequest {
@@ -22,7 +24,7 @@ interface LookbookRequest {
 // IDM-VTON Model
 const REPLICATE_MODEL_VERSION = "0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985";
 
-const COST_PER_GENERATION = 5;
+const COST_PER_GENERATION = 7; // Increased to cover IDM-VTON + Face Swap
 
 /**
  * Check user credits and deduct credits if available
@@ -51,14 +53,56 @@ async function checkAndDeductCredit(
 async function saveGenerationRecord(
   db: DbClient,
   predictionId: string,
-  userId: string
+  userId: string,
+  stage: number,
+  originalImageUrl?: string
 ): Promise<void> {
   await db.insert(imageGenerations).values({
     predictionId,
     userId,
     status: ImageGenerationStatus.PENDING,
-    // type: "VIRTUAL_TRY_ON", // If we had a type column, for now just generic
+    stage,
+    originalImageUrl,
   });
+}
+
+/**
+ * Upload base64 original image to R2 for face swap
+ */
+async function uploadOriginalImageToR2(
+  bucket: R2Bucket,
+  base64Image: string,
+  userId: string
+): Promise<string> {
+  // Remove data URL prefix if present
+  const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+  
+  // Convert base64 to ArrayBuffer
+  const binaryString = atob(base64Data);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  
+  // Generate R2 key with date-based path
+  const timestamp = Date.now();
+  const fileName = `${userId}_${timestamp}.jpg`;
+  const date = new Date();
+  const datePrefix = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
+  const key = `original-images/${datePrefix}/${fileName}`;
+  
+  // Upload to R2
+  await bucket.put(key, bytes.buffer, {
+    httpMetadata: {
+      contentType: "image/jpeg",
+    },
+    customMetadata: {
+      userId,
+      purpose: "face-swap-source",
+    },
+  });
+  
+  return key;
 }
 
 const corsHeaders = {
@@ -101,7 +145,15 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       });
     }
 
-    // 3. Call Replicate
+    // 3. Upload original user image to R2 for later face swap
+    const originalImageKey = await uploadOriginalImageToR2(
+      env.R2_BUCKET,
+      human_image,
+      user.id
+    );
+    const originalImageUrl = `${env.R2_PUBLIC_URL}/${originalImageKey}`;
+
+    // 4. Call Replicate IDM-VTON (Stage 1)
     const webhookUrl = env.BASE_URL
       ? `${env.BASE_URL}/api/webhook/replicate`
       : null;
@@ -141,16 +193,22 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
 
     const result = await response.json();
 
-    // 4. Save Record
+    // 5. Save Stage 1 Record with metadata
     if (result.id) {
-      await saveGenerationRecord(db, result.id, user.id);
+      await saveGenerationRecord(
+        db,
+        result.id,
+        user.id,
+        1, // Stage 1: IDM-VTON
+        originalImageUrl // Store R2 URL for Stage 2
+      );
       await recordCreditTransaction(
         db,
         user.id,
         -COST_PER_GENERATION,
         CreditTransactionType.USAGE,
         result.id,
-        "AI Lookbook Try-On"
+        "AI Lookbook Try-On (Stage 1 + 2)"
       );
     }
 
