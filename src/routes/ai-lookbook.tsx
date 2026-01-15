@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { virtualTryOn, getStatus } from '@/api';
 import { useAuth } from '@/hooks/useAuth';
+import { getImageDimensions, resizeImage, blobUrlToBase64, downloadImage } from '@/utils/imageEditor';
 
 export const Route = createFileRoute('/ai-lookbook')({
   component: AiLookbook,
@@ -58,13 +59,68 @@ function AiLookbook() {
 
   const { isAuthenticated } = useAuth(); // Assume useAuth is available
   
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = error => reject(error);
-    });
+}
+  
+  const handleDownload = async () => {
+    if (resultImage && userImage && clothingImage) {
+        // Construct filename: model_clothes_result.png
+        // Strip extensions from input names for cleaner output
+        const modelName = userImage.name.replace(/\.[^/.]+$/, "");
+        const clothName = clothingImage.name.replace(/\.[^/.]+$/, "");
+        const filename = `${modelName}_${clothName}_result.png`;
+        
+        try {
+            // If resultImage is a remote URL, we might need to fetch it first or use downloadImage helper
+            // simpler to use the helper which handles blob conversion if needed
+            await downloadImage(resultImage, filename);
+            toast.success("Image downloaded");
+        } catch (e) {
+            console.error("Download failed", e);
+            toast.error("Failed to download image");
+        }
+    }
+  };
+
+  const processImage = async (file: File): Promise<string> => {
+    // 1. Load file
+    const blobUrl = URL.createObjectURL(file);
+    
+    try {
+        // 2. Get dimensions
+        const dims = await getImageDimensions(blobUrl);
+        
+        // 3. Resize if too large (max 1500px) - this involves drawing to canvas which fixes EXIF rotation
+        const maxDim = 1500;
+        let processedBlobUrl = blobUrl;
+        
+        if (dims.width > maxDim || dims.height > maxDim) {
+             const scale = maxDim / Math.max(dims.width, dims.height);
+             processedBlobUrl = await resizeImage(blobUrl, {
+                width: Math.round(dims.width * scale),
+                height: Math.round(dims.height * scale)
+             });
+        } else {
+            // Even if not resizing, we force a draw to canvas to bake in EXIF orientation
+            // We can use resizeImage with original dims
+             processedBlobUrl = await resizeImage(blobUrl, {
+                width: dims.width,
+                height: dims.height
+             });
+        }
+        
+        // 4. Convert to base64
+        const base64 = await blobUrlToBase64(processedBlobUrl);
+        
+        // Cleanup intermediate blob URLs if they were created by resizeImage
+        if (processedBlobUrl !== blobUrl) {
+           // revoke processedBlobUrl? (resizeImage returns a fresh blob url)
+        }
+        
+        return base64;
+    } finally {
+        // Cleanup original blob url
+        URL.revokeObjectURL(blobUrl);
+    }
   };
 
   const handleGenerate = async () => {
@@ -81,10 +137,10 @@ function AiLookbook() {
     setResultImage(null);
 
     try {
-        // Convert images to base64
+        // Process images (Resize + Fix Rotation)
         const [humanImgBase64, garmImgBase64] = await Promise.all([
-            fileToBase64(userImage),
-            fileToBase64(clothingImage)
+            processImage(userImage),
+            processImage(clothingImage)
         ]);
 
         // Call API
@@ -296,7 +352,13 @@ function AiLookbook() {
                         <>
                              <img src={resultImage} alt="Generated look" className="h-full w-full object-cover" />
                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                                 <Button variant="secondary" className="bg-white/90 hover:bg-white">Download</Button>
+                                 <Button 
+                                    variant="secondary" 
+                                    className="bg-white/90 hover:bg-white"
+                                    onClick={handleDownload}
+                                 >
+                                    Download
+                                 </Button>
                                  <Button variant="secondary" className="bg-white/90 hover:bg-white">Share</Button>
                              </div>
                         </>

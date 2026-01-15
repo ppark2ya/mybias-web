@@ -1,13 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import {
+  CreditTransactionType,
   imageGenerations,
   ImageGenerationStatus,
   profiles,
-  CreditTransactionType,
 } from "../../src/db/schema";
-import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
-import type { ContextData, DbClient } from "../types.d.ts";
 import { recordCreditTransaction } from "../lib/credit";
+import type { ContextData, DbClient } from "../types.d.ts";
 
 interface Env {
   REPLICATE_API_TOKEN: string;
@@ -120,8 +119,8 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           garm_img: garm_image,
           garment_des: garment_des,
           // crop: false, // Optional params
-          // seed: 42,
-          // steps: 30,
+          steps: 50,
+          crop: false,
         },
         ...(webhookUrl && {
           webhook: webhookUrl,
