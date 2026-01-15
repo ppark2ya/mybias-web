@@ -119,7 +119,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           garm_img: garm_image,
           garment_des: garment_des,
           // crop: false, // Optional params
-          steps: 50,
+          steps: 40,
           crop: false,
         },
         ...(webhookUrl && {
