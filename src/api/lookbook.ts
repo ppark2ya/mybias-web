@@ -10,6 +10,6 @@ export interface LookbookRequest {
 export const virtualTryOn = async (
   data: LookbookRequest
 ): Promise<GenerateResponse> => {
-  const response = await apiClient.post<GenerateResponse>("/api/lookbook", data);
+  const response = await apiClient.post<GenerateResponse>("/lookbook", data);
   return response.data;
 };
