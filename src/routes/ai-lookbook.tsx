@@ -89,8 +89,8 @@ function AiLookbook() {
         // 2. Get dimensions
         const dims = await getImageDimensions(blobUrl);
         
-        // 3. Resize if too large (max 1500px) - this involves drawing to canvas which fixes EXIF rotation
-        const maxDim = 1500;
+        // 3. Resize if too large (max 3072px) - this involves drawing to canvas which fixes EXIF rotation
+        const maxDim = 3072;
         let processedBlobUrl = blobUrl;
         
         if (dims.width > maxDim || dims.height > maxDim) {
