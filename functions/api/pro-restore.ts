@@ -47,12 +47,10 @@ interface ReplicatePredictionResponse {
 /** Pro Restore costs 4 credits */
 const PRO_RESTORE_CREDIT_COST = 4;
 
-/** Default prompts optimized for K-pop idol photo restoration */
+/** Default prompts optimized for photo restoration (minimal to preserve original) */
 const DEFAULT_PROMPTS = {
-  positive:
-    "high quality, natural skin tone, studio lighting, detailed pores, k-pop idol, sharp focus, professional photo",
-  negative:
-    "red skin, blue skin, strong color cast, blurry, waxy skin, cartoon, illustration, distorted, artifacts, noise",
+  positive: "high quality photo, sharp focus, natural",
+  negative: "blurry, artifacts, noise, distorted",
 };
 
 /**
@@ -188,9 +186,9 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
           prompt,
           negative_prompt: negativePrompt,
           scale_factor: upscale,
-          resemblance: 1 - denoisingStrength, // Higher resemblance = less denoising
-          creativity: denoisingStrength, // Higher creativity = more enhancement
-          dynamic: 6, // Balance between sharpness and smoothness
+          resemblance: 0.95, // High value to preserve original face
+          creativity: 0.05, // Minimal AI creativity to prevent face changes
+          dynamic: 3, // Lower value for less aggressive processing
           sd_model: "juggernaut_reborn.safetensors [338b85bc4f]", // Best for realistic photos
           scheduler: "DPM++ 3M SDE Karras",
           num_inference_steps: 18,
