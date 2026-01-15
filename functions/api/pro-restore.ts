@@ -88,36 +88,60 @@ async function saveGenerationRecord(
 }
 
 /**
- * Create a Replicate prediction
+ * Sleep for specified milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Create a Replicate prediction with retry logic for rate limiting
  */
 async function createPrediction(
   apiToken: string,
   version: string,
   input: Record<string, unknown>,
-  webhookUrl: string | null
+  webhookUrl: string | null,
+  maxRetries: number = 3
 ): Promise<ReplicatePredictionResponse> {
-  const response = await fetch("https://api.replicate.com/v1/predictions", {
-    method: "POST",
-    headers: {
-      Authorization: `Token ${apiToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      version,
-      input,
-      ...(webhookUrl && {
-        webhook: webhookUrl,
-        webhook_events_filter: ["completed"],
-      }),
-    }),
-  });
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const response = await fetch("https://api.replicate.com/v1/predictions", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        version,
+        input,
+        ...(webhookUrl && {
+          webhook: webhookUrl,
+          webhook_events_filter: ["completed"],
+        }),
+      }),
+    });
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    // Handle rate limiting (429)
+    if (response.status === 429) {
+      const retryAfter = response.headers.get("retry-after");
+      const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : (attempt + 1) * 5000;
+      console.log(`Rate limited, waiting ${waitTime}ms before retry (attempt ${attempt + 1}/${maxRetries})`);
+      await sleep(waitTime);
+      lastError = new Error(`Rate limited after ${maxRetries} retries`);
+      continue;
+    }
+
     const errorText = await response.text();
     throw new Error(`Replicate API error: ${errorText}`);
   }
 
-  return response.json();
+  throw lastError || new Error("Failed to create prediction");
 }
 
 const corsHeaders = {
@@ -197,35 +221,39 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       ? `${env.BASE_URL}/api/webhook/replicate`
       : null;
 
-    // Create both predictions in parallel
+    // Create predictions sequentially to avoid rate limiting
+    // (Replicate has burst limit of 1 when account credit < $5)
     // 1. Real-ESRGAN: Good for skin texture, pores (but blurry faces)
     // 2. CodeFormer: Good for facial features (but waxy skin)
-    const [realEsrganResult, codeformerResult] = await Promise.all([
-      // Real-ESRGAN prediction
-      createPrediction(
-        apiToken,
-        ReplicateModels.REAL_ESRGAN,
-        {
-          image,
-          scale: upscale,
-          face_enhance: false, // Don't use built-in face enhance, we'll blend with CodeFormer
-        },
-        webhookUrl
-      ),
-      // CodeFormer prediction
-      createPrediction(
-        apiToken,
-        ReplicateModels.CODEFORMER,
-        {
-          image,
-          upscale,
-          codeformer_fidelity: fidelity,
-          background_enhance: true,
-          face_upsample: true,
-        },
-        webhookUrl
-      ),
-    ]);
+
+    // First: Real-ESRGAN prediction
+    const realEsrganResult = await createPrediction(
+      apiToken,
+      ReplicateModels.REAL_ESRGAN,
+      {
+        image,
+        scale: upscale,
+        face_enhance: false, // Don't use built-in face enhance, we'll blend with CodeFormer
+      },
+      webhookUrl
+    );
+
+    // Wait before second request to avoid rate limiting
+    await sleep(2000);
+
+    // Second: CodeFormer prediction
+    const codeformerResult = await createPrediction(
+      apiToken,
+      ReplicateModels.CODEFORMER,
+      {
+        image,
+        upscale,
+        codeformer_fidelity: fidelity,
+        background_enhance: true,
+        face_upsample: true,
+      },
+      webhookUrl
+    );
 
     // Save generation records to database
     try {
