@@ -22,7 +22,11 @@ export type ReplicatePredictionStatusType =
  */
 export const ReplicateModels = {
   // CodeFormer - Face Restoration model (sczhou/codeformer)
+  // Good for facial features (eyes, nose, lips) but can look waxy on skin
   CODEFORMER: "cc4956dd26fa5a7185d5660cc9100fab1b8070a1d1654a8bb5eb6d443b020bb2",
+  // Real-ESRGAN - General upscaling model (nightmareai/real-esrgan)
+  // Good for skin texture and pores but facial features may be blurry
+  REAL_ESRGAN: "f121d640bd286e1fdc67f9799164c1d5be36ff74576ee11c803ae5b665dd46aa",
   // Image Object Removal - LaMa with Fast Fourier Convolutions (dpakkk/image-object-removal)
   // High-quality object removal without prompt, fills with natural background
   // Very cost-effective: ~4,545 runs per $1

@@ -15,6 +15,7 @@ import { POLLING } from "../../../constants/times";
 import {
   getImageDimensions,
   urlToBlobUrl,
+  blendImages,
   resizeImage,
   loadImage,
 } from "../../../utils/imageEditor";
@@ -31,8 +32,8 @@ export interface ProRestoreResult {
   afterImageUrl: string;
 }
 
-/** Pro Restore costs 4 credits per use */
-export const PRO_RESTORE_CREDIT_COST = 4;
+/** Pro Restore costs 3 credits per use */
+export const PRO_RESTORE_CREDIT_COST = 3;
 
 /** Maximum image dimension before downscaling (to prevent OOM errors) */
 const MAX_INPUT_DIMENSION = 1500;
@@ -63,7 +64,52 @@ export function useProRestore(
     setRemainingCredits(profile.credits);
   }
 
-  const handleProRestore = async (denoisingStrength: number = 0.3) => {
+  /**
+   * Poll for a single prediction result
+   */
+  const pollForResult = async (
+    predictionId: string,
+    maxAttempts: number = 180
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+
+      const interval = setInterval(async () => {
+        attempts++;
+
+        try {
+          const statusData = await getStatus(predictionId);
+
+          if (statusData.status === "succeeded") {
+            clearInterval(interval);
+            const outputUrl = getOutputUrl(statusData);
+            if (outputUrl) {
+              resolve(outputUrl);
+            } else {
+              console.error("No output URL in succeeded status");
+              reject(new Error("No output URL"));
+            }
+          } else if (statusData.status === "failed") {
+            clearInterval(interval);
+            if (statusData.error) {
+              console.error("Prediction failed:", statusData.error);
+            }
+            reject(new Error("Prediction failed"));
+          } else if (attempts >= maxAttempts) {
+            clearInterval(interval);
+            console.error("Prediction timed out after", maxAttempts, "attempts");
+            reject(new Error("Prediction timed out"));
+          }
+        } catch (error) {
+          clearInterval(interval);
+          console.error("Status polling error:", error);
+          reject(error);
+        }
+      }, POLLING.DEFAULT);
+    });
+  };
+
+  const handleProRestore = async (fidelity: number = 0.5) => {
     if (!currentImageState || isProcessing) return;
 
     // Check authentication
@@ -108,6 +154,7 @@ export function useProRestore(
         });
       }
 
+      // Convert image to base64
       setProcessingMessage(t("editor.proRestore.preparingImage"));
       const response = await fetch(imageSrcForApi);
       const blob = await response.blob();
@@ -116,121 +163,113 @@ export function useProRestore(
         reader.onload = () => resolve(reader.result as string);
         reader.readAsDataURL(blob);
       });
-      setProcessingMessage(t("editor.proRestore.requestingServer"));
 
+      // Request dual predictions (Real-ESRGAN + CodeFormer)
+      setProcessingMessage(t("editor.proRestore.requestingServer"));
       const generateResponse = await proRestoreImage(
-        createProRestoreRequest(base64, { denoisingStrength })
+        createProRestoreRequest(base64, { fidelity })
       );
-      const predictionId = generateResponse.id;
 
       // Update remaining credits from server response
       if (generateResponse.remainingCredits !== undefined) {
         setRemainingCredits(generateResponse.remainingCredits);
       }
 
-      if (!predictionId) {
-        throw new Error("No prediction ID received");
+      const { predictions, blendRatio } = generateResponse;
+
+      if (!predictions?.realEsrgan?.id || !predictions?.codeformer?.id) {
+        throw new Error("No prediction IDs received");
       }
 
+      // Poll for both results in parallel with progress messages
       setProcessingMessage(t("editor.proRestore.analyzingImage"));
-      const pollForResult = (): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const maxAttempts = 180; // Pro restore may take longer
-          let attempts = 0;
-          const messages = [
-            t("editor.proRestore.analyzingImage"),
-            t("editor.proRestore.restoringDetails"),
-            t("editor.proRestore.enhancingSkinTone"),
-            t("editor.proRestore.optimizingColors"),
-            t("editor.proRestore.upscaling"),
-            t("editor.proRestore.almostDone"),
-          ];
 
-          const interval = setInterval(async () => {
-            attempts++;
-            const messageIdx = Math.min(
-              Math.floor(attempts / 6),
-              messages.length - 1
-            );
-            setProcessingMessage(messages[messageIdx]);
+      // Create progress message updater
+      const messages = [
+        t("editor.proRestore.analyzingImage"),
+        t("editor.proRestore.restoringDetails"),
+        t("editor.proRestore.enhancingSkinTone"),
+        t("editor.proRestore.optimizingColors"),
+        t("editor.proRestore.upscaling"),
+        t("editor.proRestore.almostDone"),
+      ];
 
-            try {
-              const statusData = await getStatus(predictionId);
+      let messageIndex = 0;
+      const messageInterval = setInterval(() => {
+        messageIndex = Math.min(messageIndex + 1, messages.length - 1);
+        setProcessingMessage(messages[messageIndex]);
+      }, 5000); // Update message every 5 seconds
 
-              if (statusData.status === "succeeded") {
-                clearInterval(interval);
-                const outputUrl = getOutputUrl(statusData);
-                if (outputUrl) {
-                  resolve(outputUrl);
-                } else {
-                  console.error("No output URL in succeeded status");
-                  reject(new Error(t("editor.proRestore.failed")));
-                }
-              } else if (statusData.status === "failed") {
-                clearInterval(interval);
-                if (statusData.error) {
-                  console.error("Pro restoration failed:", statusData.error);
-                }
-                reject(new Error(t("editor.proRestore.failed")));
-              } else if (attempts >= maxAttempts) {
-                clearInterval(interval);
-                console.error("Pro restoration timed out after", maxAttempts, "attempts");
-                reject(new Error(t("editor.proRestore.timeout")));
-              }
-            } catch (error) {
-              clearInterval(interval);
-              console.error("Status polling error:", error);
-              reject(new Error(t("editor.proRestore.failed")));
-            }
-          }, POLLING.DEFAULT);
+      try {
+        // Poll for both predictions in parallel
+        const [realEsrganUrl, codeformerUrl] = await Promise.all([
+          pollForResult(predictions.realEsrgan.id),
+          pollForResult(predictions.codeformer.id),
+        ]);
+
+        clearInterval(messageInterval);
+
+        // Blend the two results
+        setProcessingMessage(t("editor.proRestore.blending"));
+
+        // Download both images and blend them
+        // blendRatio = 0.7 means 70% CodeFormer, 30% Real-ESRGAN
+        const [realEsrganBlobUrl, codeformerBlobUrl] = await Promise.all([
+          urlToBlobUrl(realEsrganUrl),
+          urlToBlobUrl(codeformerUrl),
+        ]);
+
+        // Blend: Real-ESRGAN (skin texture) + CodeFormer (facial features)
+        const blendedBlobUrl = await blendImages(
+          realEsrganBlobUrl, // Image A: skin texture
+          codeformerBlobUrl, // Image B: facial features
+          blendRatio // 0.7 = 70% CodeFormer, 30% Real-ESRGAN
+        );
+
+        const durationMs = Date.now() - startTime;
+        trackAIEnhanceSuccess(durationMs);
+
+        // Refresh profile and credit history to sync credits
+        refreshProfile();
+        queryClient.invalidateQueries({ queryKey: creditHistoryKeys.all });
+
+        setProcessingMessage(t("editor.proRestore.downloadingImage"));
+
+        const dimensions = await getImageDimensions(blendedBlobUrl);
+        const currentIdx = historyIndex.get(selectedIndex) ?? 0;
+
+        setImageStates((prev) => {
+          const newMap = new Map(prev || new Map());
+          newMap.set(selectedIndex, {
+            blobUrl: blendedBlobUrl,
+            width: dimensions.width,
+            height: dimensions.height,
+          });
+          return newMap;
         });
-      };
-
-      const outputUrl = await pollForResult();
-      const durationMs = Date.now() - startTime;
-      trackAIEnhanceSuccess(durationMs);
-
-      // Refresh profile and credit history to sync credits
-      refreshProfile();
-      queryClient.invalidateQueries({ queryKey: creditHistoryKeys.all });
-
-      setProcessingMessage(t("editor.proRestore.downloadingImage"));
-
-      const [dimensions, blobUrl] = await Promise.all([
-        getImageDimensions(outputUrl),
-        urlToBlobUrl(outputUrl),
-      ]);
-
-      const currentIdx = historyIndex.get(selectedIndex) ?? 0;
-
-      setImageStates((prev) => {
-        const newMap = new Map(prev || new Map());
-        newMap.set(selectedIndex, {
-          blobUrl,
-          width: dimensions.width,
-          height: dimensions.height,
+        setHistory((prev) => {
+          const newMap = new Map(prev || new Map());
+          const currentHistory = newMap.get(selectedIndex) || [];
+          const newHistory = [...currentHistory.slice(0, currentIdx + 1), blendedBlobUrl];
+          newMap.set(selectedIndex, newHistory);
+          return newMap;
         });
-        return newMap;
-      });
-      setHistory((prev) => {
-        const newMap = new Map(prev || new Map());
-        const currentHistory = newMap.get(selectedIndex) || [];
-        const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
-        newMap.set(selectedIndex, newHistory);
-        return newMap;
-      });
-      setHistoryIndex((prev) => {
-        const newMap = new Map(prev || new Map());
-        newMap.set(selectedIndex, currentIdx + 1);
-        return newMap;
-      });
-
-      // Call the completion callback with before/after URLs
-      if (onRestoreComplete) {
-        onRestoreComplete({
-          beforeImageUrl,
-          afterImageUrl: blobUrl,
+        setHistoryIndex((prev) => {
+          const newMap = new Map(prev || new Map());
+          newMap.set(selectedIndex, currentIdx + 1);
+          return newMap;
         });
+
+        // Call the completion callback with before/after URLs
+        if (onRestoreComplete) {
+          onRestoreComplete({
+            beforeImageUrl,
+            afterImageUrl: blendedBlobUrl,
+          });
+        }
+      } catch (pollError) {
+        clearInterval(messageInterval);
+        throw pollError;
       }
     } catch (error) {
       console.error("Failed to restore image:", error);
