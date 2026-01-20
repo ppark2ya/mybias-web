@@ -15,6 +15,45 @@ export default {
     // About page
     "about.backToHome": "홈으로 돌아가기",
 
+    // Landing page sections
+    "landing.features.title": "강력한 AI 도구를 만나보세요",
+    "landing.features.subtitle": "전문적인 사진 편집을 간단하게, AI 기반 도구 모음",
+    "landing.features.upscale.name": "AI 업스케일",
+    "landing.features.upscale.description": "흐릿하고 저해상도인 사진을 선명한 HD 이미지로 변환하세요. AI가 얼굴 디테일을 복원하고 피부톤을 개선하며 모든 픽셀을 선명하게 만들어 드립니다.",
+    "landing.features.eraser.name": "AI 지우개",
+    "landing.features.eraser.description": "사진에서 원치 않는 객체, 사람, 잡티를 제거하세요. AI가 배경을 자연스럽게 채워 완벽한 결과물을 만들어 드립니다.",
+    "landing.features.lookbook.name": "AI 룩북",
+    "landing.features.lookbook.description": "가상으로 옷을 입어보세요. 사진을 업로드하고 구매 전에 다양한 옷이 어떻게 어울리는지 확인해보세요.",
+    "landing.tryNow": "지금 사용하기",
+
+    "landing.howItWorks.title": "이용 방법",
+    "landing.howItWorks.subtitle": "간단한 3단계로 멋진 결과물을 얻으세요",
+    "landing.howItWorks.step1.title": "업로드",
+    "landing.howItWorks.step1.description": "이미지를 드래그하거나 클릭해서 업로드",
+    "landing.howItWorks.step2.title": "AI 도구 선택",
+    "landing.howItWorks.step2.description": "업스케일, 지우개 등 원하는 도구 선택",
+    "landing.howItWorks.step3.title": "다운로드",
+    "landing.howItWorks.step3.description": "보정된 사진을 바로 다운로드",
+
+    "landing.benefits.title": "왜 MyBias인가요?",
+    "landing.benefits.fast.title": "초고속 처리",
+    "landing.benefits.fast.description": "GPU 기반 AI로 몇 초 만에 결과물을 받아보세요",
+    "landing.benefits.secure.title": "개인정보 보호",
+    "landing.benefits.secure.description": "사진은 안전하게 처리되며 절대 공유되지 않습니다",
+    "landing.benefits.mobile.title": "모든 기기 지원",
+    "landing.benefits.mobile.description": "모바일, 태블릿, 데스크톱 어디서나 사용 가능",
+    "landing.benefits.quality.title": "프로 품질",
+    "landing.benefits.quality.description": "최첨단 AI로 스튜디오급 품질의 결과물 제공",
+
+    "landing.cta.title": "사진을 변환할 준비가 되셨나요?",
+    "landing.cta.subtitle": "수천 명의 사용자가 신뢰하는 MyBias와 함께하세요",
+    "landing.cta.button": "무료로 시작하기",
+    "landing.cta.learnMore": "더 알아보기",
+
+    "landing.trust.noSignup": "가입 필요 없음",
+    "landing.trust.freeCredits": "무료 크레딧 5개",
+    "landing.trust.noWatermark": "워터마크 없음",
+
     // Navigation
     "nav.aiTools": "AI 도구",
     "nav.pricing": "요금제",
