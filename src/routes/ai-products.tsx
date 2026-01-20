@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   ImageUp,
-  WandSparkles,
   Eraser,
+  Shirt,
   ArrowRight,
 } from "lucide-react";
 import Footer from "../components/Footer";
@@ -65,22 +65,22 @@ const models: AIModel[] = [
     color: "from-pink-400 to-rose-500",
   },
   {
-    id: "upscaler",
-    name: "Pro Restoration",
-    modelName: "Clarity Upscaler",
-    credits: 4,
-    description: "2배 고해상도로 업스케일하며 자연스러운 피부 톤을 재현합니다",
+    id: "lookbook",
+    name: "AI Lookbook",
+    modelName: "Virtual Try-On",
+    credits: 2,
+    description: "가상으로 옷을 입어볼 수 있습니다. 원하는 의상을 선택하고 착용 모습을 미리 확인하세요",
     technicalDetails:
-      "SDXL-based upscaler (philz1337x/clarity-upscaler) - High-quality 2x upscaling with prompt engineering for natural skin tones",
+      "AI-powered virtual try-on technology - Upload your photo and see how different outfits look on you",
     useCases: [
-      "작은 사진을 크게 확대",
-      "프로급 화질 개선",
-      "자연스러운 피부 표현",
+      "구매 전 가상 피팅",
+      "다양한 스타일 시도",
+      "코디 미리보기",
     ],
-    beforeImage: "https://assets.savemybias.com/ai-examples/virtual-pro-before.png",
-    afterImage: "https://assets.savemybias.com/ai-examples/virtual-pro-after.png",
-    icon: <WandSparkles className="w-6 h-6" />,
-    color: "from-purple-400 to-indigo-500",
+    beforeImage: "https://assets.savemybias.com/ai-examples/virtual-lookbook-before-v2.png",
+    afterImage: "https://assets.savemybias.com/ai-examples/virtual-lookbook-after-v2.png",
+    icon: <Shirt className="w-6 h-6" />,
+    color: "from-cyan-400 to-teal-500",
   },
 ];
 
