@@ -3,6 +3,17 @@ export default {
     // Home page
     "home.title": "SaveMyBias Gallery",
     "home.subtitle": "Capture your precious memories beautifully",
+    "home.heroTitle": "Transform Your Photos with AI",
+    "home.heroSubtitle": "Upscale, enhance, and edit your photos with cutting-edge AI technology. Free to start.",
+    "home.uploadTitle": "Drop your image here",
+    "home.uploadDesc": "or click to browse from your device",
+    "home.uploadButton": "Choose Image",
+    "home.uploadFormats": "Supports JPG, PNG, WEBP up to 10MB",
+    "home.orTryTools": "Or try our AI tools directly",
+    "home.learnMore": "Learn more about our AI tools",
+
+    // About page
+    "about.backToHome": "Back to Home",
 
     // Navigation
     "nav.aiTools": "AI Tools",
@@ -15,6 +26,7 @@ export default {
     "nav.tools.eraserDesc": "Remove unwanted objects",
     "nav.tools.lookbook": "AI Lookbook",
     "nav.tools.lookbookDesc": "Virtual try-on",
+    "nav.moreTools": "More",
 
     // AI Feature Cards
     "aiFeatures.badge": "AI-Powered Photo Tools",

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ImageUp, Eraser, Shirt, Pencil, Sparkles, Crown, Coins } from "lucide-react";
+import { ImageUp, Eraser, Shirt, Pencil, Sparkles, Coins } from "lucide-react";
 
 interface AIFeatureCardsProps {
   onDirectEdit?: () => void;
@@ -31,19 +31,6 @@ export function AIFeatureCards({ onDirectEdit }: AIFeatureCardsProps) {
       bgGradient: "from-amber-50 to-orange-50",
       borderColor: "border-amber-200",
       credits: 1,
-      href: null,
-      onClick: onDirectEdit,
-    },
-    {
-      id: "pro-restore",
-      name: t("aiFeatures.proRestore.name", "Pro Restore"),
-      description: t("aiFeatures.proRestore.description", "Premium dual AI blending"),
-      icon: Crown,
-      gradient: "from-purple-500 to-indigo-500",
-      bgGradient: "from-purple-50 to-indigo-50",
-      borderColor: "border-purple-200",
-      credits: 3,
-      isPro: true,
       href: null,
       onClick: onDirectEdit,
     },
@@ -92,7 +79,7 @@ export function AIFeatureCards({ onDirectEdit }: AIFeatureCardsProps) {
       </div>
 
       {/* Feature Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {features.map((feature) => {
           const CardWrapper = feature.href ? Link : "button";
           const cardProps = feature.href
@@ -123,11 +110,6 @@ export function AIFeatureCards({ onDirectEdit }: AIFeatureCardsProps) {
                   {feature.isNew && (
                     <span className="px-1.5 py-0.5 text-[9px] font-bold text-white bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full uppercase">
                       New
-                    </span>
-                  )}
-                  {feature.isPro && (
-                    <span className="px-1.5 py-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 rounded-full uppercase">
-                      Pro
                     </span>
                   )}
                 </div>

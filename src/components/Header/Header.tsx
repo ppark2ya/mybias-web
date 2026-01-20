@@ -197,6 +197,14 @@ export function Header({ variant = "default" }: HeaderProps) {
             )}
           </Link>
         ))}
+        {/* AI Products link for mobile */}
+        <Link
+          to="/ai-products"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/90 hover:text-white whitespace-nowrap rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>{t("nav.moreTools", "More")}</span>
+        </Link>
       </nav>
     </header>
   );

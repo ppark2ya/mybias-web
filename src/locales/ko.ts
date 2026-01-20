@@ -3,6 +3,17 @@ export default {
     // Home page
     "home.title": "나만의 최애 갤러리",
     "home.subtitle": "소중한 추억을 아름답게 담아보세요",
+    "home.heroTitle": "AI로 사진을 완벽하게",
+    "home.heroSubtitle": "최첨단 AI 기술로 사진을 업스케일하고, 보정하고, 편집하세요. 무료로 시작하세요.",
+    "home.uploadTitle": "이미지를 여기에 놓으세요",
+    "home.uploadDesc": "또는 클릭하여 파일을 선택하세요",
+    "home.uploadButton": "이미지 선택",
+    "home.uploadFormats": "JPG, PNG, WEBP 최대 10MB 지원",
+    "home.orTryTools": "또는 AI 도구를 바로 사용해보세요",
+    "home.learnMore": "AI 도구에 대해 더 알아보기",
+
+    // About page
+    "about.backToHome": "홈으로 돌아가기",
 
     // Navigation
     "nav.aiTools": "AI 도구",
@@ -15,6 +26,7 @@ export default {
     "nav.tools.eraserDesc": "원치 않는 객체 제거",
     "nav.tools.lookbook": "AI 룩북",
     "nav.tools.lookbookDesc": "가상 피팅",
+    "nav.moreTools": "더보기",
 
     // AI Feature Cards
     "aiFeatures.badge": "AI 기반 사진 도구",
