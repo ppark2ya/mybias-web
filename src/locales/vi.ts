@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "Trước",
+    "common.after": "Sau",
+    "common.new": "MỚI",
+
     // Home page
     "home.title": "Bộ Sưu Tập Thần Tượng Của Tôi",
     "home.subtitle": "Lưu giữ những kỷ niệm quý giá của bạn một cách đẹp đẽ",

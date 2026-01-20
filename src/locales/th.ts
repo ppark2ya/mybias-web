@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "ก่อน",
+    "common.after": "หลัง",
+    "common.new": "ใหม่",
+
     // Home page
     "home.title": "แกลเลอรี่ไอดอลของฉัน",
     "home.subtitle": "เก็บความทรงจำอันล้ำค่าของคุณอย่างสวยงาม",

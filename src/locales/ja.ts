@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "補正前",
+    "common.after": "補正後",
+    "common.new": "新規",
+
     // Home page
     "home.title": "マイバイアスギャラリー",
     "home.subtitle": "大切な思い出を美しく保存しましょう",

@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "Antes",
+    "common.after": "Después",
+    "common.new": "NUEVO",
+
     // Home page
     "home.title": "Mi Galería de Bias",
     "home.subtitle": "Captura tus recuerdos preciosos hermosamente",

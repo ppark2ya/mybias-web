@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "增强前",
+    "common.after": "增强后",
+    "common.new": "新功能",
+
     // Home page
     "home.title": "我的偏爱画廊",
     "home.subtitle": "美好地保存您的珍贵回忆",

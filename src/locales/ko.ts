@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "보정 전",
+    "common.after": "보정 후",
+    "common.new": "신규",
+
     // Home page
     "home.title": "나만의 최애 갤러리",
     "home.subtitle": "소중한 추억을 아름답게 담아보세요",

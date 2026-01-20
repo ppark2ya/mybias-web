@@ -256,7 +256,7 @@ export function Home() {
                       {/* Before */}
                       <div className="relative">
                         <div className="absolute top-2 left-2 px-2 py-1 bg-black/50 backdrop-blur-sm rounded text-xs font-medium text-white z-10">
-                          Before
+                          {t("common.before", "Before")}
                         </div>
                         <img
                           src={tool.beforeImage}
@@ -267,7 +267,7 @@ export function Home() {
                       {/* After */}
                       <div className="relative">
                         <div className="absolute top-2 left-2 px-2 py-1 bg-gradient-to-r from-fuchsia-500 to-purple-500 rounded text-xs font-medium text-white z-10">
-                          After
+                          {t("common.after", "After")}
                         </div>
                         <img
                           src={tool.afterImage}
@@ -292,7 +292,7 @@ export function Home() {
                     </h3>
                     {tool.isNew && (
                       <span className="px-2 py-1 text-xs font-bold text-white bg-gradient-to-r from-fuchsia-500 to-cyan-500 rounded-full">
-                        NEW
+                        {t("common.new", "NEW")}
                       </span>
                     )}
                   </div>
