@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import {
@@ -9,6 +10,7 @@ import {
   getOutputUrl,
 } from "../../../api";
 import type { EraserErrorResponse } from "../../../api/eraser/types";
+import { creditHistoryKeys } from "../../../api/credit-history";
 import { POLLING } from "../../../constants/times";
 import {
   getImageDimensions,
@@ -27,6 +29,103 @@ export interface MagicEraserResult {
   afterImageUrl: string;
 }
 
+/**
+ * Composite the inpainted result onto the original image using the mask
+ */
+async function compositeImages(
+  originalUrl: string,
+  inpaintedUrl: string,
+  maskBase64: string,
+  width: number,
+  height: number
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      reject(new Error("Failed to get canvas context"));
+      return;
+    }
+
+    const imgOriginal = new Image();
+    const imgInpainted = new Image();
+    const imgMask = new Image();
+
+    let loadedCount = 0;
+    const checkLoaded = () => {
+      loadedCount++;
+      if (loadedCount === 3) {
+        draw();
+      }
+    };
+
+    const draw = () => {
+      // 1. Draw original (base)
+      ctx.drawImage(imgOriginal, 0, 0, width, height);
+
+      // 2. Prepare the mask as specific alpha
+      const maskCanvas = document.createElement("canvas");
+      maskCanvas.width = width;
+      maskCanvas.height = height;
+      const maskCtx = maskCanvas.getContext("2d");
+      if (!maskCtx) return;
+
+      maskCtx.drawImage(imgMask, 0, 0, width, height);
+      const maskData = maskCtx.getImageData(0, 0, width, height);
+
+      // Convert White/Black mask to Alpha channel
+      // We want to keep Inpainted where Mask is White (Alpha=255).
+      // We want to discard Inpainted where Mask is Black (Alpha=0).
+      // Since mask is grayscale (white on black), we can use the Red channel as Alpha.
+      for (let i = 0; i < maskData.data.length; i += 4) {
+        // R channel: 0 (black/keep) -> 255 (white/erase)
+        const alpha = maskData.data[i];
+        maskData.data[i + 3] = alpha;
+      }
+      maskCtx.putImageData(maskData, 0, 0);
+
+      // 3. Composite Inpainted using the alpha-converted mask
+      const patchCanvas = document.createElement("canvas");
+      patchCanvas.width = width;
+      patchCanvas.height = height;
+      const patchCtx = patchCanvas.getContext("2d");
+      if (!patchCtx) return;
+
+      // Draw alpha mask
+      patchCtx.drawImage(maskCanvas, 0, 0);
+      // Source-in to keep inpainted only where mask is opaque
+      patchCtx.globalCompositeOperation = "source-in";
+      patchCtx.drawImage(imgInpainted, 0, 0, width, height);
+
+      // 4. Draw patch over original
+      ctx.drawImage(patchCanvas, 0, 0);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(URL.createObjectURL(blob));
+        } else {
+          reject(new Error("Failed to create blob"));
+        }
+      }, "image/png");
+    };
+
+    imgOriginal.onload = checkLoaded;
+    imgOriginal.onerror = reject;
+    imgOriginal.src = originalUrl;
+
+    imgInpainted.onload = checkLoaded;
+    imgInpainted.onerror = reject;
+    imgInpainted.src = inpaintedUrl;
+
+    imgMask.onload = checkLoaded;
+    imgMask.onerror = reject;
+    imgMask.src = maskBase64;
+  });
+}
+
 export function useMagicEraser(
   currentImageState: ImageState | undefined,
   selectedIndex: number,
@@ -40,6 +139,7 @@ export function useMagicEraser(
   onEraseComplete?: (result: MagicEraserResult) => void
 ) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { profile, isAuthenticated, refreshProfile } = useAuth();
 
   // Get remaining credits from profile (server-side)
@@ -90,10 +190,33 @@ export function useMagicEraser(
         reader.readAsDataURL(blob);
       });
 
+      // Calculate optimal dimensions (max 1024, multiple of 64)
+      const { width: originalWidth, height: originalHeight } =
+        await getImageDimensions(currentImageState.blobUrl);
+
+      const MAX_DIMENSION = 1024;
+      let targetWidth = originalWidth;
+      let targetHeight = originalHeight;
+
+      if (originalWidth > MAX_DIMENSION || originalHeight > MAX_DIMENSION) {
+        const aspect = originalWidth / originalHeight;
+        if (originalWidth > originalHeight) {
+          targetWidth = MAX_DIMENSION;
+          targetHeight = Math.round(MAX_DIMENSION / aspect);
+        } else {
+          targetHeight = MAX_DIMENSION;
+          targetWidth = Math.round(MAX_DIMENSION * aspect);
+        }
+      }
+
+      // Ensure multiple of 64 (required by some SD models)
+      targetWidth = Math.round(targetWidth / 64) * 64;
+      targetHeight = Math.round(targetHeight / 64) * 64;
+
       setProcessingMessage(t("editor.eraser.requestingServer"));
 
       const eraserResponse = await eraseImage(
-        createEraserRequest(imageBase64, maskBase64)
+        createEraserRequest(imageBase64, maskBase64, targetWidth, targetHeight)
       );
       const predictionId = eraserResponse.id;
 
@@ -168,31 +291,41 @@ export function useMagicEraser(
       const durationMs = Date.now() - startTime;
       trackMagicEraserSuccess(durationMs);
 
-      // Refresh profile to sync credits
+      // Refresh profile and credit history to sync credits
       refreshProfile();
+      queryClient.invalidateQueries({ queryKey: creditHistoryKeys.all });
 
       setProcessingMessage(t("editor.eraser.downloadingImage"));
 
-      const [dimensions, blobUrl] = await Promise.all([
-        getImageDimensions(outputUrl),
+      const [outputBlobUrl] = await Promise.all([
         urlToBlobUrl(outputUrl),
       ]);
+
+      // Composite the result onto the original image
+      // result = (original * (1-mask)) + (output * mask)
+      const afterBlobUrl = await compositeImages(
+        currentImageState.blobUrl,
+        outputBlobUrl,
+        maskBase64,
+        originalWidth,
+        originalHeight
+      );
 
       const currentIdx = historyIndex.get(selectedIndex) ?? 0;
 
       setImageStates((prev) => {
         const newMap = new Map(prev || new Map());
         newMap.set(selectedIndex, {
-          blobUrl,
-          width: dimensions.width,
-          height: dimensions.height,
+          blobUrl: afterBlobUrl,
+          width: originalWidth,
+          height: originalHeight,
         });
         return newMap;
       });
       setHistory((prev) => {
         const newMap = new Map(prev || new Map());
         const currentHistory = newMap.get(selectedIndex) || [];
-        const newHistory = [...currentHistory.slice(0, currentIdx + 1), blobUrl];
+        const newHistory = [...currentHistory.slice(0, currentIdx + 1), afterBlobUrl];
         newMap.set(selectedIndex, newHistory);
         return newMap;
       });
@@ -206,7 +339,7 @@ export function useMagicEraser(
       if (onEraseComplete) {
         onEraseComplete({
           beforeImageUrl,
-          afterImageUrl: blobUrl,
+          afterImageUrl: afterBlobUrl,
         });
       }
     } catch (error) {

@@ -1,8 +1,95 @@
 export default {
   translation: {
+    // Common
+    "common.before": "Before",
+    "common.after": "After",
+    "common.new": "NEW",
+
     // Home page
-    "home.title": "My Bias Gallery",
+    "home.title": "SaveMyBias Gallery",
     "home.subtitle": "Capture your precious memories beautifully",
+    "home.heroTitle": "Transform Your Photos with AI",
+    "home.heroSubtitle": "Upscale, enhance, and edit your photos with cutting-edge AI technology. Free to start.",
+    "home.uploadTitle": "Drop your image here",
+    "home.uploadDesc": "or click to browse from your device",
+    "home.uploadButton": "Choose Image",
+    "home.uploadFormats": "Supports JPG, PNG, WEBP up to 10MB",
+    "home.orTryTools": "Or try our AI tools directly",
+    "home.learnMore": "Learn more about our AI tools",
+
+    // About page
+    "about.backToHome": "Back to Home",
+
+    // Landing page sections
+    "landing.features.title": "Powerful AI Tools at Your Fingertips",
+    "landing.features.subtitle": "Professional photo editing made simple with our suite of AI-powered tools",
+    "landing.features.upscale.name": "AI Upscale",
+    "landing.features.upscale.description": "Transform blurry, low-resolution photos into crystal-clear HD images. Our AI restores facial details, enhances skin tones, and sharpens every pixel.",
+    "landing.features.eraser.name": "Magic Eraser",
+    "landing.features.eraser.description": "Remove unwanted objects, people, or blemishes from your photos. AI intelligently fills the background for seamless results.",
+    "landing.features.lookbook.name": "AI Lookbook",
+    "landing.features.lookbook.description": "Try on any outfit virtually. Upload your photo and see how different clothes look on you before buying.",
+    "landing.tryNow": "Try Now",
+
+    "landing.howItWorks.title": "How It Works",
+    "landing.howItWorks.subtitle": "Get stunning results in just 3 simple steps",
+    "landing.howItWorks.step1.title": "Upload",
+    "landing.howItWorks.step1.description": "Drop your image or click to upload",
+    "landing.howItWorks.step2.title": "Choose AI Tool",
+    "landing.howItWorks.step2.description": "Select upscale, eraser, or other tools",
+    "landing.howItWorks.step3.title": "Download",
+    "landing.howItWorks.step3.description": "Get your enhanced photo instantly",
+
+    "landing.benefits.title": "Why Choose MyBias?",
+    "landing.benefits.fast.title": "Lightning Fast",
+    "landing.benefits.fast.description": "Get results in seconds with our GPU-powered AI processing",
+    "landing.benefits.secure.title": "Privacy First",
+    "landing.benefits.secure.description": "Your photos are processed securely and never shared",
+    "landing.benefits.mobile.title": "Works Everywhere",
+    "landing.benefits.mobile.description": "Use on any device - mobile, tablet, or desktop",
+    "landing.benefits.quality.title": "Pro Quality",
+    "landing.benefits.quality.description": "Studio-quality results powered by state-of-the-art AI",
+
+    "landing.cta.title": "Ready to Transform Your Photos?",
+    "landing.cta.subtitle": "Join thousands of users who trust MyBias for their photo editing needs",
+    "landing.cta.button": "Start Editing for Free",
+    "landing.cta.learnMore": "Learn More",
+
+    "landing.trust.noSignup": "No signup required",
+    "landing.trust.freeCredits": "5 free credits",
+    "landing.trust.noWatermark": "No watermarks",
+
+    // Navigation
+    "nav.aiTools": "AI Tools",
+    "nav.pricing": "Pricing",
+    "nav.credits": "Credits",
+    "nav.viewAllProducts": "View all AI products",
+    "nav.tools.upscale": "AI Upscale",
+    "nav.tools.upscaleDesc": "Enhance image quality",
+    "nav.tools.eraser": "Magic Eraser",
+    "nav.tools.eraserDesc": "Remove unwanted objects",
+    "nav.tools.lookbook": "AI Lookbook",
+    "nav.tools.lookbookDesc": "Virtual try-on",
+    "nav.moreTools": "More",
+
+    // AI Feature Cards
+    "aiFeatures.badge": "AI-Powered Photo Tools",
+    "aiFeatures.title": "What would you like to do?",
+    "aiFeatures.subtitle": "Choose a tool to enhance your photos with cutting-edge AI technology",
+    "aiFeatures.directEdit.name": "Direct Edit",
+    "aiFeatures.directEdit.description": "Crop, resize, blur and more",
+    "aiFeatures.upscale.name": "AI Upscale",
+    "aiFeatures.upscale.description": "Enhance quality & restore faces",
+    "aiFeatures.proRestore.name": "Pro Restore",
+    "aiFeatures.proRestore.description": "Premium dual AI blending",
+    "aiFeatures.eraser.name": "Magic Eraser",
+    "aiFeatures.eraser.description": "Remove unwanted objects",
+    "aiFeatures.lookbook.name": "AI Lookbook",
+    "aiFeatures.lookbook.description": "Virtual clothing try-on",
+    "aiFeatures.free": "Free",
+    "aiFeatures.credits": "{{count}} credits",
+    "aiFeatures.uploadDirect": "Or upload photos directly",
+    "aiFeatures.backToFeatures": "Back to AI tools",
 
     // Uploader
     "uploader.title": "Capture your precious moments",
@@ -22,8 +109,10 @@ export default {
 
     // Editor - AI Enhancement
     "editor.ai.loginRequired": "Please log in to use AI enhancement.",
-    "editor.ai.insufficientCredits": "Insufficient credits. Please top up and try again.",
-    "editor.ai.limitReached": "You've used all AI enhancements for today. Please try again tomorrow!",
+    "editor.ai.insufficientCredits":
+      "Insufficient credits. Please top up and try again.",
+    "editor.ai.limitReached":
+      "You've used all AI enhancements for today. Please try again tomorrow!",
     "editor.ai.preparingImage": "Preparing image...",
     "editor.ai.requestingServer": "Requesting AI server...",
     "editor.ai.analyzingFaces": "AI is analyzing faces...",
@@ -33,14 +122,16 @@ export default {
     "editor.ai.almostDone": "Almost done!",
     "editor.ai.downloadingImage": "Downloading image...",
     "editor.ai.failed": "AI enhancement failed. Please try again.",
-    "editor.ai.timeout": "AI server response is delayed. Please try again later.",
+    "editor.ai.timeout":
+      "AI server response is delayed. Please try again later.",
 
     // Editor - AI Preview Modal
     "editor.ai.preview.title": "AI Enhancement",
     "editor.ai.preview.subtitle": "Preview the expected result",
     "editor.ai.preview.before": "BEFORE",
     "editor.ai.preview.after": "AFTER (Preview)",
-    "editor.ai.preview.info": "The actual AI result may differ from this preview. AI enhancement restores facial details, improves skin tone, and sharpens overall image quality.",
+    "editor.ai.preview.info":
+      "The actual AI result may differ from this preview. AI enhancement restores facial details, improves skin tone, and sharpens overall image quality.",
     "editor.ai.preview.remaining": "{{count}} uses remaining today",
     "editor.ai.preview.cancel": "Cancel",
     "editor.ai.preview.enhance": "Enhance with AI",
@@ -53,18 +144,57 @@ export default {
     "editor.ai.result.subtitle": "Compare the before and after",
     "editor.ai.result.before": "BEFORE",
     "editor.ai.result.after": "AFTER",
-    "editor.ai.result.info": "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
+    "editor.ai.result.info":
+      "AI enhancement has restored facial details, improved skin tone, and sharpened overall image quality. Use undo if you want to revert.",
     "editor.ai.result.confirm": "Done",
+
+    // Editor - Pro Restore (Blending: Real-ESRGAN + CodeFormer)
+    "editor.proRestore.resizingImage": "Resizing image...",
+    "editor.proRestore.preparingImage": "Preparing image...",
+    "editor.proRestore.requestingServer": "Requesting dual AI models...",
+    "editor.proRestore.analyzingImage": "Analyzing image structure...",
+    "editor.proRestore.restoringDetails": "Restoring fine details...",
+    "editor.proRestore.enhancingSkinTone": "Perfecting skin texture...",
+    "editor.proRestore.optimizingColors": "Enhancing facial features...",
+    "editor.proRestore.upscaling": "Upscaling to high resolution...",
+    "editor.proRestore.blending": "Blending results for natural look...",
+    "editor.proRestore.almostDone": "Almost done!",
+    "editor.proRestore.downloadingImage": "Finalizing image...",
+    "editor.proRestore.failed": "Pro restoration failed. Please try again.",
+    "editor.proRestore.timeout": "AI server response is delayed. Please try again later.",
+    "editor.proRestore.preview.title": "Pro Restoration",
+    "editor.proRestore.preview.subtitle": "Dual AI blending for natural high-quality results",
+    "editor.proRestore.preview.before": "BEFORE",
+    "editor.proRestore.preview.after": "AFTER (Preview)",
+    "editor.proRestore.preview.info": "Pro Restoration blends Real-ESRGAN (skin texture) with CodeFormer (facial features) to deliver natural results without waxy AI look.",
+    "editor.proRestore.preview.fidelity": "Face Restoration",
+    "editor.proRestore.preview.fidelityLow": "Stronger restoration",
+    "editor.proRestore.preview.fidelityHigh": "Keep original features",
+    "editor.proRestore.preview.cancel": "Cancel",
+    "editor.proRestore.preview.restore": "Start Pro Restore",
+    "editor.proRestore.preview.creditCost": "credits per use",
+    "editor.proRestore.result.title": "Pro Restoration Complete",
+    "editor.proRestore.result.subtitle": "Compare the before and after",
+    "editor.proRestore.result.before": "BEFORE",
+    "editor.proRestore.result.after": "AFTER",
+    "editor.proRestore.result.info": "Dual AI blending has restored facial features while preserving natural skin texture. Use undo to revert.",
+    "editor.proRestore.result.confirm": "Done",
+    "editor.proRestore.features.upscale2x": "2x Upscaling",
+    "editor.proRestore.features.skinTone": "Natural Skin Texture",
+    "editor.proRestore.features.colorCorrection": "Sharp Facial Features",
+    "editor.proRestore.features.promptGuided": "Dual AI Blending",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "Magic Eraser",
     "editor.eraser.subtitle": "Draw over the area you want to remove",
-    "editor.eraser.info": "Draw over unwanted objects to remove them. AI will fill in the background naturally.",
+    "editor.eraser.info":
+      "Draw over unwanted objects to remove them. AI will fill in the background naturally.",
     "editor.eraser.remaining": "{{count}} uses remaining",
     "editor.eraser.cancel": "Cancel",
     "editor.eraser.erase": "Erase",
     "editor.eraser.loginRequired": "Please log in to use Magic Eraser.",
-    "editor.eraser.insufficientCredits": "Insufficient credits. Please top up and try again.",
+    "editor.eraser.insufficientCredits":
+      "Insufficient credits. Please top up and try again.",
     "editor.eraser.preparingImage": "Preparing image...",
     "editor.eraser.requestingServer": "Requesting AI server...",
     "editor.eraser.processingAI": "AI is processing...",
@@ -74,14 +204,15 @@ export default {
     "editor.eraser.almostDone": "Almost done!",
     "editor.eraser.downloadingImage": "Downloading image...",
     "editor.eraser.failed": "Magic eraser failed. Please try again.",
-    "editor.eraser.timeout": "AI server response is delayed. Please try again later.",
+    "editor.eraser.timeout":
+      "AI server response is delayed. Please try again later.",
 
     // Share Modal
     "share.title": "Share",
     "share.kakaotalk": "KakaoTalk",
     "share.copyLink": "Copy Link",
     "share.saveImage": "Save Image",
-    "share.message": "Photo created in My Bias Gallery!",
+    "share.message": "Photo created in SaveMyBias Gallery!",
     "share.linkCopiedKakao": "Link copied. Please paste in KakaoTalk!",
     "share.shareFromKakaoApp": "Please share directly from KakaoTalk app.",
     "share.linkCopied": "Link copied!",
@@ -92,7 +223,7 @@ export default {
     "seo.intro.title":
       "AI Photo Restoration & Quality Enhancement Tool (MyBias)",
     "seo.intro.description1":
-      "MyBias is an online AI photo restoration tool that enhances blurry, low-resolution photos into crisp, high-quality images. Using advanced photo restoration and quality enhancement technology, we help you recover precious memories from low-quality concert photos, event shots, or old photographs.",
+      "MyBias is an online AI photo restoration tool that enhances blurry, low-resolution photos into crisp, high-quality images. Using advanced photo restoration and quality enhancement technology, we help you recover precious memories from low-quality Low-resolution photos, event shots, or old photographs.",
     "seo.intro.description2":
       "Our AI engine specializes in photo restoration and quality enhancement. Built on CodeFormer and Real-ESRGAN algorithms, it analyzes degraded facial features and restores lost details naturally, bringing your photos back to life with improved clarity and sharpness.",
 
@@ -143,11 +274,26 @@ export default {
     // User
     "user.login": "Login",
     "user.menu": "User Menu",
+    "user.pricing": "Pricing",
+    "user.aiProducts": "AI Products",
     "user.profile": "Profile",
     "user.gallery": "My Gallery",
+    "user.creditHistory": "Credit History",
     "user.logout": "Logout",
     "user.language": "Language",
     "user.back": "Back",
+
+    // Credit History
+    "creditHistory.title": "Credit History",
+    "creditHistory.subtitle": "View your credit usage",
+    "creditHistory.backToHome": "Home",
+    "creditHistory.empty": "No credit history",
+    "creditHistory.emptyHint": "Start using credits to see your history",
+    "creditHistory.buyCredits": "Buy Credits",
+    "creditHistory.loadError": "Failed to load history",
+    "creditHistory.type.usage": "Usage",
+    "creditHistory.type.purchase": "Purchase",
+    "creditHistory.type.refund": "Refund",
 
     // Gallery
     "gallery.title": "My Gallery",
@@ -173,7 +319,7 @@ export default {
 
     // Login
     "login.title": "Welcome Back",
-    "login.subtitle": "Continue to My Bias Gallery",
+    "login.subtitle": "Continue to SaveMyBias Gallery",
     "login.continueWithGoogle": "Continue with Google",
     "login.continueWithEmail": "Continue with Email",
     "login.or": "or",
@@ -187,7 +333,8 @@ export default {
     "login.invalidEmail": "Please enter a valid email",
     "login.emailSent": "Login link sent to your email!",
     "login.checkEmail": "Check your email",
-    "login.emailSentDescription": "We sent a login link to {{email}}. Please check your inbox and click the link.",
+    "login.emailSentDescription":
+      "We sent a login link to {{email}}. Please check your inbox and click the link.",
     "login.tryAnotherMethod": "Try another method",
     "login.termsText": "By continuing, you agree to our",
     "login.termsLink": "Terms of Service",
@@ -198,6 +345,12 @@ export default {
     "auth.signingIn": "Signing you in...",
     "auth.error": "Sign In Error",
     "auth.tryAgain": "Try Again",
+
+    // 404
+    "404.title": "Page Not Found",
+    "404.subtitle":
+      "The page you are looking for does not exist or has been moved.",
+    "404.backToHome": "Back to Home",
 
     // Footer
     "footer.rights": "All rights reserved.",

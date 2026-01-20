@@ -1,8 +1,95 @@
 export default {
   translation: {
+    // Common
+    "common.before": "보정 전",
+    "common.after": "보정 후",
+    "common.new": "신규",
+
     // Home page
     "home.title": "나만의 최애 갤러리",
     "home.subtitle": "소중한 추억을 아름답게 담아보세요",
+    "home.heroTitle": "AI로 사진을 완벽하게",
+    "home.heroSubtitle": "최첨단 AI 기술로 사진을 업스케일하고, 보정하고, 편집하세요. 무료로 시작하세요.",
+    "home.uploadTitle": "이미지를 여기에 놓으세요",
+    "home.uploadDesc": "또는 클릭하여 파일을 선택하세요",
+    "home.uploadButton": "이미지 선택",
+    "home.uploadFormats": "JPG, PNG, WEBP 최대 10MB 지원",
+    "home.orTryTools": "또는 AI 도구를 바로 사용해보세요",
+    "home.learnMore": "AI 도구에 대해 더 알아보기",
+
+    // About page
+    "about.backToHome": "홈으로 돌아가기",
+
+    // Landing page sections
+    "landing.features.title": "강력한 AI 도구를 만나보세요",
+    "landing.features.subtitle": "전문적인 사진 편집을 간단하게, AI 기반 도구 모음",
+    "landing.features.upscale.name": "AI 업스케일",
+    "landing.features.upscale.description": "흐릿하고 저해상도인 사진을 선명한 HD 이미지로 변환하세요. AI가 얼굴 디테일을 복원하고 피부톤을 개선하며 모든 픽셀을 선명하게 만들어 드립니다.",
+    "landing.features.eraser.name": "AI 지우개",
+    "landing.features.eraser.description": "사진에서 원치 않는 객체, 사람, 잡티를 제거하세요. AI가 배경을 자연스럽게 채워 완벽한 결과물을 만들어 드립니다.",
+    "landing.features.lookbook.name": "AI 룩북",
+    "landing.features.lookbook.description": "가상으로 옷을 입어보세요. 사진을 업로드하고 구매 전에 다양한 옷이 어떻게 어울리는지 확인해보세요.",
+    "landing.tryNow": "지금 사용하기",
+
+    "landing.howItWorks.title": "이용 방법",
+    "landing.howItWorks.subtitle": "간단한 3단계로 멋진 결과물을 얻으세요",
+    "landing.howItWorks.step1.title": "업로드",
+    "landing.howItWorks.step1.description": "이미지를 드래그하거나 클릭해서 업로드",
+    "landing.howItWorks.step2.title": "AI 도구 선택",
+    "landing.howItWorks.step2.description": "업스케일, 지우개 등 원하는 도구 선택",
+    "landing.howItWorks.step3.title": "다운로드",
+    "landing.howItWorks.step3.description": "보정된 사진을 바로 다운로드",
+
+    "landing.benefits.title": "왜 MyBias인가요?",
+    "landing.benefits.fast.title": "초고속 처리",
+    "landing.benefits.fast.description": "GPU 기반 AI로 몇 초 만에 결과물을 받아보세요",
+    "landing.benefits.secure.title": "개인정보 보호",
+    "landing.benefits.secure.description": "사진은 안전하게 처리되며 절대 공유되지 않습니다",
+    "landing.benefits.mobile.title": "모든 기기 지원",
+    "landing.benefits.mobile.description": "모바일, 태블릿, 데스크톱 어디서나 사용 가능",
+    "landing.benefits.quality.title": "프로 품질",
+    "landing.benefits.quality.description": "최첨단 AI로 스튜디오급 품질의 결과물 제공",
+
+    "landing.cta.title": "사진을 변환할 준비가 되셨나요?",
+    "landing.cta.subtitle": "수천 명의 사용자가 신뢰하는 MyBias와 함께하세요",
+    "landing.cta.button": "무료로 시작하기",
+    "landing.cta.learnMore": "더 알아보기",
+
+    "landing.trust.noSignup": "가입 필요 없음",
+    "landing.trust.freeCredits": "무료 크레딧 5개",
+    "landing.trust.noWatermark": "워터마크 없음",
+
+    // Navigation
+    "nav.aiTools": "AI 도구",
+    "nav.pricing": "요금제",
+    "nav.credits": "크레딧",
+    "nav.viewAllProducts": "모든 AI 상품 보기",
+    "nav.tools.upscale": "AI 업스케일",
+    "nav.tools.upscaleDesc": "화질 개선",
+    "nav.tools.eraser": "AI 지우개",
+    "nav.tools.eraserDesc": "원치 않는 객체 제거",
+    "nav.tools.lookbook": "AI 룩북",
+    "nav.tools.lookbookDesc": "가상 피팅",
+    "nav.moreTools": "더보기",
+
+    // AI Feature Cards
+    "aiFeatures.badge": "AI 기반 사진 도구",
+    "aiFeatures.title": "어떤 작업을 하시겠어요?",
+    "aiFeatures.subtitle": "최첨단 AI 기술로 사진을 완벽하게 보정하세요",
+    "aiFeatures.directEdit.name": "직접 편집",
+    "aiFeatures.directEdit.description": "자르기, 크기 조정, 블러 등",
+    "aiFeatures.upscale.name": "AI 업스케일",
+    "aiFeatures.upscale.description": "화질 개선 & 얼굴 복원",
+    "aiFeatures.proRestore.name": "Pro 복원",
+    "aiFeatures.proRestore.description": "프리미엄 듀얼 AI 블렌딩",
+    "aiFeatures.eraser.name": "AI 지우개",
+    "aiFeatures.eraser.description": "원치 않는 객체 제거",
+    "aiFeatures.lookbook.name": "AI 룩북",
+    "aiFeatures.lookbook.description": "가상 의류 피팅",
+    "aiFeatures.free": "무료",
+    "aiFeatures.credits": "{{count}} 크레딧",
+    "aiFeatures.uploadDirect": "또는 사진을 직접 업로드",
+    "aiFeatures.backToFeatures": "AI 도구로 돌아가기",
 
     // Uploader
     "uploader.title": "소중한 순간을 담아주세요",
@@ -57,6 +144,42 @@ export default {
     "editor.ai.result.after": "보정 후",
     "editor.ai.result.info": "AI가 얼굴 디테일을 복원하고 피부 톤을 개선하며 전체적인 화질을 선명하게 만들었습니다. 되돌리기 버튼으로 원본으로 복원할 수 있습니다.",
     "editor.ai.result.confirm": "확인",
+
+    // Editor - Pro Restore (블렌딩: Real-ESRGAN + CodeFormer)
+    "editor.proRestore.resizingImage": "이미지 크기 조정 중...",
+    "editor.proRestore.preparingImage": "이미지 준비 중...",
+    "editor.proRestore.requestingServer": "듀얼 AI 모델 요청 중...",
+    "editor.proRestore.analyzingImage": "이미지 구조를 분석하고 있어요...",
+    "editor.proRestore.restoringDetails": "세부 디테일을 복원하고 있어요...",
+    "editor.proRestore.enhancingSkinTone": "피부 질감을 살리고 있어요...",
+    "editor.proRestore.optimizingColors": "이목구비를 선명하게 하고 있어요...",
+    "editor.proRestore.upscaling": "고해상도로 업스케일 중...",
+    "editor.proRestore.blending": "자연스러운 결과를 위해 블렌딩 중...",
+    "editor.proRestore.almostDone": "거의 다 됐어요!",
+    "editor.proRestore.downloadingImage": "이미지 마무리 중...",
+    "editor.proRestore.failed": "Pro 복원에 실패했습니다. 다시 시도해주세요.",
+    "editor.proRestore.timeout": "AI 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.",
+    "editor.proRestore.preview.title": "Pro 복원",
+    "editor.proRestore.preview.subtitle": "듀얼 AI 블렌딩으로 자연스러운 고화질 결과",
+    "editor.proRestore.preview.before": "복원 전",
+    "editor.proRestore.preview.after": "복원 후 (예상)",
+    "editor.proRestore.preview.info": "Pro 복원은 Real-ESRGAN(피부 질감)과 CodeFormer(이목구비)를 블렌딩하여 밀랍인형 느낌 없이 자연스러운 결과를 제공합니다.",
+    "editor.proRestore.preview.fidelity": "얼굴 복원 강도",
+    "editor.proRestore.preview.fidelityLow": "강하게 복원",
+    "editor.proRestore.preview.fidelityHigh": "원본 특징 유지",
+    "editor.proRestore.preview.cancel": "취소",
+    "editor.proRestore.preview.restore": "Pro 복원 시작",
+    "editor.proRestore.preview.creditCost": "크레딧 사용",
+    "editor.proRestore.result.title": "Pro 복원 완료",
+    "editor.proRestore.result.subtitle": "복원 전후를 비교해보세요",
+    "editor.proRestore.result.before": "복원 전",
+    "editor.proRestore.result.after": "복원 후",
+    "editor.proRestore.result.info": "듀얼 AI 블렌딩이 자연스러운 피부 질감을 유지하면서 이목구비를 선명하게 복원했습니다. 되돌리기로 원본으로 복원할 수 있습니다.",
+    "editor.proRestore.result.confirm": "확인",
+    "editor.proRestore.features.upscale2x": "2배 업스케일",
+    "editor.proRestore.features.skinTone": "자연스러운 피부 질감",
+    "editor.proRestore.features.colorCorrection": "선명한 이목구비",
+    "editor.proRestore.features.promptGuided": "듀얼 AI 블렌딩",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "AI 지우개",
@@ -146,11 +269,26 @@ export default {
     // User
     "user.login": "로그인",
     "user.menu": "사용자 메뉴",
+    "user.pricing": "요금제",
+    "user.aiProducts": "AI 상품 소개",
     "user.profile": "프로필",
     "user.gallery": "내 사진함",
+    "user.creditHistory": "크레딧 내역",
     "user.logout": "로그아웃",
     "user.language": "언어",
     "user.back": "뒤로",
+
+    // Credit History
+    "creditHistory.title": "크레딧 내역",
+    "creditHistory.subtitle": "크레딧 사용 및 충전 내역",
+    "creditHistory.backToHome": "홈으로",
+    "creditHistory.empty": "크레딧 내역이 없습니다",
+    "creditHistory.emptyHint": "크레딧을 사용하면 내역이 표시됩니다",
+    "creditHistory.buyCredits": "크레딧 구매하기",
+    "creditHistory.loadError": "내역을 불러오는데 실패했습니다",
+    "creditHistory.type.usage": "사용",
+    "creditHistory.type.purchase": "충전",
+    "creditHistory.type.refund": "환불",
 
     // Gallery
     "gallery.title": "내 사진함",
@@ -201,6 +339,12 @@ export default {
     "auth.signingIn": "로그인 중...",
     "auth.error": "로그인 오류",
     "auth.tryAgain": "다시 시도하기",
+
+    // 404
+    "404.title": "페이지를 찾을 수 없습니다",
+    "404.subtitle":
+      "요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.",
+    "404.backToHome": "홈으로 돌아가기",
 
     // Footer
     "footer.rights": "All rights reserved.",

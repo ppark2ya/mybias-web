@@ -225,3 +225,67 @@ export async function urlToBlobUrl(url: string): Promise<string> {
   const blob = await response.blob()
   return URL.createObjectURL(blob)
 }
+
+/**
+ * Blend two images together using alpha compositing
+ * Used for Pro Restore: blends Real-ESRGAN (skin texture) with CodeFormer (facial features)
+ * @param imageA - First image URL (Real-ESRGAN result - skin texture)
+ * @param imageB - Second image URL (CodeFormer result - facial features)
+ * @param alpha - Blend ratio (0-1, 0.7 = 70% imageB, 30% imageA)
+ * @returns Blob URL of blended image
+ */
+export async function blendImages(
+  imageA: string,
+  imageB: string,
+  alpha: number = 0.7
+): Promise<string> {
+  // Load both images
+  const [imgA, imgB] = await Promise.all([loadImage(imageA), loadImage(imageB)])
+
+  // Use the larger dimensions (they should be the same after upscaling)
+  const width = Math.max(imgA.width, imgB.width)
+  const height = Math.max(imgA.height, imgB.height)
+
+  // Create canvas for blending
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+
+  if (!ctx) {
+    throw new Error('Failed to get canvas context')
+  }
+
+  canvas.width = width
+  canvas.height = height
+
+  // Enable high-quality image smoothing
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+
+  // Draw image A (Real-ESRGAN - skin texture) as base
+  ctx.globalAlpha = 1 - alpha // 30% for Real-ESRGAN when alpha=0.7
+  ctx.drawImage(imgA, 0, 0, width, height)
+
+  // Blend image B (CodeFormer - facial features) on top
+  ctx.globalAlpha = alpha // 70% for CodeFormer when alpha=0.7
+  ctx.drawImage(imgB, 0, 0, width, height)
+
+  // Reset alpha
+  ctx.globalAlpha = 1
+
+  return canvasToBlobUrl(canvas)
+}
+
+/**
+ * Convert a blob URL to a base64 string
+ */
+export async function blobUrlToBase64(blobUrl: string): Promise<string> {
+  const response = await fetch(blobUrl)
+  const blob = await response.blob()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+

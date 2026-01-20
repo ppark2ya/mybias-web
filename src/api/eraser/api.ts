@@ -18,9 +18,16 @@ export async function eraseImage(
  * @param image - Base64 encoded original image
  * @param mask - Base64 encoded mask image (white = erase, black = keep)
  */
-export function createEraserRequest(image: string, mask: string): EraserRequest {
+export function createEraserRequest(
+  image: string,
+  mask: string,
+  width?: number,
+  height?: number
+): EraserRequest {
   return {
     image,
     mask,
+    width,
+    height,
   };
 }

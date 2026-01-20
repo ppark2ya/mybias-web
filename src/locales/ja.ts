@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "補正前",
+    "common.after": "補正後",
+    "common.new": "新規",
+
     // Home page
     "home.title": "マイバイアスギャラリー",
     "home.subtitle": "大切な思い出を美しく保存しましょう",
@@ -70,9 +75,22 @@ export default {
     "user.menu": "ユーザーメニュー",
     "user.profile": "プロフィール",
     "user.gallery": "マイギャラリー",
+    "user.creditHistory": "クレジット履歴",
     "user.logout": "ログアウト",
     "user.language": "言語",
     "user.back": "戻る",
+
+    // Credit History
+    "creditHistory.title": "クレジット履歴",
+    "creditHistory.subtitle": "クレジットの使用履歴",
+    "creditHistory.backToHome": "ホーム",
+    "creditHistory.empty": "クレジット履歴がありません",
+    "creditHistory.emptyHint": "クレジットを使用すると履歴が表示されます",
+    "creditHistory.buyCredits": "クレジットを購入",
+    "creditHistory.loadError": "履歴の読み込みに失敗しました",
+    "creditHistory.type.usage": "使用",
+    "creditHistory.type.purchase": "購入",
+    "creditHistory.type.refund": "払い戻し",
 
     // Gallery
     "gallery.title": "マイギャラリー",

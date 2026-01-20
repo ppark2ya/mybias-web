@@ -394,8 +394,7 @@ export function Editor({ files, onClose }: EditorProps) {
               onClick={openAIPreviewModal}
               disabled={isProcessing || !currentImageState || (isAuthenticated && remainingAIUsage === 0)}
               icon={<Sparkles className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
-              label="AI"
-              badge={isAuthenticated ? remainingAIUsage : undefined}
+              label="UPSCALE"
               variant="ai"
             />
 
@@ -404,7 +403,6 @@ export function Editor({ files, onClose }: EditorProps) {
               disabled={isProcessing || !currentImageState || (isAuthenticated && eraserCredits === 0)}
               icon={<Eraser className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
               label="ERASER"
-              badge={isAuthenticated ? eraserCredits : undefined}
               variant="eraser"
             />
 

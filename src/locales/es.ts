@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "Antes",
+    "common.after": "Después",
+    "common.new": "NUEVO",
+
     // Home page
     "home.title": "Mi Galería de Bias",
     "home.subtitle": "Captura tus recuerdos preciosos hermosamente",
@@ -70,9 +75,22 @@ export default {
     "user.menu": "Menú de Usuario",
     "user.profile": "Perfil",
     "user.gallery": "Mi Galería",
+    "user.creditHistory": "Historial de Créditos",
     "user.logout": "Cerrar Sesión",
     "user.language": "Idioma",
     "user.back": "Volver",
+
+    // Credit History
+    "creditHistory.title": "Historial de Créditos",
+    "creditHistory.subtitle": "Ver tu historial de créditos",
+    "creditHistory.backToHome": "Inicio",
+    "creditHistory.empty": "Sin historial de créditos",
+    "creditHistory.emptyHint": "Comienza a usar créditos para ver tu historial",
+    "creditHistory.buyCredits": "Comprar Créditos",
+    "creditHistory.loadError": "Error al cargar historial",
+    "creditHistory.type.usage": "Uso",
+    "creditHistory.type.purchase": "Compra",
+    "creditHistory.type.refund": "Reembolso",
 
     // Gallery
     "gallery.title": "Mi Galería",

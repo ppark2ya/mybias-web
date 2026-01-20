@@ -81,18 +81,47 @@ export const MaskCanvas = ({
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(exportedSvg, "image/svg+xml");
         const svgElement = svgDoc.querySelector("svg");
-        const displayWidth = svgElement
+        const containerWidth = svgElement
           ? parseFloat(svgElement.getAttribute("width") || "0")
           : 0;
-        const displayHeight = svgElement
+        const containerHeight = svgElement
           ? parseFloat(svgElement.getAttribute("height") || "0")
           : 0;
 
-        // Calculate scale factors
-        const scaleX = displayWidth > 0 ? imageWidth / displayWidth : 1;
-        const scaleY = displayHeight > 0 ? imageHeight / displayHeight : 1;
+        // Calculate object-contain rendering dimensions and offset
+        // This accounts for the fact that the background image uses object-contain
+        // which maintains aspect ratio and centers the image with possible padding
+        const containerAspect = containerWidth / containerHeight;
+        const imageAspect = imageWidth / imageHeight;
 
-        // Draw white strokes (areas to erase)
+        let renderedWidth: number;
+        let renderedHeight: number;
+        let offsetX: number;
+        let offsetY: number;
+
+        if (imageAspect > containerAspect) {
+          // Image is wider - fits horizontally, padding top/bottom
+          renderedWidth = containerWidth;
+          renderedHeight = containerWidth / imageAspect;
+          offsetX = 0;
+          offsetY = (containerHeight - renderedHeight) / 2;
+        } else {
+          // Image is taller - fits vertically, padding left/right
+          renderedHeight = containerHeight;
+          renderedWidth = containerHeight * imageAspect;
+          offsetX = (containerWidth - renderedWidth) / 2;
+          offsetY = 0;
+        }
+
+        // Calculate scale from rendered image to original image
+        const scaleX = imageWidth / renderedWidth;
+        const scaleY = imageHeight / renderedHeight;
+
+        // Mask enhancement settings
+        const MASK_DILATION_PX = 10; // Expand mask by this many pixels
+        const MASK_BLUR_PX = 8; // Apply gaussian blur for smooth edges
+
+        // Draw white strokes (areas to erase) with dilation
         ctx.strokeStyle = "#FFFFFF";
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -100,23 +129,44 @@ export const MaskCanvas = ({
         for (const pathData of paths) {
           if (pathData.paths.length === 0) continue;
 
-          ctx.lineWidth =
+          // Add dilation to line width for expanded mask coverage
+          const baseLineWidth =
             (pathData.strokeWidth || brushSize) * Math.max(scaleX, scaleY);
+          ctx.lineWidth = baseLineWidth + MASK_DILATION_PX * 2;
           ctx.beginPath();
 
           const firstPoint = pathData.paths[0];
-          ctx.moveTo(firstPoint.x * scaleX, firstPoint.y * scaleY);
+          // Transform coordinates: subtract offset, then scale to original image size
+          const startX = (firstPoint.x - offsetX) * scaleX;
+          const startY = (firstPoint.y - offsetY) * scaleY;
+          ctx.moveTo(startX, startY);
 
           for (let i = 1; i < pathData.paths.length; i++) {
             const point = pathData.paths[i];
-            ctx.lineTo(point.x * scaleX, point.y * scaleY);
+            const x = (point.x - offsetX) * scaleX;
+            const y = (point.y - offsetY) * scaleY;
+            ctx.lineTo(x, y);
           }
 
           ctx.stroke();
         }
 
+        // Apply gaussian blur for smooth mask edges
+        const blurredCanvas = document.createElement("canvas");
+        blurredCanvas.width = imageWidth;
+        blurredCanvas.height = imageHeight;
+        const blurCtx = blurredCanvas.getContext("2d");
+
+        if (!blurCtx) {
+          throw new Error("Failed to get blur canvas context");
+        }
+
+        // Apply blur filter and draw the mask
+        blurCtx.filter = `blur(${MASK_BLUR_PX}px)`;
+        blurCtx.drawImage(canvas, 0, 0);
+
         // Export as base64 PNG
-        return canvas.toDataURL("image/png");
+        return blurredCanvas.toDataURL("image/png");
       },
 
       clearCanvas: () => {

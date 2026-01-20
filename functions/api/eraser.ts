@@ -3,10 +3,12 @@ import {
   imageGenerations,
   ImageGenerationStatus,
   profiles,
+  CreditTransactionType,
 } from "../../src/db/schema";
 import { ReplicateModels } from "../../src/constants/replicate";
 import type { ReplicatePredictionStatusType } from "../../src/constants/replicate";
-import type { ContextData, DbClient } from "../types";
+import type { ContextData, DbClient } from "../types.d.ts";
+import { recordCreditTransaction } from "../lib/credit";
 
 interface Env {
   REPLICATE_API_TOKEN: string;
@@ -16,6 +18,8 @@ interface Env {
 interface EraserRequest {
   image: string; // Base64 encoded original image
   mask: string; // Base64 encoded mask image (white = erase, black = keep)
+  width?: number;
+  height?: number;
 }
 
 interface ReplicatePredictionResponse {
@@ -122,7 +126,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       );
     }
 
-    const { image, mask }: EraserRequest = await request.json();
+    const { image, mask, width, height }: EraserRequest = await request.json();
 
     if (!image || !mask) {
       return new Response(
@@ -150,7 +154,7 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
       ? `${env.BASE_URL}/api/webhook/replicate`
       : null;
 
-    // Create prediction with LaMa model
+    // Create prediction with dpakkk/image-object-removal model (LaMa + FFT)
     const response = await fetch("https://api.replicate.com/v1/predictions", {
       method: "POST",
       headers: {
@@ -158,10 +162,17 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        version: ReplicateModels.LAMA,
+        version: ReplicateModels.STABLE_DIFFUSION_INPAINTING,
         input: {
           image,
           mask,
+          width,
+          height,
+          prompt: "background, texture, empty space, wall, floor", // Force background generation
+          negative_prompt:
+            "person, human, face, man, woman, child, body, people, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, mosaic, pixelated",
+          num_inference_steps: 30,
+          scheduler: "DPMSolverMultistep",
         },
         ...(webhookUrl && {
           webhook: webhookUrl,
@@ -188,6 +199,15 @@ export const onRequestPost: PagesFunction<Env, string, ContextData> = async (
     if (result.id) {
       try {
         await saveGenerationRecord(db, result.id, user.id);
+        // Record credit transaction for history
+        await recordCreditTransaction(
+          db,
+          user.id,
+          -1,
+          CreditTransactionType.USAGE,
+          result.id,
+          "Magic eraser"
+        );
       } catch (err) {
         console.error("Failed to save generation record:", err);
         return new Response(

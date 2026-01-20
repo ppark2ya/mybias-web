@@ -13,8 +13,13 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as CreditHistoryRouteImport } from './routes/credit-history'
+import { Route as AiProductsRouteImport } from './routes/ai-products'
+import { Route as AiLookbookRouteImport } from './routes/ai-lookbook'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 
@@ -38,6 +43,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -46,6 +56,26 @@ const LoginRoute = LoginRouteImport.update({
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditHistoryRoute = CreditHistoryRouteImport.update({
+  id: '/credit-history',
+  path: '/credit-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiProductsRoute = AiProductsRouteImport.update({
+  id: '/ai-products',
+  path: '/ai-products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiLookbookRoute = AiLookbookRouteImport.update({
+  id: '/ai-lookbook',
+  path: '/ai-lookbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,8 +91,13 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-lookbook': typeof AiLookbookRoute
+  '/ai-products': typeof AiProductsRoute
+  '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -71,8 +106,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-lookbook': typeof AiLookbookRoute
+  '/ai-products': typeof AiProductsRoute
+  '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -82,8 +122,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-lookbook': typeof AiLookbookRoute
+  '/ai-products': typeof AiProductsRoute
+  '/credit-history': typeof CreditHistoryRoute
   '/gallery': typeof GalleryRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -94,8 +139,13 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/ai-lookbook'
+    | '/ai-products'
+    | '/credit-history'
     | '/gallery'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/refund-policy'
@@ -104,8 +154,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/ai-lookbook'
+    | '/ai-products'
+    | '/credit-history'
     | '/gallery'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/refund-policy'
@@ -114,8 +169,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/ai-lookbook'
+    | '/ai-products'
+    | '/credit-history'
     | '/gallery'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/profile'
     | '/refund-policy'
@@ -125,8 +185,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AiLookbookRoute: typeof AiLookbookRoute
+  AiProductsRoute: typeof AiProductsRoute
+  CreditHistoryRoute: typeof CreditHistoryRoute
   GalleryRoute: typeof GalleryRoute
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
@@ -164,6 +229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -176,6 +248,34 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credit-history': {
+      id: '/credit-history'
+      path: '/credit-history'
+      fullPath: '/credit-history'
+      preLoaderRoute: typeof CreditHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-products': {
+      id: '/ai-products'
+      path: '/ai-products'
+      fullPath: '/ai-products'
+      preLoaderRoute: typeof AiProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-lookbook': {
+      id: '/ai-lookbook'
+      path: '/ai-lookbook'
+      fullPath: '/ai-lookbook'
+      preLoaderRoute: typeof AiLookbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -197,8 +297,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AiLookbookRoute: AiLookbookRoute,
+  AiProductsRoute: AiProductsRoute,
+  CreditHistoryRoute: CreditHistoryRoute,
   GalleryRoute: GalleryRoute,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   RefundPolicyRoute: RefundPolicyRoute,

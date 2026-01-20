@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check, ImageIcon } from "lucide-react";
+import { User, LogIn, LogOut, UserCircle, ChevronRight, Globe, Check, ImageIcon, History } from "lucide-react";
 import { FlagIcon } from "../LanguageSwitcher/FlagIcon";
 import { LANGUAGES } from "../../constants/locales";
 import { useAuth } from "../../hooks/useAuth";
@@ -149,7 +149,7 @@ export function UserMenu() {
             /* Main Menu View */
             <>
               {isAuthenticated ? (
-                /* Logged In Menu */
+                /* Logged In Menu - Account related items only */
                 <>
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
                     {avatarUrl ? (
@@ -186,9 +186,17 @@ export function UserMenu() {
                     <ImageIcon className="w-4 h-4" />
                     <span>{t("user.gallery")}</span>
                   </Link>
+                  <Link
+                    to="/credit-history"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <History className="w-4 h-4" />
+                    <span>{t("user.creditHistory", "Credit History")}</span>
+                  </Link>
                 </>
               ) : (
-                /* Not Logged In - Login Button */
+                /* Not Logged In - Login Button only */
                 <Link
                   to="/login"
                   onClick={() => setIsOpen(false)}

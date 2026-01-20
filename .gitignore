@@ -33,3 +33,8 @@ dist-ssr
 .dev.vars
 .wrangler
 .claude
+
+# Playwright
+playwright-report/
+test-results/*.tsbuildinfo
+test-results/*

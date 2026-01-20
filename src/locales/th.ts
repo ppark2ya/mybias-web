@@ -1,5 +1,10 @@
 export default {
   translation: {
+    // Common
+    "common.before": "ก่อน",
+    "common.after": "หลัง",
+    "common.new": "ใหม่",
+
     // Home page
     "home.title": "แกลเลอรี่ไอดอลของฉัน",
     "home.subtitle": "เก็บความทรงจำอันล้ำค่าของคุณอย่างสวยงาม",
@@ -22,8 +27,10 @@ export default {
 
     // Editor - AI Enhancement
     "editor.ai.loginRequired": "กรุณาเข้าสู่ระบบเพื่อใช้การปรับปรุงด้วย AI",
-    "editor.ai.insufficientCredits": "เครดิตไม่เพียงพอ กรุณาเติมเครดิตแล้วลองใหม่",
-    "editor.ai.limitReached": "คุณใช้การปรับปรุง AI หมดแล้วสำหรับวันนี้ กรุณาลองใหม่พรุ่งนี้!",
+    "editor.ai.insufficientCredits":
+      "เครดิตไม่เพียงพอ กรุณาเติมเครดิตแล้วลองใหม่",
+    "editor.ai.limitReached":
+      "คุณใช้การปรับปรุง AI หมดแล้วสำหรับวันนี้ กรุณาลองใหม่พรุ่งนี้!",
     "editor.ai.preparingImage": "กำลังเตรียมรูปภาพ...",
     "editor.ai.requestingServer": "กำลังขอข้อมูลจากเซิร์ฟเวอร์ AI...",
     "editor.ai.analyzingFaces": "AI กำลังวิเคราะห์ใบหน้า...",
@@ -40,7 +47,8 @@ export default {
     "editor.ai.preview.subtitle": "ดูตัวอย่างผลลัพธ์ที่คาดหวัง",
     "editor.ai.preview.before": "ก่อน",
     "editor.ai.preview.after": "หลัง (ตัวอย่าง)",
-    "editor.ai.preview.info": "ผลลัพธ์ AI จริงอาจแตกต่างจากตัวอย่างนี้ การปรับปรุงด้วย AI จะกู้คืนรายละเอียดใบหน้า ปรับปรุงสีผิว และเพิ่มคุณภาพรูปภาพโดยรวม",
+    "editor.ai.preview.info":
+      "ผลลัพธ์ AI จริงอาจแตกต่างจากตัวอย่างนี้ การปรับปรุงด้วย AI จะกู้คืนรายละเอียดใบหน้า ปรับปรุงสีผิว และเพิ่มคุณภาพรูปภาพโดยรวม",
     "editor.ai.preview.remaining": "เหลือ {{count}} ครั้งสำหรับวันนี้",
     "editor.ai.preview.cancel": "ยกเลิก",
     "editor.ai.preview.enhance": "ปรับปรุงด้วย AI",
@@ -53,18 +61,21 @@ export default {
     "editor.ai.result.subtitle": "เปรียบเทียบก่อนและหลัง",
     "editor.ai.result.before": "ก่อน",
     "editor.ai.result.after": "หลัง",
-    "editor.ai.result.info": "AI ได้กู้คืนรายละเอียดใบหน้า ปรับปรุงสีผิว และเพิ่มคุณภาพรูปภาพโดยรวมแล้ว ใช้ปุ่มเลิกทำหากต้องการย้อนกลับ",
+    "editor.ai.result.info":
+      "AI ได้กู้คืนรายละเอียดใบหน้า ปรับปรุงสีผิว และเพิ่มคุณภาพรูปภาพโดยรวมแล้ว ใช้ปุ่มเลิกทำหากต้องการย้อนกลับ",
     "editor.ai.result.confirm": "เสร็จสิ้น",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "ยางลบวิเศษ",
     "editor.eraser.subtitle": "วาดบนพื้นที่ที่ต้องการลบ",
-    "editor.eraser.info": "วาดบนวัตถุที่ไม่ต้องการเพื่อลบออก AI จะเติมพื้นหลังอย่างเป็นธรรมชาติ",
+    "editor.eraser.info":
+      "วาดบนวัตถุที่ไม่ต้องการเพื่อลบออก AI จะเติมพื้นหลังอย่างเป็นธรรมชาติ",
     "editor.eraser.remaining": "เหลือ {{count}} ครั้ง",
     "editor.eraser.cancel": "ยกเลิก",
     "editor.eraser.erase": "ลบ",
     "editor.eraser.loginRequired": "กรุณาเข้าสู่ระบบเพื่อใช้ยางลบวิเศษ",
-    "editor.eraser.insufficientCredits": "เครดิตไม่เพียงพอ กรุณาเติมเครดิตแล้วลองใหม่",
+    "editor.eraser.insufficientCredits":
+      "เครดิตไม่เพียงพอ กรุณาเติมเครดิตแล้วลองใหม่",
     "editor.eraser.preparingImage": "กำลังเตรียมรูปภาพ...",
     "editor.eraser.requestingServer": "กำลังขอข้อมูลจากเซิร์ฟเวอร์ AI...",
     "editor.eraser.processingAI": "AI กำลังประมวลผล...",
@@ -81,7 +92,7 @@ export default {
     "share.kakaotalk": "KakaoTalk",
     "share.copyLink": "คัดลอกลิงก์",
     "share.saveImage": "บันทึกรูปภาพ",
-    "share.message": "รูปภาพที่สร้างใน My Bias Gallery!",
+    "share.message": "รูปภาพที่สร้างใน SaveMyBias Gallery!",
     "share.linkCopiedKakao": "คัดลอกลิงก์แล้ว กรุณาวางใน KakaoTalk!",
     "share.shareFromKakaoApp": "กรุณาแชร์โดยตรงจากแอป KakaoTalk",
     "share.linkCopied": "คัดลอกลิงก์แล้ว!",
@@ -145,9 +156,22 @@ export default {
     "user.menu": "เมนูผู้ใช้",
     "user.profile": "โปรไฟล์",
     "user.gallery": "แกลเลอรี่ของฉัน",
+    "user.creditHistory": "ประวัติเครดิต",
     "user.logout": "ออกจากระบบ",
     "user.language": "ภาษา",
     "user.back": "กลับ",
+
+    // Credit History
+    "creditHistory.title": "ประวัติเครดิต",
+    "creditHistory.subtitle": "ดูประวัติการใช้เครดิต",
+    "creditHistory.backToHome": "หน้าหลัก",
+    "creditHistory.empty": "ไม่มีประวัติเครดิต",
+    "creditHistory.emptyHint": "เริ่มใช้เครดิตเพื่อดูประวัติของคุณ",
+    "creditHistory.buyCredits": "ซื้อเครดิต",
+    "creditHistory.loadError": "โหลดประวัติไม่สำเร็จ",
+    "creditHistory.type.usage": "ใช้งาน",
+    "creditHistory.type.purchase": "ซื้อ",
+    "creditHistory.type.refund": "คืนเงิน",
 
     // Gallery
     "gallery.title": "แกลเลอรี่ของฉัน",
@@ -173,7 +197,7 @@ export default {
 
     // Login
     "login.title": "ยินดีต้อนรับกลับมา",
-    "login.subtitle": "ดำเนินการต่อไปยัง My Bias Gallery",
+    "login.subtitle": "ดำเนินการต่อไปยัง SaveMyBias Gallery",
     "login.continueWithGoogle": "ดำเนินการต่อด้วย Google",
     "login.continueWithEmail": "ดำเนินการต่อด้วยอีเมล",
     "login.or": "หรือ",
@@ -187,7 +211,8 @@ export default {
     "login.invalidEmail": "กรุณากรอกอีเมลที่ถูกต้อง",
     "login.emailSent": "ส่งลิงก์เข้าสู่ระบบไปยังอีเมลของคุณแล้ว!",
     "login.checkEmail": "ตรวจสอบอีเมลของคุณ",
-    "login.emailSentDescription": "เราส่งลิงก์เข้าสู่ระบบไปที่ {{email}} กรุณาตรวจสอบกล่องจดหมายและคลิกลิงก์",
+    "login.emailSentDescription":
+      "เราส่งลิงก์เข้าสู่ระบบไปที่ {{email}} กรุณาตรวจสอบกล่องจดหมายและคลิกลิงก์",
     "login.tryAnotherMethod": "ลองวิธีอื่น",
     "login.termsText": "เมื่อดำเนินการต่อ คุณยอมรับ",
     "login.termsLink": "ข้อกำหนดการให้บริการ",

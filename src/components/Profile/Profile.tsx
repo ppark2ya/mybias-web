@@ -7,7 +7,7 @@ import {
   Calendar,
   CreditCard,
   LogOut,
-  Sparkles,
+  Coins,
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect } from "react";
@@ -49,22 +49,7 @@ export function Profile() {
 
   const handleCharge = () => {
     trackChargeClick();
-
-    // Lemon Squeezy checkout URL with user metadata
-    const checkoutUrl = new URL(
-      "https://savemybias.lemonsqueezy.com/checkout/buy/a92ae8c9-945a-4bff-bcc3-cb7600e9e51d"
-    );
-
-    // Pass user email and ID as checkout data
-    if (userEmail) {
-      checkoutUrl.searchParams.set("checkout[email]", userEmail);
-    }
-    if (user?.id) {
-      checkoutUrl.searchParams.set("checkout[custom][user_id]", user.id);
-    }
-
-    // Open checkout in new tab
-    window.open(checkoutUrl.toString(), "_blank");
+    navigate({ to: "/pricing" });
   };
 
   if (isLoading) {
@@ -159,15 +144,18 @@ export function Profile() {
               {/* AI Credits */}
               <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-fuchsia-50 to-purple-50 rounded-xl">
                 <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow-sm">
-                  <Sparkles className="w-5 h-5 text-fuchsia-500" />
+                  <Coins className="w-5 h-5 text-yellow-500" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500">
                     {t("profile.aiCredits")}
                   </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {t("profile.creditsRemaining", { count: profile?.credits ?? 0 })}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <Coins className="w-4 h-4 text-yellow-500" />
+                    <span className="text-lg font-bold text-gray-900">
+                      {profile?.credits ?? 0}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
