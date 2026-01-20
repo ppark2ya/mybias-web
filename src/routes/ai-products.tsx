@@ -67,15 +67,15 @@ const models: AIModel[] = [
   {
     id: "lookbook",
     name: "AI Lookbook",
-    modelName: "Virtual Try-On",
-    credits: 2,
-    description: "가상으로 옷을 입어볼 수 있습니다. 원하는 의상을 선택하고 착용 모습을 미리 확인하세요",
+    modelName: "Virtual Try-On + Face Swap",
+    credits: 7,
+    description: "가상으로 옷을 입어볼 수 있습니다. AI가 자동으로 얼굴을 복원하여 자연스러운 결과를 제공합니다",
     technicalDetails:
-      "AI-powered virtual try-on technology - Upload your photo and see how different outfits look on you",
+      "Two-stage AI processing: IDM-VTON for virtual try-on + Face Swap for natural face restoration (7 credits total)",
     useCases: [
       "구매 전 가상 피팅",
       "다양한 스타일 시도",
-      "코디 미리보기",
+      "자연스러운 얼굴 복원",
     ],
     beforeImage: "https://assets.savemybias.com/ai-examples/virtual-lookbook-before-v2.png",
     afterImage: "https://assets.savemybias.com/ai-examples/virtual-lookbook-after-v2.png",
