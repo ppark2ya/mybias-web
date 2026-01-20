@@ -4,6 +4,37 @@ export default {
     "home.title": "나만의 최애 갤러리",
     "home.subtitle": "소중한 추억을 아름답게 담아보세요",
 
+    // Navigation
+    "nav.aiTools": "AI 도구",
+    "nav.pricing": "요금제",
+    "nav.credits": "크레딧",
+    "nav.viewAllProducts": "모든 AI 상품 보기",
+    "nav.tools.upscale": "AI 업스케일",
+    "nav.tools.upscaleDesc": "화질 개선",
+    "nav.tools.eraser": "AI 지우개",
+    "nav.tools.eraserDesc": "원치 않는 객체 제거",
+    "nav.tools.lookbook": "AI 룩북",
+    "nav.tools.lookbookDesc": "가상 피팅",
+
+    // AI Feature Cards
+    "aiFeatures.badge": "AI 기반 사진 도구",
+    "aiFeatures.title": "어떤 작업을 하시겠어요?",
+    "aiFeatures.subtitle": "최첨단 AI 기술로 사진을 완벽하게 보정하세요",
+    "aiFeatures.directEdit.name": "직접 편집",
+    "aiFeatures.directEdit.description": "자르기, 크기 조정, 블러 등",
+    "aiFeatures.upscale.name": "AI 업스케일",
+    "aiFeatures.upscale.description": "화질 개선 & 얼굴 복원",
+    "aiFeatures.proRestore.name": "Pro 복원",
+    "aiFeatures.proRestore.description": "프리미엄 듀얼 AI 블렌딩",
+    "aiFeatures.eraser.name": "AI 지우개",
+    "aiFeatures.eraser.description": "원치 않는 객체 제거",
+    "aiFeatures.lookbook.name": "AI 룩북",
+    "aiFeatures.lookbook.description": "가상 의류 피팅",
+    "aiFeatures.free": "무료",
+    "aiFeatures.credits": "{{count}} 크레딧",
+    "aiFeatures.uploadDirect": "또는 사진을 직접 업로드",
+    "aiFeatures.backToFeatures": "AI 도구로 돌아가기",
+
     // Uploader
     "uploader.title": "소중한 순간을 담아주세요",
     "uploader.dragActive": "여기에 놓아주세요",

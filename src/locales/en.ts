@@ -4,6 +4,37 @@ export default {
     "home.title": "SaveMyBias Gallery",
     "home.subtitle": "Capture your precious memories beautifully",
 
+    // Navigation
+    "nav.aiTools": "AI Tools",
+    "nav.pricing": "Pricing",
+    "nav.credits": "Credits",
+    "nav.viewAllProducts": "View all AI products",
+    "nav.tools.upscale": "AI Upscale",
+    "nav.tools.upscaleDesc": "Enhance image quality",
+    "nav.tools.eraser": "Magic Eraser",
+    "nav.tools.eraserDesc": "Remove unwanted objects",
+    "nav.tools.lookbook": "AI Lookbook",
+    "nav.tools.lookbookDesc": "Virtual try-on",
+
+    // AI Feature Cards
+    "aiFeatures.badge": "AI-Powered Photo Tools",
+    "aiFeatures.title": "What would you like to do?",
+    "aiFeatures.subtitle": "Choose a tool to enhance your photos with cutting-edge AI technology",
+    "aiFeatures.directEdit.name": "Direct Edit",
+    "aiFeatures.directEdit.description": "Crop, resize, blur and more",
+    "aiFeatures.upscale.name": "AI Upscale",
+    "aiFeatures.upscale.description": "Enhance quality & restore faces",
+    "aiFeatures.proRestore.name": "Pro Restore",
+    "aiFeatures.proRestore.description": "Premium dual AI blending",
+    "aiFeatures.eraser.name": "Magic Eraser",
+    "aiFeatures.eraser.description": "Remove unwanted objects",
+    "aiFeatures.lookbook.name": "AI Lookbook",
+    "aiFeatures.lookbook.description": "Virtual clothing try-on",
+    "aiFeatures.free": "Free",
+    "aiFeatures.credits": "{{count}} credits",
+    "aiFeatures.uploadDirect": "Or upload photos directly",
+    "aiFeatures.backToFeatures": "Back to AI tools",
+
     // Uploader
     "uploader.title": "Capture your precious moments",
     "uploader.dragActive": "Drop here",
