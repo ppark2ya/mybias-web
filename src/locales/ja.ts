@@ -204,6 +204,27 @@ export default {
     "seo.features.privacy.title": "安全な写真保管",
     "seo.features.privacy.description":
       "復元された画像は「マイギャラリー」に安全に保存され、いつでも閲覧・ダウンロードできます。大切な思い出を失う心配なく安心してご利用ください。",
+    "aiFeatures.lookbook.name": "AIルックブック",
+    "aiFeatures.lookbook.description": "仮想試着",
+
+    // AI Lookbook page
+    "lookbook.accessoryNotice": "眼鏡やサングラスなどの顔アクセサリーを着用した写真の場合、AIの顔復元処理により元の顔と異なる印象を与える可能性があります。",
+    "lookbook.title": "AI Lookbook",
+    "lookbook.subtitle": "Virtually try on any outfit with our AI stylist",
+    "lookbook.inputA": "Input A: Your Model",
+    "lookbook.inputB": "Input B: Clothing Item",
+    "lookbook.result": "Result",
+    "lookbook.uploadModel": "Upload your photo",
+    "lookbook.uploadClothing": "Upload clothing",
+    "lookbook.bodySpecs": "Body Specifications (Optional)",
+    "lookbook.height": "Height (cm)",
+    "lookbook.weight": "Weight (kg)",
+    "lookbook.generate": "Generate Look",
+    "lookbook.generating": "Generating...",
+    "lookbook.download": "Download",
+    "lookbook.loginRequired": "Please log in to use AI Lookbook",
+    "lookbook.insufficientCredits": "Insufficient credits. Please purchase more credits.",
+    "lookbook.uploadBothImages": "Please upload both user and clothing images",
     "seo.features.mobile.title": "モバイル最適化",
     "seo.features.mobile.description":
       "アプリのインストール不要。iPhone、GalaxyなどのモバイルブラウザでもPCと同じ高性能AI写真復元機能をご利用いただけます。",
