@@ -256,8 +256,8 @@ async function triggerFaceSwap(
     body: JSON.stringify({
       version: FACE_SWAP_VERSION,
       input: {
-        target: stage1ResultUrl,
-        swap: originalImageUrl,
+        target_image: stage1ResultUrl,
+        swap_image: originalImageUrl,
         enhance_face: false,
       },
       ...(webhookUrl && {

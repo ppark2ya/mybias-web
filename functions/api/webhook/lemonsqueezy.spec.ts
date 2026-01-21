@@ -180,9 +180,56 @@ describe('POST /api/webhook/lemonsqueezy', () => {
     });
 
     const res = await onRequestPost(mockContext);
-    
+
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual({ received: true });
+  });
+
+  it('should match Ultra variant and add 450 credits', async () => {
+    mockRequest.json.mockResolvedValue({
+      meta: {
+        event_name: 'order_created',
+        custom_data: { user_id: 'user-123' },
+      },
+      data: {
+        id: 'order-1',
+        attributes: {
+          status: 'paid',
+          first_order_item: { variant_name: 'Ultra' },
+          user_email: 'test@example.com',
+        },
+      },
+    });
+
+    const res = await onRequestPost(mockContext);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.processed).toBe(true);
+    expect(mockDb.update).toHaveBeenCalled();
+  });
+
+  it('should match Master variant and add 1000 credits', async () => {
+    mockRequest.json.mockResolvedValue({
+      meta: {
+        event_name: 'order_created',
+        custom_data: { user_id: 'user-123' },
+      },
+      data: {
+        id: 'order-1',
+        attributes: {
+          status: 'paid',
+          first_order_item: { variant_name: 'Master' },
+          user_email: 'test@example.com',
+        },
+      },
+    });
+
+    const res = await onRequestPost(mockContext);
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.processed).toBe(true);
   });
 });

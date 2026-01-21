@@ -12,8 +12,8 @@ import {
   ChevronDown,
   ChevronUp,
   ImageUp,
-  WandSparkles,
   Eraser,
+  Shirt,
 } from "lucide-react";
 import Footer from "../components/Footer";
 import { useAuth } from "../hooks/useAuth";
@@ -351,21 +351,21 @@ export function Pricing() {
                 </p>
               </div>
 
-              {/* Pro Restoration */}
+              {/* AI Lookbook */}
               <div className="bg-white/10 rounded-xl p-4 hover:bg-white/15 transition-colors">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-purple-400/20 rounded-lg">
-                    <WandSparkles className="w-5 h-5 text-purple-300" />
+                  <div className="p-2 bg-cyan-400/20 rounded-lg">
+                    <Shirt className="w-5 h-5 text-cyan-300" />
                   </div>
-                  <span className="text-lg font-bold text-white">4 Credits</span>
+                  <span className="text-lg font-bold text-white">2 Credits</span>
                 </div>
                 <h3 className="font-semibold text-white mb-1">
-                  {t("pricing.usageGuide.pro.title", "Pro Restoration")}
+                  {t("pricing.usageGuide.lookbook.title", "AI Lookbook")}
                 </h3>
                 <p className="text-xs text-white/70">
                   {t(
-                    "pricing.usageGuide.pro.description",
-                    "AI redraws faces. Revive your blurry fancam shots."
+                    "pricing.usageGuide.lookbook.description",
+                    "Virtual try-on. See how outfits look on you."
                   )}
                 </p>
               </div>

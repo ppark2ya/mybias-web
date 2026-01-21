@@ -97,7 +97,8 @@ interface LemonSqueezyWebhookPayload {
 }
 
 /**
- * Plan definitions matching the Pricing page
+ * Plan credits mapping - matches LemonSqueezy variant names
+ * Variants: Tiny, Basic, Pro, Ultra, Master
  */
 const PLAN_CREDITS: Record<string, number> = {
   "tiny": 20,
@@ -111,18 +112,16 @@ const PLAN_CREDITS: Record<string, number> = {
  * Get credits amount based on variant name
  */
 function getCreditsForVariant(variantName: string): number {
-  // Normalize variant name to lowercase to match keys
   const normalizedName = variantName.toLowerCase();
-  
-  // Check if any plan name is contained in the variant name
+
   for (const [plan, credits] of Object.entries(PLAN_CREDITS)) {
     if (normalizedName.includes(plan)) {
+      console.log(`Matched plan "${plan}" for ${credits} credits`);
       return credits;
     }
   }
-  
-  // Default fallback (log warning in calling function if this happens)
-  console.warn(`Unknown variant name: ${variantName}, default to 0 credits`);
+
+  console.warn(`Unknown variant: ${variantName}`);
   return 0;
 }
 
@@ -303,7 +302,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         );
       }
 
-      // Determine credits based on variant
+      // Determine credits based on variant name
       const creditsToAdd = getCreditsForVariant(
         attributes.first_order_item.variant_name
       );
