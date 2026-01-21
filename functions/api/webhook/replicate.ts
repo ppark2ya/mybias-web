@@ -228,8 +228,8 @@ async function updateGenerationRecord(
 }
 
 // Face swap model
-const FACE_SWAP_MODEL = "codeplugtech/face-swap";
-const FACE_SWAP_VERSION = "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b34";
+const FACE_SWAP_MODEL = "lucataco/faceswap";
+const FACE_SWAP_VERSION = "9a4298548422074c3f57258c5d544497314ae4112df80d116f0d2109e843d20d";
 
 /**
  * Trigger Stage 2: Face Swap
@@ -256,8 +256,9 @@ async function triggerFaceSwap(
     body: JSON.stringify({
       version: FACE_SWAP_VERSION,
       input: {
-        input_image: stage1ResultUrl,  // Target image (IDM-VTON result with clothing)
-        swap_image: originalImageUrl,  // Source face (original user photo)
+        target: stage1ResultUrl,
+        swap: originalImageUrl,
+        enhance_face: false,
       },
       ...(webhookUrl && {
         webhook: webhookUrl,
