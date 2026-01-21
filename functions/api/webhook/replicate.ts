@@ -256,7 +256,7 @@ async function triggerFaceSwap(
     body: JSON.stringify({
       version: FACE_SWAP_VERSION,
       input: {
-        swap_image: originalImageUrl,  // Source face (original user photo)
+        input_image: originalImageUrl,  // Source face (original user photo)
         target_image: stage1ResultUrl,  // Target image (IDM-VTON result)
       },
       ...(webhookUrl && {
