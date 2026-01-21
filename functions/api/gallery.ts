@@ -55,6 +55,8 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
         outputImageUrl: imageGenerations.outputImageUrl,
         replicateOutputUrl: imageGenerations.replicateOutputUrl,
         createdAt: imageGenerations.createdAt,
+        stage: imageGenerations.stage,
+        parentId: imageGenerations.parentId,
       })
       .from(imageGenerations)
       .where(and(...conditions))
@@ -65,9 +67,26 @@ export const onRequestGet: PagesFunction<unknown, string, ContextData> = async (
     const hasMore = generations.length > limit;
     const results = hasMore ? generations.slice(0, limit) : generations;
 
-    // Filter only generations with output URL
+    // Get all Stage 1 prediction IDs that have a corresponding Stage 2
+    const stage1IdsWithStage2 = new Set(
+      results
+        .filter(g => g.stage === 2 && g.parentId)
+        .map(g => g.parentId)
+    );
+
+    // Filter only generations with output URL and exclude Stage 1 if Stage 2 exists
     const images = results
-      .filter((g) => g.outputImageUrl || g.replicateOutputUrl)
+      .filter((g) => {
+        // Must have output URL
+        if (!g.outputImageUrl && !g.replicateOutputUrl) return false;
+        
+        // If this is Stage 1 and has a Stage 2 child, exclude it
+        if (g.stage === 1 && stage1IdsWithStage2.has(g.predictionId)) {
+          return false;
+        }
+        
+        return true;
+      })
       .map((g) => ({
         id: g.id,
         predictionId: g.predictionId,
