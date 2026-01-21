@@ -5,7 +5,7 @@ import { Upload, X, Shirt, User, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { virtualTryOn, getStatus } from '@/api';
+import { virtualTryOn, getStatus, getChildPrediction } from '@/api';
 import { useAuth } from '@/hooks/useAuth';
 import { getImageDimensions, resizeImage, blobUrlToBase64, downloadImage } from '@/utils/imageEditor';
 
@@ -143,37 +143,75 @@ function AiLookbook() {
             processImage(clothingImage)
         ]);
 
-        // Call API
+        // Call API - this starts Stage 1 (IDM-VTON)
         const response = await virtualTryOn({
             human_image: humanImgBase64,
             garm_image: garmImgBase64,
-            garment_des: "A cool outfit" // TODO: Add input for description later
+            garment_des: "A cool outfit"
         });
 
         if (!response.id) {
             throw new Error("No prediction ID received");
         }
 
-        // Poll for status
+        const stage1PredictionId = response.id;
+        let stage1Complete = false;
+
+        // Poll for Stage 1 (IDM-VTON) completion
+        const pollStage1 = async () => {
+            const statusData = await getStatus(stage1PredictionId);
+            
+            if (statusData.status === 'succeeded') {
+                stage1Complete = true;
+                toast.success('Virtual try-on complete! Applying face swap...');
+                return true;
+            } else if (statusData.status === 'failed' || statusData.status === 'canceled') {
+                throw new Error(`Stage 1 failed: ${statusData.error || 'Unknown error'}`);
+            }
+            return false;
+        };
+
+        // Poll for Stage 2 (Face Swap) prediction ID and completion
+        const pollStage2 = async () => {
+            // First, check if Stage 2 prediction exists
+            const childResponse = await getChildPrediction(stage1PredictionId);
+            
+            if (!childResponse.child) {
+                // Stage 2 not started yet
+                return false;
+            }
+            
+            if (childResponse.child.status === 'succeeded' && childResponse.child.output) {
+                return { complete: true, output: childResponse.child.output };
+            } else if (childResponse.child.status === 'failed' || childResponse.child.status === 'canceled') {
+                throw new Error(`Face swap failed: ${childResponse.child.error || 'Unknown error'}`);
+            }
+            
+            return false;
+        };
+
+        // Start polling
         const pollInterval = setInterval(async () => {
             try {
-                const statusData = await getStatus(response.id);
-                if (statusData.status === 'succeeded' && statusData.output) {
+                // Stage 1: Poll until complete
+                if (!stage1Complete) {
+                    await pollStage1();
+                    return;
+                }
+                
+                // Stage 2: Poll for child prediction
+                const stage2Result = await pollStage2();
+                if (stage2Result && typeof stage2Result === 'object' && stage2Result.complete) {
                     clearInterval(pollInterval);
-                    
-                    // Handle output: IDM-VTON might return a list or string
-                    const outputUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output;
-                    setResultImage(outputUrl);
+                    setResultImage(stage2Result.output);
                     setIsGenerating(false);
-                    toast.success('Look generated successfully!');
-                } else if (statusData.status === 'failed' || statusData.status === 'canceled') {
-                    clearInterval(pollInterval);
-                    setIsGenerating(false);
-                    toast.error(`Generation failed: ${statusData.error || 'Unknown error'}`);
+                    toast.success('Face swap complete! Your look is ready!');
                 }
             } catch (err) {
-                console.error("Polling error", err);
-                // Don't stop polling immediately on transient errors, but maybe limit retries in prod
+                clearInterval(pollInterval);
+                console.error("Polling error:", err);
+                setIsGenerating(false);
+                toast.error(err instanceof Error ? err.message : "Generation failed");
             }
         }, 3000); // Poll every 3 seconds
 
