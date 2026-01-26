@@ -312,7 +312,7 @@ export function trackMagicEraserFail(errorMessage: string) {
 /**
  * Track login start event
  */
-export function trackLoginStart(method: "google" | "email") {
+export function trackLoginStart(method: "google" | "email" | "username") {
   trackEvent({
     category: EventCategory.AUTH,
     action: EventAction.LOGIN_START,
@@ -323,7 +323,7 @@ export function trackLoginStart(method: "google" | "email") {
 /**
  * Track login success event
  */
-export function trackLoginSuccess(method: "google" | "email") {
+export function trackLoginSuccess(method: "google" | "email" | "username") {
   trackEvent({
     category: EventCategory.AUTH,
     action: EventAction.LOGIN_SUCCESS,

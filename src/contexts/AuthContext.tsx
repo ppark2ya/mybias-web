@@ -17,6 +17,11 @@ export type AuthContextType = {
   isAuthenticated: boolean;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signInWithEmail: (email: string) => Promise<{ error: AuthError | null }>;
+  signUpWithPassword: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signInWithPassword: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+  signUpWithUsername: (username: string, password: string) => Promise<{ error: AuthError | null }>;
+  signInWithUsername: (username: string, password: string) => Promise<{ error: AuthError | null }>;
+  checkUsernameAvailability: (username: string) => Promise<boolean>;
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
 };
@@ -150,6 +155,108 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return { error };
   };
 
+  // Sign up with Email and Password
+  const signUpWithPassword = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    return { error };
+  };
+
+  // Sign in with Email and Password
+  const signInWithPassword = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
+  };
+
+  // Check if username is available
+  const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("username", username)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking username:", error);
+        return false;
+      }
+
+      // Username is available if no matching record found
+      return !data;
+    } catch (error) {
+      console.error("Error checking username:", error);
+      return false;
+    }
+  };
+
+  // Sign up with Username and Password
+  const signUpWithUsername = async (username: string, password: string) => {
+    try {
+      // First check if username is available
+      const isAvailable = await checkUsernameAvailability(username);
+      if (!isAvailable) {
+        return { error: { message: "Username already taken" } as AuthError };
+      }
+
+      // Use username as email with .local domain
+      const email = `${username}@mybias.local`;
+
+      // Sign up with Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      // Update profile with username
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ username })
+          .eq("id", data.user.id);
+
+        if (profileError) {
+          console.error("Error updating profile with username:", profileError);
+        }
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error("Error signing up with username:", error);
+      return { error: error as AuthError };
+    }
+  };
+
+  // Sign in with Username and Password
+  const signInWithUsername = async (username: string, password: string) => {
+    // Convert username to email format
+    const email = `${username}@mybias.local`;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
+  };
+
   // Sign out
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -169,6 +276,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated: !!user,
     signInWithGoogle,
     signInWithEmail,
+    signUpWithPassword,
+    signInWithPassword,
+    signUpWithUsername,
+    signInWithUsername,
+    checkUsernameAvailability,
     signOut,
     refreshProfile,
   };
