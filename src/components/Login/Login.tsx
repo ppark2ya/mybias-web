@@ -576,7 +576,7 @@ export function Login() {
               disabled={isLoading}
               className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t("login.continueWithEmail")}
+              {t("login.continueWithPassword")}
             </button>
             <button
               type="button"
