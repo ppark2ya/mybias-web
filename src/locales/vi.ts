@@ -8,6 +8,107 @@ export default {
     // Home page
     "home.title": "Bộ Sưu Tập Thần Tượng Của Tôi",
     "home.subtitle": "Lưu giữ những kỷ niệm quý giá của bạn một cách đẹp đẽ",
+    "home.heroTitle": "Biến Đổi Ảnh Với AI",
+    "home.heroSubtitle": "Nâng cấp, cải thiện và chỉnh sửa ảnh với công nghệ AI tiên tiến. Bắt đầu miễn phí.",
+    "home.uploadTitle": "Thả ảnh vào đây",
+    "home.uploadDesc": "hoặc nhấp để chọn từ thiết bị",
+    "home.uploadButton": "Chọn Ảnh",
+    "home.uploadFormats": "Hỗ trợ JPG, PNG, WEBP tối đa 10MB",
+    "home.orTryTools": "Hoặc thử công cụ AI trực tiếp",
+    "home.learnMore": "Tìm hiểu thêm về công cụ AI",
+
+    // About page
+    "about.backToHome": "Quay Về Trang Chủ",
+
+    // Landing page sections
+    "landing.features.title": "Công Cụ AI Mạnh Mẽ Trong Tầm Tay",
+    "landing.features.subtitle": "Chỉnh sửa ảnh chuyên nghiệp trở nên đơn giản với bộ công cụ AI",
+    "landing.features.upscale.name": "AI Nâng Cấp",
+    "landing.features.upscale.description": "Biến ảnh mờ, độ phân giải thấp thành ảnh HD sắc nét. AI khôi phục chi tiết khuôn mặt, cải thiện tông da và làm sắc nét từng pixel.",
+    "landing.features.eraser.name": "Tẩy Thần Kỳ",
+    "landing.features.eraser.description": "Xóa các đối tượng, người hoặc khuyết điểm không mong muốn khỏi ảnh. AI điền nền thông minh cho kết quả hoàn hảo.",
+    "landing.features.lookbook.name": "AI Lookbook",
+    "landing.features.lookbook.description": "Thử quần áo ảo. Tải ảnh lên và xem các trang phục khác nhau trông như thế nào trước khi mua.",
+    "landing.tryNow": "Thử Ngay",
+
+    "landing.howItWorks.title": "Cách Thức Hoạt Động",
+    "landing.howItWorks.subtitle": "Nhận kết quả tuyệt vời chỉ trong 3 bước đơn giản",
+    "landing.howItWorks.step1.title": "Tải Lên",
+    "landing.howItWorks.step1.description": "Kéo thả ảnh hoặc nhấp để tải lên",
+    "landing.howItWorks.step2.title": "Chọn Công Cụ AI",
+    "landing.howItWorks.step2.description": "Chọn nâng cấp, tẩy hoặc công cụ khác",
+    "landing.howItWorks.step3.title": "Tải Xuống",
+    "landing.howItWorks.step3.description": "Nhận ảnh đã cải thiện ngay lập tức",
+
+    "landing.benefits.title": "Tại Sao Chọn MyBias?",
+    "landing.benefits.fast.title": "Xử Lý Siêu Nhanh",
+    "landing.benefits.fast.description": "Nhận kết quả trong vài giây với xử lý AI GPU",
+    "landing.benefits.secure.title": "Bảo Mật Đầu Tiên",
+    "landing.benefits.secure.description": "Ảnh được xử lý an toàn và không bao giờ được chia sẻ",
+    "landing.benefits.mobile.title": "Hoạt Động Mọi Nơi",
+    "landing.benefits.mobile.description": "Sử dụng trên mọi thiết bị - di động, máy tính bảng hoặc máy tính",
+    "landing.benefits.quality.title": "Chất Lượng Chuyên Nghiệp",
+    "landing.benefits.quality.description": "Kết quả chất lượng studio với AI tiên tiến",
+
+    "landing.cta.title": "Sẵn Sàng Biến Đổi Ảnh?",
+    "landing.cta.subtitle": "Tham gia cùng hàng nghìn người dùng tin tưởng MyBias",
+    "landing.cta.button": "Bắt Đầu Miễn Phí",
+    "landing.cta.learnMore": "Tìm Hiểu Thêm",
+
+    "landing.trust.noSignup": "Không cần đăng ký",
+    "landing.trust.freeCredits": "10 điểm miễn phí",
+    "landing.trust.noWatermark": "Không có watermark",
+
+    // Navigation
+    "nav.aiTools": "Công Cụ AI",
+    "nav.pricing": "Bảng Giá",
+    "nav.credits": "Điểm",
+    "nav.viewAllProducts": "Xem tất cả sản phẩm AI",
+    "nav.tools.upscale": "AI Nâng Cấp",
+    "nav.tools.upscaleDesc": "Cải thiện chất lượng ảnh",
+    "nav.tools.eraser": "Tẩy Thần Kỳ",
+    "nav.tools.eraserDesc": "Xóa đối tượng không mong muốn",
+    "nav.tools.lookbook": "AI Lookbook",
+    "nav.tools.lookbookDesc": "Thử đồ ảo",
+    "nav.moreTools": "Thêm",
+
+    // AI Feature Cards
+    "aiFeatures.badge": "Công Cụ Ảnh AI",
+    "aiFeatures.title": "Bạn muốn làm gì?",
+    "aiFeatures.subtitle": "Chọn công cụ để cải thiện ảnh với công nghệ AI tiên tiến",
+    "aiFeatures.directEdit.name": "Chỉnh Sửa Trực Tiếp",
+    "aiFeatures.directEdit.description": "Cắt, thay đổi kích thước, làm mờ và hơn thế nữa",
+    "aiFeatures.upscale.name": "AI Nâng Cấp",
+    "aiFeatures.upscale.description": "Cải thiện chất lượng & khôi phục khuôn mặt",
+    "aiFeatures.proRestore.name": "Pro Khôi Phục",
+    "aiFeatures.proRestore.description": "Kết hợp AI kép cao cấp",
+    "aiFeatures.eraser.name": "Tẩy Thần Kỳ",
+    "aiFeatures.eraser.description": "Xóa đối tượng không mong muốn",
+    "aiFeatures.lookbook.name": "AI Lookbook",
+    "aiFeatures.lookbook.description": "Thử quần áo ảo",
+    "aiFeatures.free": "Miễn phí",
+    "aiFeatures.credits": "{{count}} điểm",
+    "aiFeatures.uploadDirect": "Hoặc tải ảnh trực tiếp",
+    "aiFeatures.backToFeatures": "Quay lại công cụ AI",
+
+    // AI Lookbook page
+    "lookbook.title": "AI Lookbook",
+    "lookbook.subtitle": "Thử quần áo ảo với AI stylist",
+    "lookbook.accessoryNotice": "Ảnh có phụ kiện khuôn mặt như kính hoặc kính râm có thể cho thấy sự khác biệt so với khuôn mặt gốc do quá trình khôi phục khuôn mặt AI.",
+    "lookbook.inputA": "Đầu vào A: Mẫu của bạn",
+    "lookbook.inputB": "Đầu vào B: Quần áo",
+    "lookbook.result": "Kết quả",
+    "lookbook.uploadModel": "Tải ảnh của bạn",
+    "lookbook.uploadClothing": "Tải quần áo",
+    "lookbook.bodySpecs": "Thông số cơ thể (Tùy chọn)",
+    "lookbook.height": "Chiều cao (cm)",
+    "lookbook.weight": "Cân nặng (kg)",
+    "lookbook.generate": "Tạo Look",
+    "lookbook.generating": "Đang tạo...",
+    "lookbook.download": "Tải Xuống",
+    "lookbook.loginRequired": "Vui lòng đăng nhập để sử dụng AI Lookbook",
+    "lookbook.insufficientCredits": "Không đủ điểm. Vui lòng mua thêm điểm.",
+    "lookbook.uploadBothImages": "Vui lòng tải lên cả ảnh người dùng và quần áo",
 
     // Uploader
     "uploader.title": "Lưu giữ những khoảnh khắc quý giá của bạn",
@@ -26,12 +127,9 @@ export default {
     "editor.pleaseWait": "Vui lòng chờ",
 
     // Editor - AI Enhancement
-    "editor.ai.loginRequired":
-      "Vui lòng đăng nhập để sử dụng tính năng cải thiện AI.",
-    "editor.ai.insufficientCredits":
-      "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
-    "editor.ai.limitReached":
-      "Bạn đã sử dụng hết lượt cải thiện AI hôm nay. Vui lòng thử lại vào ngày mai!",
+    "editor.ai.loginRequired": "Vui lòng đăng nhập để sử dụng tính năng cải thiện AI.",
+    "editor.ai.insufficientCredits": "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
+    "editor.ai.limitReached": "Bạn đã sử dụng hết lượt cải thiện AI hôm nay. Vui lòng thử lại vào ngày mai!",
     "editor.ai.preparingImage": "Đang chuẩn bị hình ảnh...",
     "editor.ai.requestingServer": "Đang yêu cầu máy chủ AI...",
     "editor.ai.analyzingFaces": "AI đang phân tích khuôn mặt...",
@@ -48,8 +146,7 @@ export default {
     "editor.ai.preview.subtitle": "Xem trước kết quả dự kiến",
     "editor.ai.preview.before": "TRƯỚC",
     "editor.ai.preview.after": "SAU (Xem trước)",
-    "editor.ai.preview.info":
-      "Kết quả AI thực tế có thể khác với bản xem trước này. Cải thiện AI khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể.",
+    "editor.ai.preview.info": "Kết quả AI thực tế có thể khác với bản xem trước này. Cải thiện AI khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể.",
     "editor.ai.preview.remaining": "Còn {{count}} lượt hôm nay",
     "editor.ai.preview.cancel": "Hủy",
     "editor.ai.preview.enhance": "Cải thiện với AI",
@@ -62,21 +159,54 @@ export default {
     "editor.ai.result.subtitle": "So sánh trước và sau",
     "editor.ai.result.before": "TRƯỚC",
     "editor.ai.result.after": "SAU",
-    "editor.ai.result.info":
-      "AI đã khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể. Sử dụng hoàn tác nếu bạn muốn hoàn nguyên.",
+    "editor.ai.result.info": "AI đã khôi phục chi tiết khuôn mặt, cải thiện tông da và tăng chất lượng hình ảnh tổng thể. Sử dụng hoàn tác nếu bạn muốn hoàn nguyên.",
     "editor.ai.result.confirm": "Xong",
+
+    // Editor - Pro Restore
+    "editor.proRestore.resizingImage": "Đang thay đổi kích thước ảnh...",
+    "editor.proRestore.preparingImage": "Đang chuẩn bị hình ảnh...",
+    "editor.proRestore.requestingServer": "Đang yêu cầu mô hình AI kép...",
+    "editor.proRestore.analyzingImage": "Đang phân tích cấu trúc hình ảnh...",
+    "editor.proRestore.restoringDetails": "Đang khôi phục chi tiết tinh tế...",
+    "editor.proRestore.enhancingSkinTone": "Đang hoàn thiện kết cấu da...",
+    "editor.proRestore.optimizingColors": "Đang cải thiện đặc điểm khuôn mặt...",
+    "editor.proRestore.upscaling": "Đang nâng cấp lên độ phân giải cao...",
+    "editor.proRestore.blending": "Đang pha trộn kết quả cho vẻ tự nhiên...",
+    "editor.proRestore.almostDone": "Sắp xong rồi!",
+    "editor.proRestore.downloadingImage": "Đang hoàn thiện hình ảnh...",
+    "editor.proRestore.failed": "Khôi phục Pro thất bại. Vui lòng thử lại.",
+    "editor.proRestore.timeout": "Phản hồi máy chủ AI bị chậm. Vui lòng thử lại sau.",
+    "editor.proRestore.preview.title": "Khôi Phục Pro",
+    "editor.proRestore.preview.subtitle": "Kết hợp AI kép cho kết quả chất lượng cao tự nhiên",
+    "editor.proRestore.preview.before": "TRƯỚC",
+    "editor.proRestore.preview.after": "SAU (Xem trước)",
+    "editor.proRestore.preview.info": "Khôi phục Pro kết hợp Real-ESRGAN (kết cấu da) với CodeFormer (đặc điểm khuôn mặt) để mang lại kết quả tự nhiên không có vẻ AI như sáp.",
+    "editor.proRestore.preview.fidelity": "Khôi Phục Khuôn Mặt",
+    "editor.proRestore.preview.fidelityLow": "Khôi phục mạnh hơn",
+    "editor.proRestore.preview.fidelityHigh": "Giữ đặc điểm gốc",
+    "editor.proRestore.preview.cancel": "Hủy",
+    "editor.proRestore.preview.restore": "Bắt Đầu Khôi Phục Pro",
+    "editor.proRestore.preview.creditCost": "điểm mỗi lần sử dụng",
+    "editor.proRestore.result.title": "Khôi Phục Pro Hoàn Tất",
+    "editor.proRestore.result.subtitle": "So sánh trước và sau",
+    "editor.proRestore.result.before": "TRƯỚC",
+    "editor.proRestore.result.after": "SAU",
+    "editor.proRestore.result.info": "Kết hợp AI kép đã khôi phục đặc điểm khuôn mặt trong khi giữ kết cấu da tự nhiên. Sử dụng hoàn tác để hoàn nguyên.",
+    "editor.proRestore.result.confirm": "Xong",
+    "editor.proRestore.features.upscale2x": "Nâng cấp 2x",
+    "editor.proRestore.features.skinTone": "Kết cấu da tự nhiên",
+    "editor.proRestore.features.colorCorrection": "Đặc điểm khuôn mặt sắc nét",
+    "editor.proRestore.features.promptGuided": "Kết hợp AI kép",
 
     // Editor - Magic Eraser
     "editor.eraser.title": "Tẩy Thần Kỳ",
     "editor.eraser.subtitle": "Vẽ lên vùng bạn muốn xóa",
-    "editor.eraser.info":
-      "Vẽ lên các đối tượng không mong muốn để xóa chúng. AI sẽ điền nền một cách tự nhiên.",
+    "editor.eraser.info": "Vẽ lên các đối tượng không mong muốn để xóa chúng. AI sẽ điền nền một cách tự nhiên.",
     "editor.eraser.remaining": "Còn {{count}} lượt",
     "editor.eraser.cancel": "Hủy",
     "editor.eraser.erase": "Xóa",
     "editor.eraser.loginRequired": "Vui lòng đăng nhập để sử dụng Tẩy Thần Kỳ.",
-    "editor.eraser.insufficientCredits":
-      "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
+    "editor.eraser.insufficientCredits": "Không đủ điểm. Vui lòng nạp thêm và thử lại.",
     "editor.eraser.preparingImage": "Đang chuẩn bị hình ảnh...",
     "editor.eraser.requestingServer": "Đang yêu cầu máy chủ AI...",
     "editor.eraser.processingAI": "AI đang xử lý...",
@@ -86,8 +216,7 @@ export default {
     "editor.eraser.almostDone": "Sắp xong rồi!",
     "editor.eraser.downloadingImage": "Đang tải xuống hình ảnh...",
     "editor.eraser.failed": "Tẩy thần kỳ thất bại. Vui lòng thử lại.",
-    "editor.eraser.timeout":
-      "Phản hồi máy chủ AI bị chậm. Vui lòng thử lại sau.",
+    "editor.eraser.timeout": "Phản hồi máy chủ AI bị chậm. Vui lòng thử lại sau.",
 
     // Share Modal
     "share.title": "Chia Sẻ",
@@ -95,69 +224,55 @@ export default {
     "share.copyLink": "Sao Chép Liên Kết",
     "share.saveImage": "Lưu Hình Ảnh",
     "share.message": "Ảnh được tạo tại SaveMyBias Gallery!",
-    "share.linkCopiedKakao":
-      "Đã sao chép liên kết. Vui lòng dán vào KakaoTalk!",
-    "share.shareFromKakaoApp":
-      "Vui lòng chia sẻ trực tiếp từ ứng dụng KakaoTalk.",
+    "share.linkCopiedKakao": "Đã sao chép liên kết. Vui lòng dán vào KakaoTalk!",
+    "share.shareFromKakaoApp": "Vui lòng chia sẻ trực tiếp từ ứng dụng KakaoTalk.",
     "share.linkCopied": "Đã sao chép liên kết!",
     "share.copyFailed": "Sao chép liên kết thất bại.",
     "share.viewOnWeb": "Xem trên Web",
 
     // SEO Content - Intro
-    "seo.intro.title":
-      "Công Cụ Khôi Phục Ảnh & Nâng Cao Chất Lượng Bằng AI (MyBias)",
-    "seo.intro.description1":
-      "MyBias là công cụ khôi phục ảnh AI trực tuyến giúp nâng cao ảnh mờ, độ phân giải thấp thành hình ảnh sắc nét, chất lượng cao. Sử dụng công nghệ khôi phục ảnh và nâng cao chất lượng tiên tiến, chúng tôi giúp bạn phục hồi những kỷ niệm quý giá từ ảnh Low-resolution photos chất lượng thấp, ảnh sự kiện hoặc ảnh cũ.",
-    "seo.intro.description2":
-      "Engine AI của chúng tôi chuyên về khôi phục ảnh và nâng cao chất lượng. Được xây dựng trên thuật toán CodeFormer và Real-ESRGAN, nó phân tích các đặc điểm khuôn mặt bị hư hỏng và khôi phục chi tiết bị mất một cách tự nhiên, mang lại sự sống cho ảnh của bạn với độ rõ nét và sắc nét được cải thiện.",
+    "seo.intro.title": "Công Cụ Khôi Phục Ảnh & Nâng Cao Chất Lượng Bằng AI (MyBias)",
+    "seo.intro.description1": "MyBias là công cụ khôi phục ảnh AI trực tuyến giúp nâng cao ảnh mờ, độ phân giải thấp thành hình ảnh sắc nét, chất lượng cao. Sử dụng công nghệ khôi phục ảnh và nâng cao chất lượng tiên tiến, chúng tôi giúp bạn phục hồi những kỷ niệm quý giá từ ảnh chất lượng thấp, ảnh sự kiện hoặc ảnh cũ.",
+    "seo.intro.description2": "Engine AI của chúng tôi chuyên về khôi phục ảnh và nâng cao chất lượng. Được xây dựng trên thuật toán CodeFormer và Real-ESRGAN, nó phân tích các đặc điểm khuôn mặt bị hư hỏng và khôi phục chi tiết bị mất một cách tự nhiên, mang lại sự sống cho ảnh của bạn với độ rõ nét và sắc nét được cải thiện.",
 
     // SEO Content - How-to
     "seo.howto.title": "Khôi Phục Ảnh Trong 3 Bước Đơn Giản",
     "seo.howto.step1.title": "Tải Lên Hình Ảnh",
-    "seo.howto.step1.description":
-      "Nhấp vào nút 'Chọn Tệp' để tải lên ảnh bạn muốn khôi phục từ thư viện. Chúng tôi hỗ trợ hầu hết các định dạng hình ảnh bao gồm JPG, PNG và WEBP. (Tối đa 5MB)",
+    "seo.howto.step1.description": "Nhấp vào nút 'Chọn Tệp' để tải lên ảnh bạn muốn khôi phục từ thư viện. Chúng tôi hỗ trợ hầu hết các định dạng hình ảnh bao gồm JPG, PNG và WEBP. (Tối đa 5MB)",
     "seo.howto.step2.title": "Xử Lý Khôi Phục AI",
-    "seo.howto.step2.description":
-      "Sau khi tải lên, mô hình AI của chúng tôi chạy trên máy chủ GPU đám mây. Khôi phục ảnh và Nâng cao chất lượng hoạt động đồng thời, và quá trình này có thể mất khoảng 10 đến 30 giây tùy thuộc vào độ phức tạp của ảnh.",
+    "seo.howto.step2.description": "Sau khi tải lên, mô hình AI của chúng tôi chạy trên máy chủ GPU đám mây. Khôi phục ảnh và Nâng cao chất lượng hoạt động đồng thời, và quá trình này có thể mất khoảng 10 đến 30 giây tùy thuộc vào độ phức tạp của ảnh.",
     "seo.howto.step3.title": "So Sánh & Tải Xuống",
-    "seo.howto.step3.description":
-      "Khi quá trình khôi phục hoàn tất, so sánh bản gốc và kết quả bằng thanh trượt. Nếu bạn thích, nhấn nút tải xuống để lưu hoặc chia sẻ trực tiếp lên mạng xã hội.",
+    "seo.howto.step3.description": "Khi quá trình khôi phục hoàn tất, so sánh bản gốc và kết quả bằng thanh trượt. Nếu bạn thích, nhấn nút tải xuống để lưu hoặc chia sẻ trực tiếp lên mạng xã hội.",
 
     // SEO Content - Features
     "seo.features.title": "Tại Sao Chọn MyBias?",
     "seo.features.ai.title": "AI Chuyên Về Khôi Phục Ảnh",
-    "seo.features.ai.description":
-      "Khác với các công cụ phóng to thông thường, chúng tôi sử dụng các mô hình học sâu chuyên về khôi phục đặc điểm khuôn mặt và nâng cao chất lượng, làm nổi bật sống động mắt, lông mi và kết cấu môi.",
+    "seo.features.ai.description": "Khác với các công cụ phóng to thông thường, chúng tôi sử dụng các mô hình học sâu chuyên về khôi phục đặc điểm khuôn mặt và nâng cao chất lượng, làm nổi bật sống động mắt, lông mi và kết cấu môi.",
     "seo.features.privacy.title": "Lưu Trữ Ảnh An Toàn",
-    "seo.features.privacy.description":
-      "Hình ảnh được khôi phục được lưu trữ an toàn trong 'Bộ Sưu Tập Của Tôi' nơi bạn có thể xem và tải xuống bất cứ lúc nào. Không lo mất những kỷ niệm quý giá của bạn.",
+    "seo.features.privacy.description": "Hình ảnh được khôi phục được lưu trữ an toàn trong 'Bộ Sưu Tập Của Tôi' nơi bạn có thể xem và tải xuống bất cứ lúc nào. Không lo mất những kỷ niệm quý giá của bạn.",
     "seo.features.mobile.title": "Tối Ưu Cho Di Động",
-    "seo.features.mobile.description":
-      "Không cần cài đặt ứng dụng. Tận hưởng các tính năng khôi phục ảnh AI hiệu suất cao tương tự trên trình duyệt di động như iPhone và Galaxy như trên PC.",
+    "seo.features.mobile.description": "Không cần cài đặt ứng dụng. Tận hưởng các tính năng khôi phục ảnh AI hiệu suất cao tương tự trên trình duyệt di động như iPhone và Galaxy như trên PC.",
 
     // SEO Content - Safe Use Policy
     "seo.safeuse.title": "Chính Sách Sử Dụng An Toàn",
-    "seo.safeuse.description":
-      "Chúng tôi nghiêm cấm deepfake, tạo nội dung khỏa thân/khiêu dâm và tổng hợp hình ảnh bất hợp pháp. Công nghệ của chúng tôi được thiết kế độc quyền cho mục đích khôi phục ảnh và nâng cao chất lượng hợp pháp.",
+    "seo.safeuse.description": "Chúng tôi nghiêm cấm deepfake, tạo nội dung khỏa thân/khiêu dâm và tổng hợp hình ảnh bất hợp pháp. Công nghệ của chúng tôi được thiết kế độc quyền cho mục đích khôi phục ảnh và nâng cao chất lượng hợp pháp.",
 
     // SEO Content - FAQ
     "seo.faq.title": "Câu Hỏi Thường Gặp",
     "seo.faq.q1": "Dịch vụ này có miễn phí không?",
-    "seo.faq.a1":
-      "Bạn nhận được 5 điểm miễn phí khi đăng ký. Sau khi sử dụng hết điểm miễn phí, bạn có thể mua thêm điểm để tiếp tục sử dụng dịch vụ.",
+    "seo.faq.a1": "Bạn nhận được 10 điểm miễn phí khi đăng ký. Sau khi sử dụng hết điểm miễn phí, bạn có thể mua thêm điểm để tiếp tục sử dụng dịch vụ.",
     "seo.faq.q2": "Loại ảnh nào cho kết quả tốt nhất?",
-    "seo.faq.a2":
-      "Ảnh có khuôn mặt nhìn thẳng và không quá nhỏ cho kết quả tốt nhất. Hình ảnh bị pixel hóa nghiêm trọng (mức khảm) hoặc ảnh toàn thân mà khuôn mặt rất nhỏ có thể có hiệu quả khôi phục giảm.",
+    "seo.faq.a2": "Ảnh có khuôn mặt nhìn thẳng và không quá nhỏ cho kết quả tốt nhất. Hình ảnh bị pixel hóa nghiêm trọng (mức khảm) hoặc ảnh toàn thân mà khuôn mặt rất nhỏ có thể có hiệu quả khôi phục giảm.",
     "seo.faq.q3": "Tốc độ chuyển đổi chậm.",
-    "seo.faq.a3":
-      "Đây là quá trình nặng sử dụng GPU hiệu suất cao để vẽ lại từng pixel. Vào giờ cao điểm, thời gian chờ có thể hơi lâu hơn. Cảm ơn sự kiên nhẫn của bạn.",
+    "seo.faq.a3": "Đây là quá trình nặng sử dụng GPU hiệu suất cao để vẽ lại từng pixel. Vào giờ cao điểm, thời gian chờ có thể hơi lâu hơn. Cảm ơn sự kiên nhẫn của bạn.",
     "seo.faq.q4": "Ảnh của tôi có được lưu trên máy chủ không?",
-    "seo.faq.a4":
-      "Khi bạn đăng ký và sử dụng chuyển đổi AI, hình ảnh kết quả được lưu trên máy chủ và có thể xem và tải xuống bất cứ lúc nào từ 'Bộ Sưu Tập Của Tôi'. Chuyển đổi AI chỉ dành cho người dùng đã đăng ký.",
+    "seo.faq.a4": "Khi bạn đăng ký và sử dụng chuyển đổi AI, hình ảnh kết quả được lưu trên máy chủ và có thể xem và tải xuống bất cứ lúc nào từ 'Bộ Sưu Tập Của Tôi'. Chuyển đổi AI chỉ dành cho người dùng đã đăng ký.",
 
     // User
     "user.login": "Đăng Nhập",
     "user.menu": "Menu Người Dùng",
+    "user.pricing": "Bảng Giá",
+    "user.aiProducts": "Sản Phẩm AI",
     "user.profile": "Hồ Sơ",
     "user.gallery": "Bộ Sưu Tập Của Tôi",
     "user.creditHistory": "Lịch Sử Điểm",
@@ -215,8 +330,7 @@ export default {
     "login.invalidEmail": "Vui lòng nhập email hợp lệ",
     "login.emailSent": "Đã gửi liên kết đăng nhập đến email của bạn!",
     "login.checkEmail": "Kiểm tra email của bạn",
-    "login.emailSentDescription":
-      "Chúng tôi đã gửi liên kết đăng nhập đến {{email}}. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết.",
+    "login.emailSentDescription": "Chúng tôi đã gửi liên kết đăng nhập đến {{email}}. Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết.",
     "login.tryAnotherMethod": "Thử phương thức khác",
     "login.termsText": "Bằng cách tiếp tục, bạn đồng ý với",
     "login.termsLink": "Điều Khoản Dịch Vụ",
@@ -227,6 +341,11 @@ export default {
     "auth.signingIn": "Đang đăng nhập...",
     "auth.error": "Lỗi Đăng Nhập",
     "auth.tryAgain": "Thử Lại",
+
+    // 404
+    "404.title": "Không Tìm Thấy Trang",
+    "404.subtitle": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.",
+    "404.backToHome": "Quay Về Trang Chủ",
 
     // Footer
     "footer.rights": "Đã đăng ký bản quyền.",
@@ -242,54 +361,39 @@ export default {
     "terms.lastUpdated": "Cập Nhật Lần Cuối",
     "terms.updateDate": "Ngày 6 tháng 1 năm 2025",
     "terms.section1.title": "1. Tổng Quan Dịch Vụ",
-    "terms.section1.content":
-      "MyBias (sau đây gọi là 'Dịch Vụ') là công cụ trực tuyến sử dụng công nghệ trí tuệ nhân tạo (AI) được thiết kế đặc biệt cho việc khôi phục ảnh và nâng cao chất lượng. Dịch vụ của chúng tôi giúp người dùng khôi phục ảnh mờ hoặc độ phân giải thấp thành chất lượng cao hơn bằng cách cải thiện chi tiết khuôn mặt, tông da và chất lượng hình ảnh tổng thể. Bằng cách sử dụng Dịch Vụ này, bạn đồng ý bị ràng buộc bởi các Điều Khoản Dịch Vụ này.",
+    "terms.section1.content": "MyBias (sau đây gọi là 'Dịch Vụ') là công cụ trực tuyến sử dụng công nghệ trí tuệ nhân tạo (AI) được thiết kế đặc biệt cho việc khôi phục ảnh và nâng cao chất lượng. Dịch vụ của chúng tôi giúp người dùng khôi phục ảnh mờ hoặc độ phân giải thấp thành chất lượng cao hơn bằng cách cải thiện chi tiết khuôn mặt, tông da và chất lượng hình ảnh tổng thể. Bằng cách sử dụng Dịch Vụ này, bạn đồng ý bị ràng buộc bởi các Điều Khoản Dịch Vụ này.",
     "terms.section2.title": "2. Chính Sách Sử Dụng An Toàn",
-    "terms.section2.content":
-      "Chúng tôi nghiêm cấm việc tạo deepfake, tạo nội dung khỏa thân/khiêu dâm, tổng hợp hình ảnh bất hợp pháp và mọi hình thức thao túng hình ảnh không có sự đồng ý. Công nghệ AI của chúng tôi được thiết kế độc quyền cho mục đích khôi phục ảnh và nâng cao chất lượng hợp pháp. Chúng tôi tích cực giám sát và chặn kỹ thuật các nỗ lực lạm dụng dịch vụ của chúng tôi. Vi phạm sẽ dẫn đến việc chấm dứt tài khoản ngay lập tức và có thể được báo cáo cho các cơ quan có thẩm quyền.",
+    "terms.section2.content": "Chúng tôi nghiêm cấm việc tạo deepfake, tạo nội dung khỏa thân/khiêu dâm, tổng hợp hình ảnh bất hợp pháp và mọi hình thức thao túng hình ảnh không có sự đồng ý. Công nghệ AI của chúng tôi được thiết kế độc quyền cho mục đích khôi phục ảnh và nâng cao chất lượng hợp pháp. Chúng tôi tích cực giám sát và chặn kỹ thuật các nỗ lực lạm dụng dịch vụ của chúng tôi. Vi phạm sẽ dẫn đến việc chấm dứt tài khoản ngay lập tức và có thể được báo cáo cho các cơ quan có thẩm quyền.",
     "terms.section3.title": "3. Điều Khoản Sử Dụng",
-    "terms.section3.content":
-      "Người dùng chỉ có thể tải lên hình ảnh mà họ sở hữu bản quyền hoặc được phép sử dụng. Cấm tải lên hình ảnh vi phạm bản quyền, quyền hình ảnh hoặc các quyền khác của người khác. Cấm nghiêm ngặt việc tải lên nội dung bất hợp pháp hoặc có hại (nội dung khiêu dâm, hình ảnh bạo lực, phát ngôn thù địch, v.v.).",
+    "terms.section3.content": "Người dùng chỉ có thể tải lên hình ảnh mà họ sở hữu bản quyền hoặc được phép sử dụng. Cấm tải lên hình ảnh vi phạm bản quyền, quyền hình ảnh hoặc các quyền khác của người khác. Cấm nghiêm ngặt việc tải lên nội dung bất hợp pháp hoặc có hại (nội dung khiêu dâm, hình ảnh bạo lực, phát ngôn thù địch, v.v.).",
     "terms.section4.title": "4. Quyền Sở Hữu Trí Tuệ",
-    "terms.section4.content":
-      "Tất cả quyền đối với hình ảnh gốc do người dùng tải lên vẫn thuộc về người dùng tương ứng. Dịch vụ chỉ sử dụng hình ảnh đã tải lên cho mục đích xử lý và tự động xóa chúng khỏi máy chủ trong khoảng thời gian quy định sau khi xử lý. Logo, thiết kế, mô hình AI và công nghệ của Dịch Vụ là tài sản của MyBias, và việc sao chép và sử dụng trái phép bị cấm.",
+    "terms.section4.content": "Tất cả quyền đối với hình ảnh gốc do người dùng tải lên vẫn thuộc về người dùng tương ứng. Dịch vụ chỉ sử dụng hình ảnh đã tải lên cho mục đích xử lý và tự động xóa chúng khỏi máy chủ trong khoảng thời gian quy định sau khi xử lý. Logo, thiết kế, mô hình AI và công nghệ của Dịch Vụ là tài sản của MyBias, và việc sao chép và sử dụng trái phép bị cấm.",
     "terms.section5.title": "5. Tuyên Bố Miễn Trừ",
-    "terms.section5.content":
-      "Dịch Vụ được cung cấp 'nguyên trạng' mà không có bất kỳ bảo đảm nào về sự phù hợp cho một mục đích cụ thể, độ chính xác hoặc tính hoàn chỉnh. Chất lượng của kết quả được xử lý bởi AI có thể thay đổi tùy thuộc vào tình trạng của hình ảnh gốc. MyBias sẽ không chịu trách nhiệm về bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, đặc biệt hoặc do hậu quả nào phát sinh từ việc sử dụng Dịch Vụ.",
+    "terms.section5.content": "Dịch Vụ được cung cấp 'nguyên trạng' mà không có bất kỳ bảo đảm nào về sự phù hợp cho một mục đích cụ thể, độ chính xác hoặc tính hoàn chỉnh. Chất lượng của kết quả được xử lý bởi AI có thể thay đổi tùy thuộc vào tình trạng của hình ảnh gốc. MyBias sẽ không chịu trách nhiệm về bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, đặc biệt hoặc do hậu quả nào phát sinh từ việc sử dụng Dịch Vụ.",
     "terms.section6.title": "6. Sửa Đổi và Chấm Dứt Dịch Vụ",
-    "terms.section6.content":
-      "MyBias bảo lưu quyền sửa đổi, tạm ngừng hoặc chấm dứt toàn bộ hoặc một phần Dịch Vụ mà không cần thông báo trước. MyBias sẽ không chịu trách nhiệm về thiệt hại do gián đoạn dịch vụ.",
+    "terms.section6.content": "MyBias bảo lưu quyền sửa đổi, tạm ngừng hoặc chấm dứt toàn bộ hoặc một phần Dịch Vụ mà không cần thông báo trước. MyBias sẽ không chịu trách nhiệm về thiệt hại do gián đoạn dịch vụ.",
     "terms.section7.title": "7. Thay Đổi Điều Khoản",
-    "terms.section7.content":
-      "Các Điều Khoản Dịch Vụ này có thể được thay đổi khi cần thiết. Các thay đổi quan trọng sẽ được thông báo qua các thông báo trong Dịch Vụ. Nếu bạn không đồng ý với các điều khoản đã thay đổi, bạn phải ngừng sử dụng Dịch Vụ.",
+    "terms.section7.content": "Các Điều Khoản Dịch Vụ này có thể được thay đổi khi cần thiết. Các thay đổi quan trọng sẽ được thông báo qua các thông báo trong Dịch Vụ. Nếu bạn không đồng ý với các điều khoản đã thay đổi, bạn phải ngừng sử dụng Dịch Vụ.",
     "terms.section8.title": "8. Liên Hệ",
-    "terms.section8.content":
-      "Nếu bạn có bất kỳ câu hỏi nào về các Điều Khoản Dịch Vụ này, vui lòng liên hệ với chúng tôi tại support@savemybias.com.",
+    "terms.section8.content": "Nếu bạn có bất kỳ câu hỏi nào về các Điều Khoản Dịch Vụ này, vui lòng liên hệ với chúng tôi tại support@savemybias.com.",
 
     // Privacy Policy
     "privacy.title": "Chính Sách Quyền Riêng Tư",
     "privacy.lastUpdated": "Cập Nhật Lần Cuối",
     "privacy.updateDate": "Ngày 6 tháng 1 năm 2025",
     "privacy.section1.title": "1. Thông Tin Chúng Tôi Thu Thập",
-    "privacy.section1.content":
-      "MyBias chỉ xử lý thông tin tối thiểu cần thiết để cung cấp Dịch Vụ. Hình ảnh đã tải lên: Được lưu trữ tạm thời trên máy chủ để xử lý nâng cao chất lượng bằng AI. Thông tin được thu thập tự động: Cookie, nhật ký truy cập (địa chỉ IP, loại trình duyệt, thời gian truy cập, v.v.) có thể được thu thập để cải thiện và phân tích dịch vụ.",
+    "privacy.section1.content": "MyBias chỉ xử lý thông tin tối thiểu cần thiết để cung cấp Dịch Vụ. Hình ảnh đã tải lên: Được lưu trữ tạm thời trên máy chủ để xử lý nâng cao chất lượng bằng AI. Thông tin được thu thập tự động: Cookie, nhật ký truy cập (địa chỉ IP, loại trình duyệt, thời gian truy cập, v.v.) có thể được thu thập để cải thiện và phân tích dịch vụ.",
     "privacy.section2.title": "2. Mục Đích Sử Dụng Thông Tin",
-    "privacy.section2.content":
-      "Thông tin được thu thập chỉ được sử dụng cho các mục đích sau: Cung cấp dịch vụ xử lý hình ảnh AI, cải thiện chất lượng dịch vụ và phân tích lỗi, phân tích thống kê sử dụng (dữ liệu ẩn danh).",
+    "privacy.section2.content": "Thông tin được thu thập chỉ được sử dụng cho các mục đích sau: Cung cấp dịch vụ xử lý hình ảnh AI, cải thiện chất lượng dịch vụ và phân tích lỗi, phân tích thống kê sử dụng (dữ liệu ẩn danh).",
     "privacy.section3.title": "3. Lưu Giữ và Xóa Thông Tin",
-    "privacy.section3.content":
-      "Hình ảnh đã tải lên được tự động và vĩnh viễn xóa khỏi máy chủ trong vòng tối đa 1 giờ sau khi xử lý hoàn tất. Nhật ký truy cập được lưu giữ tối đa 90 ngày cho mục đích phân tích dịch vụ sau đó bị xóa. Người dùng có thể yêu cầu xóa thông tin cá nhân bất cứ lúc nào.",
+    "privacy.section3.content": "Hình ảnh đã tải lên được tự động và vĩnh viễn xóa khỏi máy chủ trong vòng tối đa 1 giờ sau khi xử lý hoàn tất. Nhật ký truy cập được lưu giữ tối đa 90 ngày cho mục đích phân tích dịch vụ sau đó bị xóa. Người dùng có thể yêu cầu xóa thông tin cá nhân bất cứ lúc nào.",
     "privacy.section4.title": "4. Chia Sẻ Thông Tin",
-    "privacy.section4.content":
-      "MyBias không bán, cho thuê hoặc chia sẻ thông tin cá nhân của người dùng với bên thứ ba. Tuy nhiên, thông tin tối thiểu có thể được chia sẻ chỉ khi được yêu cầu theo pháp luật hoặc thiết yếu cho hoạt động dịch vụ (ví dụ: dịch vụ lưu trữ đám mây).",
+    "privacy.section4.content": "MyBias không bán, cho thuê hoặc chia sẻ thông tin cá nhân của người dùng với bên thứ ba. Tuy nhiên, thông tin tối thiểu có thể được chia sẻ chỉ khi được yêu cầu theo pháp luật hoặc thiết yếu cho hoạt động dịch vụ (ví dụ: dịch vụ lưu trữ đám mây).",
     "privacy.section5.title": "5. Sử Dụng Cookie",
-    "privacy.section5.content":
-      "Dịch Vụ có thể sử dụng cookie để nâng cao trải nghiệm người dùng và phân tích dịch vụ. Người dùng có thể từ chối sử dụng cookie thông qua cài đặt trình duyệt, nhưng một số tính năng dịch vụ có thể bị hạn chế.",
+    "privacy.section5.content": "Dịch Vụ có thể sử dụng cookie để nâng cao trải nghiệm người dùng và phân tích dịch vụ. Người dùng có thể từ chối sử dụng cookie thông qua cài đặt trình duyệt, nhưng một số tính năng dịch vụ có thể bị hạn chế.",
     "privacy.section6.title": "6. Bảo Vệ Trẻ Em",
-    "privacy.section6.content":
-      "Dịch Vụ này không dành cho trẻ em dưới 14 tuổi. Nếu chúng tôi biết rằng thông tin cá nhân từ trẻ em dưới 14 tuổi đã được thu thập, chúng tôi sẽ xóa thông tin đó ngay lập tức.",
+    "privacy.section6.content": "Dịch Vụ này không dành cho trẻ em dưới 14 tuổi. Nếu chúng tôi biết rằng thông tin cá nhân từ trẻ em dưới 14 tuổi đã được thu thập, chúng tôi sẽ xóa thông tin đó ngay lập tức.",
     "privacy.section7.title": "7. Liên Hệ",
-    "privacy.section7.content":
-      "Nếu bạn có bất kỳ câu hỏi nào về thực tiễn quyền riêng tư của chúng tôi, vui lòng liên hệ với chúng tôi tại support@savemybias.com.",
+    "privacy.section7.content": "Nếu bạn có bất kỳ câu hỏi nào về thực tiễn quyền riêng tư của chúng tôi, vui lòng liên hệ với chúng tôi tại support@savemybias.com.",
   },
 };
