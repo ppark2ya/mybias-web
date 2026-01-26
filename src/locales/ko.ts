@@ -56,7 +56,7 @@ export default {
     "landing.cta.learnMore": "더 알아보기",
 
     "landing.trust.noSignup": "가입 필요 없음",
-    "landing.trust.freeCredits": "무료 크레딧 5개",
+    "landing.trust.freeCredits": "무료 크레딧 10개",
     "landing.trust.noWatermark": "워터마크 없음",
 
     // Navigation

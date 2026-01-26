@@ -56,7 +56,7 @@ export default {
     "landing.cta.learnMore": "Learn More",
 
     "landing.trust.noSignup": "No signup required",
-    "landing.trust.freeCredits": "5 free credits",
+    "landing.trust.freeCredits": "10 free credits",
     "landing.trust.noWatermark": "No watermarks",
 
     // Navigation

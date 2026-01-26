@@ -419,7 +419,7 @@ export function Home() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-green-400" />
-              <span>{t("landing.trust.freeCredits", "5 free credits")}</span>
+              <span>{t("landing.trust.freeCredits", "10 free credits")}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-green-400" />
