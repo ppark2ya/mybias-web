@@ -17,6 +17,14 @@ export type AuthContextType = {
   isAuthenticated: boolean;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
   signInWithEmail: (email: string) => Promise<{ error: AuthError | null }>;
+  signInWithPassword: (
+    email: string,
+    password: string
+  ) => Promise<{ error: AuthError | null }>;
+  signUpWithPassword: (
+    email: string,
+    password: string
+  ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   refreshProfile: () => Promise<void>;
 };
@@ -150,6 +158,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return { error };
   };
 
+  // Sign in with Email and Password
+  const signInWithPassword = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
+  };
+
+  // Sign up with Email and Password
+  const signUpWithPassword = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    return { error };
+  };
+
   // Sign out
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -169,6 +198,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated: !!user,
     signInWithGoogle,
     signInWithEmail,
+    signInWithPassword,
+    signUpWithPassword,
     signOut,
     refreshProfile,
   };
