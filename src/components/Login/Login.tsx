@@ -3,15 +3,25 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { SocialButton } from "./SocialButton";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { trackLoginStart } from "../../utils/analytics";
 
+type AuthMode = "select" | "login" | "signup" | "magiclink";
+
 export function Login() {
   const { t } = useTranslation();
-  const { signInWithGoogle, signInWithEmail } = useAuth();
+  const {
+    signInWithGoogle,
+    signInWithEmail,
+    signInWithPassword,
+    signUpWithPassword,
+  } = useAuth();
   const [email, setEmail] = useState("");
-  const [isEmailMode, setIsEmailMode] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>("select");
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
@@ -51,6 +61,82 @@ export function Login() {
     toast.success(t("login.emailSent"));
   };
 
+  const handlePasswordLogin = async () => {
+    if (!email) {
+      toast.error(t("login.enterEmail"));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error(t("login.invalidEmail"));
+      return;
+    }
+
+    if (!password) {
+      toast.error(t("login.enterPassword"));
+      return;
+    }
+
+    setIsLoading(true);
+    trackLoginStart("password");
+    const { error } = await signInWithPassword(email, password);
+    setIsLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!email) {
+      toast.error(t("login.enterEmail"));
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error(t("login.invalidEmail"));
+      return;
+    }
+
+    if (!password) {
+      toast.error(t("login.enterPassword"));
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error(t("login.passwordTooShort"));
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error(t("login.passwordMismatch"));
+      return;
+    }
+
+    setIsLoading(true);
+    trackLoginStart("signup");
+    const { error } = await signUpWithPassword(email, password);
+    setIsLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    setEmailSent(true);
+    toast.success(t("login.signupEmailSent"));
+  };
+
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+    setEmailSent(false);
+    setAuthMode("select");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-fuchsia-500 via-purple-500 to-cyan-400 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Back to Home Link */}
@@ -86,21 +172,19 @@ export function Login() {
               {t("login.checkEmail")}
             </h3>
             <p className="text-gray-600 mb-6">
-              {t("login.emailSentDescription", { email })}
+              {authMode === "signup"
+                ? t("login.signupEmailSentDescription", { email })
+                : t("login.emailSentDescription", { email })}
             </p>
             <button
               type="button"
-              onClick={() => {
-                setEmailSent(false);
-                setEmail("");
-                setIsEmailMode(false);
-              }}
+              onClick={resetForm}
               className="text-purple-600 hover:text-purple-700 font-medium"
             >
               {t("login.tryAnotherMethod")}
             </button>
           </div>
-        ) : !isEmailMode ? (
+        ) : authMode === "select" ? (
           /* Social Login Buttons */
           <div className="space-y-3 mb-6">
             <SocialButton
@@ -115,8 +199,8 @@ export function Login() {
               )}
             </SocialButton>
           </div>
-        ) : (
-          /* Email Login Form */
+        ) : authMode === "magiclink" ? (
+          /* Magic Link Email Form */
           <div className="mb-6">
             <label
               htmlFor="email"
@@ -139,6 +223,86 @@ export function Login() {
               }}
             />
           </div>
+        ) : (
+          /* Email/Password Login or Signup Form */
+          <div className="space-y-4 mb-6">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                {t("login.emailLabel")}
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("login.emailPlaceholder")}
+                disabled={isLoading}
+                className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                {t("login.passwordLabel")}
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={t("login.passwordPlaceholder")}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isLoading && authMode === "login") {
+                      handlePasswordLogin();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+            {authMode === "signup" && (
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  {t("login.confirmPasswordLabel")}
+                </label>
+                <input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder={t("login.confirmPasswordPlaceholder")}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all text-base disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !isLoading) {
+                      handleSignUp();
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
         )}
 
         {/* Divider - hide when email sent */}
@@ -155,47 +319,140 @@ export function Login() {
           </div>
         )}
 
-        {/* Email Login Toggle / Continue Button - hide when email sent */}
-        {!emailSent && (
-          !isEmailMode ? (
+        {/* Action Buttons - hide when email sent */}
+        {!emailSent && authMode === "select" && (
+          <div className="space-y-3">
             <button
               type="button"
-              onClick={() => setIsEmailMode(true)}
+              onClick={() => setAuthMode("login")}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("login.loginWithEmail")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMode("signup")}
               disabled={isLoading}
               className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-purple-600 border-2 border-purple-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t("login.continueWithEmail")}
+              {t("login.createAccount")}
             </button>
-          ) : (
-            <div className="space-y-3">
+          </div>
+        )}
+
+        {!emailSent && authMode === "magiclink" && (
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={handleEmailContinue}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t("login.sending")}
+                </>
+              ) : (
+                t("login.sendMagicLink")
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("login.back")}
+            </button>
+          </div>
+        )}
+
+        {!emailSent && authMode === "login" && (
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={handlePasswordLogin}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t("login.loggingIn")}
+                </>
+              ) : (
+                t("login.loginButton")
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMode("magiclink")}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-purple-600 hover:text-purple-700 transition-all duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("login.forgotPassword")}
+            </button>
+            <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+              <span>{t("login.noAccount")}</span>
               <button
                 type="button"
-                onClick={handleEmailContinue}
+                onClick={() => setAuthMode("signup")}
                 disabled={isLoading}
-                className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="text-purple-600 hover:text-purple-700 font-medium"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    {t("login.sending")}
-                  </>
-                ) : (
-                  t("login.continue")
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEmailMode(false);
-                  setEmail("");
-                }}
-                disabled={isLoading}
-                className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t("login.back")}
+                {t("login.signupLink")}
               </button>
             </div>
-          )
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("login.back")}
+            </button>
+          </div>
+        )}
+
+        {!emailSent && authMode === "signup" && (
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={handleSignUp}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t("login.signingUp")}
+                </>
+              ) : (
+                t("login.signupButton")
+              )}
+            </button>
+            <div className="flex items-center justify-center gap-1 text-sm text-gray-600">
+              <span>{t("login.haveAccount")}</span>
+              <button
+                type="button"
+                onClick={() => setAuthMode("login")}
+                disabled={isLoading}
+                className="text-purple-600 hover:text-purple-700 font-medium"
+              >
+                {t("login.loginLink")}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={resetForm}
+              disabled={isLoading}
+              className="w-full px-6 py-3.5 rounded-xl font-medium text-base text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t("login.back")}
+            </button>
+          </div>
         )}
 
         {/* Terms & Privacy */}
