@@ -1,21 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { SocialButton } from "./SocialButton";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { trackLoginStart } from "../../utils/analytics";
+import { trackLoginStart, trackLoginSuccess } from "../../utils/analytics";
 
 type AuthMode = "select" | "login" | "signup" | "magiclink";
 
 export function Login() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     signInWithGoogle,
     signInWithEmail,
     signInWithPassword,
     signUpWithPassword,
+    isAuthenticated,
   } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +26,13 @@ export function Login() {
   const [authMode, setAuthMode] = useState<AuthMode>("select");
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  // Redirect to home if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({ to: "/" });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -86,6 +95,10 @@ export function Login() {
       toast.error(error.message);
       return;
     }
+
+    // Login successful - track and redirect to home
+    trackLoginSuccess("password");
+    navigate({ to: "/" });
   };
 
   const handleSignUp = async () => {
